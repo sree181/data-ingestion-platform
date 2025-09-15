@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2025-08-11T22:45:00.000Z" agent="5.0" etag="drawio" version="24.7.8" type="device">
+  <diagram name="Data Flow End-to-End" id="data-flow">
+    <mxGraphModel dx="1422" dy="754" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Stage 1: Data Ingestion -->
+        <mxCell id="ingestion-stage" value="1. Data Ingestion" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1565c0;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="60" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="user" value="👤 User" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1565c0;fontFamily=Inter;" parent="ingestion-stage" vertex="1">
+          <mxGeometry x="20" y="30" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="upload" value="📄 Document&#xa;Upload" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1565c0;fontFamily=Inter;" parent="ingestion-stage" vertex="1">
+          <mxGeometry x="100" y="30" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="batch" value="📦 Batch&#xa;Processing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1565c0;fontFamily=Inter;" parent="ingestion-stage" vertex="1">
+          <mxGeometry x="20" y="80" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="streaming" value="🌊 Streaming&#xa;Data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1565c0;fontFamily=Inter;" parent="ingestion-stage" vertex="1">
+          <mxGeometry x="100" y="80" width="80" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Stage 2: Initial Processing -->
+        <mxCell id="initial-stage" value="2. Initial Processing" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#4a148c;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="280" y="60" width="180" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="api-gw" value="🔀 API Gateway&#xa;Authentication&#xa;&amp; Routing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#4a148c;fontFamily=Inter;" parent="initial-stage" vertex="1">
+          <mxGeometry x="20" y="30" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="queue" value="📬 Kafka Queue&#xa;Event Distribution" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#4a148c;fontFamily=Inter;" parent="initial-stage" vertex="1">
+          <mxGeometry x="20" y="90" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Stage 3: Document Processing -->
+        <mxCell id="doc-stage" value="3. Document Processing Pipeline" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="500" y="60" width="220" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="doc-ai" value="🧠 LlamaParse&#xa;Intelligent Parsing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontFamily=Inter;" parent="doc-stage" vertex="1">
+          <mxGeometry x="20" y="30" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ocr" value="👁️ OCR Engine&#xa;Text Extraction" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontFamily=Inter;" parent="doc-stage" vertex="1">
+          <mxGeometry x="120" y="30" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="structure" value="🏗️ Structure Analysis&#xa;Layout Understanding" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontFamily=Inter;" parent="doc-stage" vertex="1">
+          <mxGeometry x="60" y="80" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Stage 4: Content Analysis -->
+        <mxCell id="content-stage" value="4. Content Analysis" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="760" y="60" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="nlp" value="🔤 NLP Processing&#xa;Named Entity&#xa;Recognition" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontFamily=Inter;" parent="content-stage" vertex="1">
+          <mxGeometry x="20" y="30" width="70" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="embedding" value="🧮 Vector&#xa;Embeddings&#xa;Semantic Analysis" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontFamily=Inter;" parent="content-stage" vertex="1">
+          <mxGeometry x="110" y="30" width="70" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="entity-ext" value="🏷️ Entity Extraction&#xa;People, Places,&#xa;Organizations" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontFamily=Inter;" parent="content-stage" vertex="1">
+          <mxGeometry x="55" y="90" width="90" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Stage 5: Knowledge Construction -->
+        <mxCell id="knowledge-stage" value="5. Knowledge Construction" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c2185b;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="240" width="280" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="graph-build" value="🕸️ Knowledge Graph&#xa;Relationship Mapping" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c2185b;fontFamily=Inter;" parent="knowledge-stage" vertex="1">
+          <mxGeometry x="20" y="30" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="enrichment" value="⭐ Entity Enrichment&#xa;External Data Sources" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c2185b;fontFamily=Inter;" parent="knowledge-stage" vertex="1">
+          <mxGeometry x="120" y="30" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="classification" value="📂 Document&#xa;Classification&#xa;Content Categorization" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c2185b;fontFamily=Inter;" parent="knowledge-stage" vertex="1">
+          <mxGeometry x="70" y="90" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Stage 6: Storage & Indexing -->
+        <mxCell id="storage-stage" value="6. Storage &amp; Indexing" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#00695c;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="240" width="280" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="search-idx" value="🔍 Search Index&#xa;Full-text &amp; Semantic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#00695c;fontFamily=Inter;" parent="storage-stage" vertex="1">
+          <mxGeometry x="20" y="30" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="graph-db" value="🗂️ Graph Database&#xa;Entities &amp; Relationships" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#00695c;fontFamily=Inter;" parent="storage-stage" vertex="1">
+          <mxGeometry x="120" y="30" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="obj-store" value="💾 Object Storage&#xa;Original Documents" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#00695c;fontFamily=Inter;" parent="storage-stage" vertex="1">
+          <mxGeometry x="20" y="90" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="meta-db" value="🗃️ Metadata DB&#xa;Processing Status" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#00695c;fontFamily=Inter;" parent="storage-stage" vertex="1">
+          <mxGeometry x="120" y="90" width="80" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Stage 7: AI Services -->
+        <mxCell id="ai-stage" value="7. AI-Powered Services" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#558b2f;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="680" y="240" width="280" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="chat-ai" value="💬 Document Chat&#xa;Q&amp;A with Context" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#558b2f;fontFamily=Inter;" parent="ai-stage" vertex="1">
+          <mxGeometry x="20" y="30" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="insight" value="📊 Insight Generation&#xa;Pattern Analysis" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#558b2f;fontFamily=Inter;" parent="ai-stage" vertex="1">
+          <mxGeometry x="120" y="30" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="recommend" value="🎯 Recommendations&#xa;Related Content" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#558b2f;fontFamily=Inter;" parent="ai-stage" vertex="1">
+          <mxGeometry x="70" y="90" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Stage 8: User Interface -->
+        <mxCell id="ui-stage" value="8. User Interface" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#ff8f00;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="420" width="920" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="dashboard" value="📈 Analytics Dashboard&#xa;KPIs &amp; Metrics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#ff8f00;fontFamily=Inter;" parent="ui-stage" vertex="1">
+          <mxGeometry x="40" y="30" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="search-ui" value="🔎 Advanced Search&#xa;Multi-modal Queries" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#ff8f00;fontFamily=Inter;" parent="ui-stage" vertex="1">
+          <mxGeometry x="200" y="30" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="graph-viz" value="🌐 Graph Visualization&#xa;Interactive Exploration" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#ff8f00;fontFamily=Inter;" parent="ui-stage" vertex="1">
+          <mxGeometry x="360" y="30" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="chat-ui" value="💭 Chat Interface&#xa;Natural Language Queries" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#ff8f00;fontFamily=Inter;" parent="ui-stage" vertex="1">
+          <mxGeometry x="520" y="30" width="120" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Data Flow Arrows -->
+        <mxCell id="flow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=3;endArrow=block;" parent="1" source="upload" target="api-gw" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=3;endArrow=block;" parent="1" source="queue" target="doc-ai" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=3;endArrow=block;" parent="1" source="structure" target="nlp" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=3;endArrow=block;" parent="1" source="entity-ext" target="graph-build" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=3;endArrow=block;" parent="1" source="graph-build" target="search-idx" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=3;endArrow=block;" parent="1" source="search-idx" target="chat-ai" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=3;endArrow=block;" parent="1" source="chat-ai" target="dashboard" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Return Flow -->
+        <mxCell id="return1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4caf50;strokeWidth=2;endArrow=block;dashed=1;" parent="1" source="dashboard" target="user" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="100" y="550" />
+              <mxPoint x="20" y="550" />
+              <mxPoint x="20" y="30" />
+              <mxPoint x="70" y="30" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Title -->
+        <mxCell id="title" value="Nuve Platform - End-to-End Data Flow Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontFamily=Inter;fontColor=#1a202c;" parent="1" vertex="1">
+          <mxGeometry x="350" y="20" width="450" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend" value="Flow Direction: Data Processing →&#xa;User Feedback: ← Response" style="text;html=1;strokeColor=#1976d2;fillColor=#e3f2fd;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontFamily=Inter;" parent="1" vertex="1">
+          <mxGeometry x="1000" y="450" width="150" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

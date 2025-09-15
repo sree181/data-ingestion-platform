@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-08-06T17:08:50.963248",
+  "stats": {
+    "total_documents": 100,
+    "processed": 99,
+    "failed": 1,
+    "skipped": 0,
+    "start_time": "2025-08-06 15:51:23.477049",
+    "errors": [
+      "Failed to process bulk_1754423148_9322: Processing timeout"
+    ]
+  },
+  "processing_time_seconds": 4647.485881
+}

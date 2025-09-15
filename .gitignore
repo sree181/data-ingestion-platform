@@ -1,0 +1,101 @@
+# Docker and containers
+.env
+.env.local
+.env.production
+docker-compose.override.yml
+*.log
+
+# Data and volumes
+data/
+logs/
+volumes/
+elasticsearch_data/
+postgres_data/
+redis_data/
+minio_data/
+kafka_data/
+zookeeper_data/
+neo4j_data/
+neo4j_logs/
+neo4j_import/
+neo4j_plugins/
+kibana_data/
+chromadb_data/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node.js (for frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Security and secrets
+*.key
+*.pem
+*.p12
+secrets/
+.secrets/
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/

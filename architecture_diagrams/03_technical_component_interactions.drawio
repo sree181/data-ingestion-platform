@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2025-08-11T22:45:00.000Z" agent="5.0" etag="drawio" version="24.7.8" type="device">
+  <diagram name="Technical Component Interactions" id="tech-components">
+    <mxGraphModel dx="1422" dy="754" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Frontend Layer -->
+        <mxCell id="frontend-layer" value="Frontend Layer" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#0277bd;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="60" width="200" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="react" value="React UI&#xa;📱 Modern Interface&#xa;Real-time Updates&#xa;Theme Toggle &amp; Logo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#0277bd;fontFamily=Inter;fontSize=10;" parent="frontend-layer" vertex="1">
+          <mxGeometry x="20" y="25" width="160" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- API Layer -->
+        <mxCell id="api-layer" value="API Layer" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="280" y="60" width="200" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway" value="FastAPI Gateway&#xa;🚪 Single Entry Point&#xa;JWT Authentication&#xa;Rate Limiting" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontFamily=Inter;fontSize=10;" parent="api-layer" vertex="1">
+          <mxGeometry x="20" y="25" width="160" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- Microservices -->
+        <mxCell id="microservices-layer" value="Microservices" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#388e3c;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="200" width="620" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="doc-proc" value="Document Processor&#xa;📄 LlamaParse Integration&#xa;Multi-format Support&#xa;OCR Capabilities" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#388e3c;fontFamily=Inter;fontSize=9;" parent="microservices-layer" vertex="1">
+          <mxGeometry x="20" y="30" width="110" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="chatbot" value="Document Chat&#xa;🤖 AI-Powered Q&amp;A&#xa;Context-Aware Responses&#xa;OpenAI Integration" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#388e3c;fontFamily=Inter;fontSize=9;" parent="microservices-layer" vertex="1">
+          <mxGeometry x="150" y="30" width="110" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="entity-svc" value="Entity Service&#xa;🏷️ Named Entity Recognition&#xa;Firecrawl Web Enrichment&#xa;Data Validation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#388e3c;fontFamily=Inter;fontSize=9;" parent="microservices-layer" vertex="1">
+          <mxGeometry x="280" y="30" width="110" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="knowledge-svc" value="Knowledge Builder&#xa;🧠 Graph Construction&#xa;Relationship Mapping&#xa;Pattern Recognition" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#388e3c;fontFamily=Inter;fontSize=9;" parent="microservices-layer" vertex="1">
+          <mxGeometry x="410" y="30" width="110" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="stream-svc" value="Stream Processor&#xa;⚡ Real-time Processing&#xa;Apache Spark Integration&#xa;Event-driven Architecture" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#388e3c;fontFamily=Inter;fontSize=9;" parent="microservices-layer" vertex="1">
+          <mxGeometry x="255" y="100" width="110" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Data Storage -->
+        <mxCell id="storage-layer" value="Data Storage" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="400" width="620" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="elastic" value="Elasticsearch&#xa;🔍 Full-text Search&#xa;Vector Similarity&#xa;Real-time Indexing&#xa;Horizontal Scaling" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontFamily=Inter;fontSize=9;" parent="storage-layer" vertex="1">
+          <mxGeometry x="20" y="30" width="110" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="neo4j-db" value="Neo4j Graph DB&#xa;🕸️ Knowledge Graph&#xa;Cypher Queries&#xa;Relationship Analytics&#xa;Graph Algorithms" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontFamily=Inter;fontSize=9;" parent="storage-layer" vertex="1">
+          <mxGeometry x="150" y="30" width="110" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="postgres-db" value="PostgreSQL&#xa;🗃️ ACID Transactions&#xa;User Management&#xa;Processing Metadata&#xa;Audit Trails" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontFamily=Inter;fontSize=9;" parent="storage-layer" vertex="1">
+          <mxGeometry x="280" y="30" width="110" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="minio-db" value="MinIO Object Store&#xa;💾 S3-Compatible&#xa;Document Versioning&#xa;Multi-part Uploads&#xa;High Availability" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontFamily=Inter;fontSize=9;" parent="storage-layer" vertex="1">
+          <mxGeometry x="410" y="30" width="110" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="redis-db" value="Redis Cache&#xa;⚡ Session Management&#xa;Real-time Cache&#xa;Pub/Sub Messaging&#xa;High Performance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontFamily=Inter;fontSize=9;" parent="storage-layer" vertex="1">
+          <mxGeometry x="255" y="110" width="110" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Event Streaming -->
+        <mxCell id="streaming-layer" value="Event Streaming" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c2185b;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="700" y="60" width="200" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="kafka-stream" value="Apache Kafka&#xa;📡 Event Streaming&#xa;Message Durability&#xa;Horizontal Scaling&#xa;Real-time Processing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c2185b;fontFamily=Inter;fontSize=9;" parent="streaming-layer" vertex="1">
+          <mxGeometry x="20" y="30" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="zk" value="Zookeeper&#xa;🎯 Service Coordination&#xa;Configuration Management&#xa;Leader Election" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c2185b;fontFamily=Inter;fontSize=9;" parent="streaming-layer" vertex="1">
+          <mxGeometry x="20" y="110" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Processing Engine -->
+        <mxCell id="processing-layer" value="Processing Engine" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#00695c;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="700" y="260" width="200" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="spark-master" value="Spark Master&#xa;⚙️ Job Scheduling&#xa;Resource Management&#xa;Fault Tolerance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#00695c;fontFamily=Inter;fontSize=9;" parent="processing-layer" vertex="1">
+          <mxGeometry x="20" y="30" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="spark-worker" value="Spark Workers&#xa;🔄 Distributed Processing&#xa;ETL Operations&#xa;ML Pipelines" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#00695c;fontFamily=Inter;fontSize=9;" parent="processing-layer" vertex="1">
+          <mxGeometry x="20" y="100" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Monitoring Stack -->
+        <mxCell id="monitoring-layer" value="Monitoring Stack" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#558b2f;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="700" y="460" width="200" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="prometheus" value="Prometheus&#xa;📊 Metrics Collection&#xa;Time-series Database&#xa;Alerting Rules" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#558b2f;fontFamily=Inter;fontSize=9;" parent="monitoring-layer" vertex="1">
+          <mxGeometry x="20" y="30" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="grafana" value="Grafana&#xa;📈 Visualization&#xa;Custom Dashboards&#xa;Alert Management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#558b2f;fontFamily=Inter;fontSize=9;" parent="monitoring-layer" vertex="1">
+          <mxGeometry x="20" y="90" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- External APIs -->
+        <mxCell id="external-layer" value="External APIs" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#ff8f00;fontFamily=Inter;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="940" y="60" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="llamaparse" value="LlamaParse&#xa;🧠 Document Intelligence&#xa;Layout Understanding&#xa;Table Extraction" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#ff8f00;fontFamily=Inter;fontSize=9;" parent="external-layer" vertex="1">
+          <mxGeometry x="20" y="30" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="openai" value="OpenAI&#xa;💭 Language Models&#xa;Text Generation&#xa;Embeddings" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#ff8f00;fontFamily=Inter;fontSize=9;" parent="external-layer" vertex="1">
+          <mxGeometry x="20" y="90" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="firecrawl" value="Firecrawl&#xa;🌐 Web Scraping&#xa;Content Extraction&#xa;Data Enrichment" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#ff8f00;fontFamily=Inter;fontSize=9;" parent="external-layer" vertex="1">
+          <mxGeometry x="20" y="150" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Primary Data Flow Connections -->
+        <mxCell id="conn1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=2;endArrow=block;" parent="1" source="react" target="gateway" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=2;endArrow=block;" parent="1" source="gateway" target="doc-proc" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=2;endArrow=block;" parent="1" source="doc-proc" target="elastic" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=2;endArrow=block;" parent="1" source="doc-proc" target="minio-db" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=2;endArrow=block;" parent="1" source="chatbot" target="elastic" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=2;endArrow=block;" parent="1" source="knowledge-svc" target="neo4j-db" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=2;endArrow=block;" parent="1" source="stream-svc" target="kafka-stream" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=2;endArrow=block;" parent="1" source="stream-svc" target="spark-master" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- External API Connections -->
+        <mxCell id="ext1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ff5722;strokeWidth=2;endArrow=block;dashed=1;" parent="1" source="doc-proc" target="llamaparse" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ext2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ff5722;strokeWidth=2;endArrow=block;dashed=1;" parent="1" source="chatbot" target="openai" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ext3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ff5722;strokeWidth=2;endArrow=block;dashed=1;" parent="1" source="entity-svc" target="firecrawl" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Monitoring Connections -->
+        <mxCell id="mon1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4caf50;strokeWidth=1;endArrow=block;dashed=1;" parent="1" source="gateway" target="prometheus" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mon2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4caf50;strokeWidth=1;endArrow=block;dashed=1;" parent="1" source="elastic" target="prometheus" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Title -->
+        <mxCell id="title" value="Nuve Platform - Technical Component Interactions" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontFamily=Inter;fontColor=#1a202c;" parent="1" vertex="1">
+          <mxGeometry x="400" y="20" width="500" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend" value="Data Flow: — Internal&#xa;External API: - - External&#xa;Monitoring: - - Metrics" style="text;html=1;strokeColor=#1976d2;fillColor=#e3f2fd;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fontFamily=Inter;" parent="1" vertex="1">
+          <mxGeometry x="940" y="280" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Key Features Box -->
+        <mxCell id="features" value="✨ Key Features&#xa;• Dark/Light Theme Toggle&#xa;• Nuve Logo Integration&#xa;• Inter Font Throughout&#xa;• Microservices Architecture&#xa;• Real-time Processing&#xa;• AI-Powered Analytics" style="text;html=1;strokeColor=#2e7d32;fillColor=#e8f5e8;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=10;fontFamily=Inter;" parent="1" vertex="1">
+          <mxGeometry x="940" y="390" width="200" height="120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

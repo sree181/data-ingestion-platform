@@ -1,0 +1,53 @@
+# Core dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.8.0
+pydantic-settings==2.4.0
+
+# Document processing
+PyMuPDF==1.23.12
+python-docx==1.1.0
+python-multipart==0.0.6
+
+# Multimodal LLM processing (Official LLaVA + Whisper approach)
+torch>=2.0.0
+transformers==4.37.2
+accelerate==0.21.0
+openai-whisper
+gtts==2.4.0
+soundfile==0.12.1
+
+# Official LLaVA dependencies (temporarily disabled due to dependency conflicts)
+# git+https://github.com/haotian-liu/LLaVA.git
+# gradio==4.36.1
+# markdown2[all]
+# nh3
+# pygments
+
+# Database and storage
+asyncpg==0.29.0
+elasticsearch==8.11.0
+minio==7.2.0
+neo4j==5.15.0
+
+# Messaging
+aiokafka==0.10.0
+
+# AI and ML
+openai==1.3.8
+tiktoken==0.5.2
+numpy==1.24.4
+
+# Text processing
+spacy==3.7.2
+nltk==3.8.1
+
+# Utilities
+aiofiles==23.2.1
+httpx==0.25.2
+aiohttp==3.9.1
+structlog==23.2.0
+python-jose[cryptography]==3.3.0
+
+# Image processing (optional)
+Pillow==10.1.0
