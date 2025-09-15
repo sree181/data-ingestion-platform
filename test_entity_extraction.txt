@@ -1,1 +1,0 @@
-This is a test document for entity extraction. It contains company names like Apple Inc., Microsoft Corporation, and Google LLC. It also mentions locations like New York, California, and Texas. The document discusses financial terms, contracts, and business relationships.

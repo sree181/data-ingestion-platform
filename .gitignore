@@ -83,6 +83,13 @@ Thumbs.db
 *.temp
 .cache/
 
+# Document storage (documents are in Elasticsearch, not needed in repo)
+Searchable/
+*.pdf
+*.docx
+*.doc
+*.txt
+
 # Security and secrets
 *.key
 *.pem
