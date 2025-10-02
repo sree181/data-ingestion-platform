@@ -17,7 +17,7 @@ Production-ready data ingestion platform with document processing, search, chat 
 - **Dashboard**: Analytics and metrics
 
 ## 🛠 Architecture
-- **Frontend**: React + Material-UI (Port 3002)
+- **Frontend**: React + Material-UI (Port 3000)
 - **API Gateway**: FastAPI with unified endpoints (Port 8000)
 - **Document Processing**: LlamaParse + AI enrichment
 - **Search**: Elasticsearch for document indexing
@@ -47,7 +47,7 @@ docker-compose -f docker-compose-optimized.yml logs -f
 ```
 
 ### Access Points
-- **Frontend**: http://localhost:3002
+- **Frontend**: http://localhost:3000
 - **API Gateway**: http://localhost:8000
 - **Elasticsearch**: http://localhost:9200
 - **Kibana**: http://localhost:5601
@@ -58,7 +58,7 @@ docker-compose -f docker-compose-optimized.yml logs -f
 ## 📊 Service Ports
 | Service | Port | Purpose |
 |---------|------|---------|
-| Frontend | 3002 | Web UI |
+| Frontend | 3000 | Web UI |
 | API Gateway | 8000 | Main API |
 | Elasticsearch | 9200 | Search & Indexing |
 | Neo4j | 7474/7687 | Knowledge Graph |
@@ -106,7 +106,7 @@ docker-compose -f docker-compose-optimized.yml logs -f
 - **DO NOT MODIFY THIS MAIN BRANCH** - Create feature branches for changes
 - Elasticsearch requires 2GB+ RAM allocation
 - All 55+ documents are confirmed accessible
-- Frontend runs on port 3002 (not 3000)
+- Frontend runs on port 3000
 - Uses `working_main.py` as the API Gateway main file
 
 ## 🌿 Development Workflow

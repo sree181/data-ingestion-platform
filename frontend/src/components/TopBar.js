@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -12,6 +12,8 @@ import {
   MenuItem,
   Chip,
   Avatar,
+  Divider,
+  ListItemIcon,
 } from '@mui/material';
 import {
   Notifications as NotificationsIcon,
@@ -21,8 +23,11 @@ import {
   AccountCircle as AccountIcon,
   DarkMode as DarkModeIcon,
   LightMode as LightModeIcon,
+  Logout as LogoutIcon,
+  Person as PersonIcon,
 } from '@mui/icons-material';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const pageInfo = {
   '/dashboard': {
@@ -53,9 +58,11 @@ const pageInfo = {
 
 function TopBar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationCount] = useState(3); // Mock notification count
   const { isDarkMode, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
 
   const currentPage = pageInfo[location.pathname] || {
     title: 'Data Platform',
@@ -72,6 +79,22 @@ function TopBar() {
 
   const handleRefresh = () => {
     window.location.reload();
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+    handleMenuClose();
+  };
+
+  const getUserInitials = () => {
+    if (user?.full_name) {
+      return user.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    }
+    if (user?.email) {
+      return user.email[0].toUpperCase();
+    }
+    return 'U';
   };
 
   return (
@@ -182,7 +205,7 @@ function TopBar() {
           </Tooltip>
 
           {/* User Menu */}
-          <Tooltip title="User Menu">
+          <Tooltip title={user?.email || 'User Menu'}>
             <IconButton
               onClick={handleMenuOpen}
               sx={{
@@ -200,7 +223,7 @@ function TopBar() {
                   fontSize: '0.875rem',
                 }}
               >
-                U
+                {getUserInitials()}
               </Avatar>
             </IconButton>
           </Tooltip>
@@ -214,23 +237,69 @@ function TopBar() {
             PaperProps={{
               sx: {
                 mt: 1,
-                minWidth: 200,
+                minWidth: 240,
                 borderRadius: 2,
                 boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
               },
             }}
           >
+            {/* User Info Header */}
+            <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+              <Typography variant="subtitle2" fontWeight={600}>
+                {user?.full_name || user?.email?.split('@')[0] || 'User'}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {user?.email || 'user@example.com'}
+              </Typography>
+              {user?.organization && (
+                <Chip
+                  label={user.organization}
+                  size="small"
+                  sx={{ 
+                    mt: 0.5, 
+                    height: 20, 
+                    fontSize: '0.7rem',
+                    backgroundColor: 'rgba(56, 178, 172, 0.1)',
+                    color: 'primary.main'
+                  }}
+                />
+              )}
+            </Box>
+
             <MenuItem onClick={handleMenuClose}>
-              <AccountIcon sx={{ mr: 2 }} />
+              <ListItemIcon>
+                <PersonIcon fontSize="small" />
+              </ListItemIcon>
               Profile
             </MenuItem>
             <MenuItem onClick={handleMenuClose}>
-              <SettingsIcon sx={{ mr: 2 }} />
+              <ListItemIcon>
+                <SettingsIcon fontSize="small" />
+              </ListItemIcon>
               Account Settings
             </MenuItem>
             <MenuItem onClick={handleMenuClose}>
-              <HelpIcon sx={{ mr: 2 }} />
+              <ListItemIcon>
+                <HelpIcon fontSize="small" />
+              </ListItemIcon>
               Help & Support
+            </MenuItem>
+            
+            <Divider sx={{ my: 1 }} />
+            
+            <MenuItem 
+              onClick={handleLogout}
+              sx={{
+                color: 'error.main',
+                '&:hover': {
+                  backgroundColor: 'error.lighter',
+                }
+              }}
+            >
+              <ListItemIcon>
+                <LogoutIcon fontSize="small" sx={{ color: 'error.main' }} />
+              </ListItemIcon>
+              Logout
             </MenuItem>
           </Menu>
         </Box>

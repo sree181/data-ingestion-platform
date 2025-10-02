@@ -24,27 +24,63 @@ class SpacePermission(str, Enum):
     DELETE = "delete"
 
 
+# Security Classification Enum
+class SecurityClassification(str, Enum):
+    """Security classification levels"""
+    PUBLIC = "public"
+    INTERNAL = "internal"
+    CONFIDENTIAL = "confidential"
+    RESTRICTED = "restricted"
+    TOP_SECRET = "top_secret"
+
 # Project Space Models
 class ProjectSpaceCreate(BaseModel):
     """Create project space request"""
     name: str = Field(..., min_length=1, max_length=255, description="Project space name")
     description: Optional[str] = Field(None, max_length=1000, description="Project space description")
-    color: Optional[str] = Field("#1976d2", regex=r"^#[0-9A-Fa-f]{6}$", description="Hex color code")
+    color: Optional[str] = Field("#1976d2", pattern=r"^#[0-9A-Fa-f]{6}$", description="Hex color code")
     icon: Optional[str] = Field("folder", description="Icon name for UI")
     settings: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Space-specific settings")
+    
+    # Security fields
+    security_classification: SecurityClassification = Field(SecurityClassification.INTERNAL, description="Security classification level")
+    encryption_enabled: bool = Field(True, description="Enable encryption at rest")
+    requires_mfa: bool = Field(False, description="Require multi-factor authentication")
+    compliance_frameworks: List[str] = Field(default_factory=list, description="Compliance frameworks (SOX, GDPR, HIPAA, etc.)")
+    ip_whitelist: List[str] = Field(default_factory=list, description="Allowed IP addresses/ranges")
+    data_retention_days: int = Field(2555, ge=1, le=3650, description="Data retention period in days")
+    allowed_domains: List[str] = Field(default_factory=list, description="Allowed email domains for invitations")
     
     @validator('name')
     def validate_name(cls, v):
         if not v.strip():
             raise ValueError('Project space name cannot be empty')
         return v.strip()
+    
+    @validator('compliance_frameworks')
+    def validate_compliance_frameworks(cls, v):
+        valid_frameworks = ['sox', 'gdpr', 'hipaa', 'iso27001', 'nist', 'pci_dss']
+        for framework in v:
+            if framework.lower() not in valid_frameworks:
+                raise ValueError(f'Invalid compliance framework: {framework}')
+        return [f.lower() for f in v]
+    
+    @validator('ip_whitelist')
+    def validate_ip_whitelist(cls, v):
+        # Basic IP validation - in production, use a proper IP validation library
+        import re
+        ip_pattern = re.compile(r'^(\d{1,3}\.){3}\d{1,3}(/\d{1,2})?$')
+        for ip in v:
+            if not ip_pattern.match(ip.strip()):
+                raise ValueError(f'Invalid IP address format: {ip}')
+        return [ip.strip() for ip in v if ip.strip()]
 
 
 class ProjectSpaceUpdate(BaseModel):
     """Update project space request"""
     name: Optional[str] = Field(None, min_length=1, max_length=255, description="Project space name")
     description: Optional[str] = Field(None, max_length=1000, description="Project space description")
-    color: Optional[str] = Field(None, regex=r"^#[0-9A-Fa-f]{6}$", description="Hex color code")
+    color: Optional[str] = Field(None, pattern=r"^#[0-9A-Fa-f]{6}$", description="Hex color code")
     icon: Optional[str] = Field(None, description="Icon name for UI")
     settings: Optional[Dict[str, Any]] = Field(None, description="Space-specific settings")
 
@@ -64,6 +100,15 @@ class ProjectSpace(BaseModel):
     member_count: Optional[int] = Field(None, description="Number of space members")
     user_role: Optional[SpaceRole] = Field(None, description="Current user's role in this space")
     user_permissions: Optional[List[SpacePermission]] = Field(None, description="Current user's permissions")
+    
+    # Security fields
+    security_classification: SecurityClassification = Field(..., description="Security classification level")
+    encryption_enabled: bool = Field(..., description="Encryption at rest enabled")
+    requires_mfa: bool = Field(..., description="Multi-factor authentication required")
+    compliance_frameworks: List[str] = Field(..., description="Compliance frameworks")
+    ip_whitelist: List[str] = Field(..., description="Allowed IP addresses/ranges")
+    data_retention_days: int = Field(..., description="Data retention period in days")
+    allowed_domains: List[str] = Field(..., description="Allowed email domains for invitations")
 
 
 class ProjectSpaceList(BaseModel):

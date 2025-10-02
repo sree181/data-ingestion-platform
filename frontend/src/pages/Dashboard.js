@@ -403,7 +403,7 @@ function Dashboard() {
         justifyContent: 'center', 
         alignItems: 'center', 
         minHeight: 400,
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #495057 0%, #343A40 100%)',
         borderRadius: 4,
         m: 3
       }}>
@@ -436,7 +436,7 @@ function Dashboard() {
   const insights = analyticsData?.insights || {};
 
   return (
-    <Box sx={{ p: 3, background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)', minHeight: '100vh' }}>
+    <Box sx={{ p: 3, background: 'linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%)', minHeight: '100vh' }}>
       {/* Modern Header */}
       <Slide direction="down" in={true} timeout={800}>
         <Paper 
@@ -444,9 +444,10 @@ function Dashboard() {
           sx={{ 
             p: 4, 
             mb: 4, 
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6))',
+            background: 'linear-gradient(135deg, #495057 0%, #343A40 100%)',
+            color: 'white',
             backdropFilter: 'blur(20px)',
-            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+            border: `1px solid #DEE2E6`,
             borderRadius: 4
           }}
         >

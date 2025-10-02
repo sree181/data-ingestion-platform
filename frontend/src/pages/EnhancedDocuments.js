@@ -4,6 +4,7 @@ import {
   Box,
   Card,
   CardContent,
+  CardActions,
   Typography,
   Button,
   IconButton,
@@ -31,6 +32,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Grid,
   useTheme,
   alpha
 } from '@mui/material';
@@ -48,9 +50,12 @@ import {
   Clear as ClearIcon,
   GridView as GridViewIcon,
   ViewList as ListViewIcon,
-
   CheckCircle as CheckIcon,
-  Error as ErrorIcon
+  Error as ErrorIcon,
+  CalendarToday as CalendarIcon,
+  LocalOffer as TagIcon,
+  Visibility as VisibilityIcon,
+  Assignment as AssignmentIcon
 } from '@mui/icons-material';
 import { apiService } from '../services/api';
 
@@ -103,16 +108,19 @@ function EnhancedDocuments() {
 
   // Fetch documents from API - CRITICAL MISSING FUNCTIONALITY
   const { data: documentsData, isLoading, error, refetch } = useQuery(
-    ['documents', page, pageSize],
+    ['documents', page, pageSize], // Simple query key based on page and pageSize
     () => {
-      console.log('Fetching documents with page:', page, 'pageSize:', pageSize);
+      console.log('🔄 Fetching documents - Page:', page, 'PageSize:', pageSize, 'From:', page * pageSize);
       return apiService.getDocuments(page, pageSize);
     },
     {
       staleTime: 0, // No caching to ensure fresh data on pagination
-      refetchOnWindowFocus: false,
-      keepPreviousData: true, // Keep previous data while loading new data
+      cacheTime: 0, // Don't cache at all
+      refetchOnWindowFocus: false, // Don't refetch on focus to avoid confusion
+      keepPreviousData: false, // Don't keep previous data - show loading instead
       enabled: activeTab === 0, // Only fetch when in browse mode
+      refetchInterval: false, // Disable auto-refetch during pagination testing
+      retry: 1, // Only retry once
     }
   );
 
@@ -285,7 +293,7 @@ function EnhancedDocuments() {
               const preview = cleanContent.substring(0, 300);
               
               return (
-                <Card key={result.id} sx={{ cursor: 'pointer' }} onClick={() => navigate(`/document/${result.id}`)}>
+                <Card key={result.id} sx={{ cursor: 'pointer', position: 'relative' }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                       <Typography variant="h6" color="primary" sx={{ fontWeight: 600 }}>
@@ -343,6 +351,51 @@ function EnhancedDocuments() {
                         </Typography>
                       )}
                     </Box>
+                    
+                    {/* Professional Action Buttons */}
+                    <Box sx={{ 
+                      display: 'flex', 
+                      gap: 1, 
+                      mt: 2, 
+                      pt: 2, 
+                      borderTop: '1px solid rgba(0,0,0,0.08)',
+                      '& .MuiButton-root': {
+                        fontSize: '0.75rem',
+                        py: 0.5,
+                        px: 1.5
+                      }
+                    }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<VisibilityIcon />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/document/${result.id}`);
+                        }}
+                        sx={{ flex: 1 }}
+                      >
+                        Standard View
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        startIcon={<AssignmentIcon />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/professional-document/${result.id}`);
+                        }}
+                        sx={{ 
+                          flex: 1,
+                          background: 'linear-gradient(135deg, #495057 0%, #343A40 100%)',
+                          '&:hover': {
+                            background: 'linear-gradient(135deg, #6C757D 0%, #495057 100%)'
+                          }
+                        }}
+                      >
+                        Professional
+                      </Button>
+                    </Box>
                   </CardContent>
                 </Card>
               );
@@ -372,86 +425,366 @@ function EnhancedDocuments() {
     </Box>
   );
 
-  // Define columns for DataGrid
-  const columns = [
-    {
-      field: 'title',
-      headerName: 'Title',
-      flex: 1,
-      minWidth: 200,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.light' }}>
-            <DocumentIcon fontSize="small" />
-          </Avatar>
-          <Box>
-            <Typography variant="body2" fontWeight={500}>
-              {params.value}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {params.row.file_type}
-            </Typography>
-          </Box>
-        </Box>
-      ),
-    },
-    {
-      field: 'extraction_method',
-      headerName: 'Processing',
-      width: 150,
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          size="small"
-          color={params.value.includes('llava') || params.value.includes('llamaparse') ? 'primary' : 'default'}
-          variant="outlined"
-        />
-      ),
-    },
-    {
-      field: 'entities',
-      headerName: 'Entities',
-      width: 100,
-      align: 'center',
-      headerAlign: 'center',
-    },
-    {
-      field: 'created_at',
-      headerName: 'Created',
-      width: 120,
-      valueFormatter: (params) => {
-        if (!params.value) return 'Unknown';
-        return new Date(params.value).toLocaleDateString();
-      },
-    },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 80,
-      sortable: false,
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <IconButton
-          size="small"
-          onClick={(event) => handleMenuClick(event, params.row)}
+  // Balanced Theme - Gray backgrounds with vibrant content colors
+  const documentTypeConfig = {
+    pdf: { icon: '📄', color: '#e53e3e', bgColor: '#F8F9FA', lightColor: '#fed7d7' },
+    docx: { icon: '📝', color: '#3182ce', bgColor: '#F8F9FA', lightColor: '#bee3f8' },
+    txt: { icon: '📋', color: '#38a169', bgColor: '#F8F9FA', lightColor: '#c6f6d5' },
+    default: { icon: '📄', color: '#718096', bgColor: '#F8F9FA', lightColor: '#edf2f7' }
+  };
+
+  const getDocumentTypeConfig = (fileType) => {
+    return documentTypeConfig[fileType?.toLowerCase()] || documentTypeConfig.default;
+  };
+
+  const getProcessingBadgeColor = (method) => {
+    if (method?.includes('llava') || method?.includes('llamaparse')) return 'primary';
+    if (method?.includes('openai')) return 'secondary';
+    return 'default';
+  };
+
+  // Enhanced Document Card Component
+  const DocumentCard = ({ document, onClick, onMenuClick }) => {
+    const typeConfig = getDocumentTypeConfig(document.file_type);
+    const processingColor = getProcessingBadgeColor(document.extraction_method);
+    
+    return (
+      <Card
+        sx={{
+          height: 360,
+          display: 'flex',
+          flexDirection: 'column',
+          cursor: 'pointer',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&:hover': {
+            transform: 'translateY(-8px)',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
+            '& .document-actions': {
+              opacity: 1,
+              transform: 'translateY(0)'
+            }
+          }
+        }}
+        onClick={() => onClick(document)}
+      >
+        {/* Document Header with Subtle Gray Identity */}
+        <Box
+          sx={{
+            height: 120,
+            background: `linear-gradient(135deg, ${typeConfig.bgColor} 0%, ${typeConfig.lightColor} 100%)`,
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderBottom: `2px solid ${typeConfig.lightColor}`,
+            borderTop: `1px solid ${typeConfig.lightColor}`
+          }}
         >
-          <MoreIcon />
-        </IconButton>
-      ),
-    },
-  ];
+          {/* Document Type Icon */}
+          <Typography
+            sx={{
+              fontSize: '3rem',
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+            }}
+          >
+            {typeConfig.icon}
+          </Typography>
+          
+          {/* File Type Badge */}
+          <Chip
+            label={document.file_type?.toUpperCase()}
+            size="small"
+            sx={{
+              position: 'absolute',
+              top: 12,
+              right: 12,
+              backgroundColor: typeConfig.color,
+              color: 'white',
+              fontWeight: 600,
+              fontSize: '0.7rem'
+            }}
+          />
+          
+          {/* Processing Status Badge - Hide technical extraction methods */}
+          {document.extraction_method && 
+           !document.extraction_method.includes('official_llava_text_only') && 
+           !document.extraction_method.includes('pymupdf') && (
+            <Chip
+              label={
+                document.extraction_method.includes('llava') ? 'AI Enhanced' :
+                document.extraction_method.includes('llamaparse') ? 'AI Parsed' :
+                document.extraction_method.includes('openai') ? 'AI Processed' :
+                'Processed'
+              }
+              size="small"
+              color={processingColor}
+              variant="outlined"
+              sx={{
+                position: 'absolute',
+                top: 12,
+                left: 12,
+                backgroundColor: 'rgba(255,255,255,0.9)',
+                backdropFilter: 'blur(4px)',
+                fontSize: '0.65rem'
+              }}
+            />
+          )}
+        </Box>
+
+        {/* Document Content */}
+        <CardContent sx={{ flexGrow: 1, p: 2, pb: 1 }}>
+          {/* Title */}
+          <Typography
+            variant="h6"
+            sx={{
+              mb: 1,
+              fontWeight: 600,
+              fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+              lineHeight: 1.3,
+              color: '#1a202c', // Restored original dark text color
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              minHeight: '2.6em',
+              letterSpacing: '-0.01em'
+            }}
+          >
+            {document.title || 'Untitled Document'}
+          </Typography>
+
+          {/* Metadata Row */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+            <Chip
+              icon={<CalendarIcon />}
+              label={document.created_at ? new Date(document.created_at).toLocaleDateString() : 'Unknown'}
+              size="small"
+              variant="outlined"
+              sx={{ fontSize: '0.7rem' }}
+            />
+            {document.entities && (
+              <Chip
+                icon={<TagIcon />}
+                label={`${document.entities} entities`}
+                size="small"
+                variant="outlined"
+                color="secondary"
+                sx={{ fontSize: '0.7rem' }}
+              />
+            )}
+          </Box>
+
+          {/* Content Preview */}
+          {document.content && (
+            <Typography
+              variant="body2"
+              sx={{
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                lineHeight: 1.5,
+                mb: 1,
+                color: '#4a5568', // Restored original secondary text color
+                fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+                fontSize: '0.875rem'
+              }}
+            >
+              {document.content.substring(0, 150)}...
+            </Typography>
+          )}
+
+          {/* Entity Tags */}
+          {document.metadata?.openai_entities && document.metadata.openai_entities.length > 0 && (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
+              {document.metadata.openai_entities.slice(0, 3).map((entity, idx) => (
+                <Chip
+                  key={idx}
+                  label={entity.text}
+                  size="small"
+                  variant="outlined"
+                  sx={{
+                    fontSize: '0.65rem',
+                    height: 20,
+                    backgroundColor: `${typeConfig.color}08`,
+                    borderColor: `${typeConfig.color}40`,
+                    color: typeConfig.color,
+                    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif'
+                  }}
+                />
+              ))}
+              {document.metadata.openai_entities.length > 3 && (
+                <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'center', ml: 0.5 }}>
+                  +{document.metadata.openai_entities.length - 3} more
+                </Typography>
+              )}
+            </Box>
+          )}
+        </CardContent>
+
+        {/* Actions Footer */}
+        <CardActions
+          className="document-actions"
+          sx={{
+            justifyContent: 'space-between',
+            px: 2,
+            pb: 2,
+            pt: 0,
+            opacity: 0.7,
+            transform: 'translateY(4px)',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <Tooltip title="Standard View">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/document/${document.id}`);
+                }}
+                sx={{
+                  backgroundColor: 'rgba(0,0,0,0.04)',
+                  '&:hover': { backgroundColor: 'rgba(0,0,0,0.08)' }
+                }}
+              >
+                <ViewIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Professional View">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/professional-document/${document.id}`);
+                }}
+                sx={{
+                  backgroundColor: '#495057',
+                  color: 'white',
+                  '&:hover': { backgroundColor: '#343A40' }
+                }}
+              >
+                <AssignmentIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Download">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDownload(document);
+                }}
+                sx={{
+                  backgroundColor: 'rgba(0,0,0,0.04)',
+                  '&:hover': { backgroundColor: 'rgba(0,0,0,0.08)' }
+                }}
+              >
+                <DownloadIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+          
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMenuClick(e, document);
+            }}
+            sx={{
+              backgroundColor: 'rgba(0,0,0,0.04)',
+              '&:hover': { backgroundColor: 'rgba(0,0,0,0.08)' }
+            }}
+          >
+            <MoreIcon fontSize="small" />
+          </IconButton>
+        </CardActions>
+      </Card>
+    );
+  };
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
-      <Box sx={{ p: 3, borderBottom: 1, borderColor: 'divider' }}>
-        <Typography variant="h4" sx={{ mb: 1, fontWeight: 600 }}>
-          Document Library
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Browse, search, and manage your documents with AI-powered insights
-        </Typography>
+      {/* Sophisticated Gray Header */}
+      <Box 
+        sx={{ 
+          background: 'linear-gradient(135deg, #343A40 0%, #495057 100%)',
+          color: 'white',
+          p: 4,
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
+        {/* Background Pattern */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: 200,
+            height: 200,
+            background: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
+            backgroundSize: '20px 20px',
+            opacity: 0.3
+          }}
+        />
+        
+        <Box sx={{ position: 'relative', zIndex: 1 }}>
+          <Typography 
+            variant="h3" 
+            sx={{ 
+              mb: 1, 
+              fontWeight: 700,
+              fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+              background: 'linear-gradient(45deg, #fff 30%, rgba(255,255,255,0.8) 90%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              letterSpacing: '-0.02em'
+            }}
+          >
+            📚 Document Library
+          </Typography>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              opacity: 0.9,
+              fontWeight: 400,
+              mb: 2
+            }}
+          >
+            Discover, explore, and analyze your documents with AI-powered intelligence
+          </Typography>
+          
+          {/* Quick Stats */}
+          <Stack direction="row" spacing={3} sx={{ mt: 2 }}>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 600 }}>
+                {totalDocuments}
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                Total Documents
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 600 }}>
+                {documents.filter(d => d.extraction_method?.includes('llava') || d.extraction_method?.includes('llamaparse')).length}
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                AI Processed
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 600 }}>
+                {new Set(documents.flatMap(d => d.metadata?.openai_entities?.map(e => e.text) || [])).size}
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                Unique Entities
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
       </Box>
       
       {/* Enhanced Tabs */}
@@ -478,47 +811,111 @@ function EnhancedDocuments() {
       {/* Search Tab Content */}
       <TabPanel value={activeTab} index={1}>
         <Box sx={{ p: 3 }}>
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                AI-Powered Document Search
+          <Paper 
+            elevation={3} 
+            sx={{ 
+              mb: 4,
+              p: 4,
+              background: 'linear-gradient(135deg, #495057 0%, #6C757D 100%)',
+              color: 'white',
+              borderRadius: 3,
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Background decoration */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: -50,
+                right: -50,
+                width: 150,
+                height: 150,
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(10px)'
+              }}
+            />
+            
+            <Box sx={{ position: 'relative', zIndex: 1 }}>
+              <Typography variant="h4" sx={{ mb: 1, fontWeight: 700 }}>
+                🤖 AI-Powered Search
+              </Typography>
+              <Typography variant="h6" sx={{ mb: 3, opacity: 0.9, fontWeight: 400 }}>
+                Ask questions, find insights, discover connections in your documents
               </Typography>
               <TextField
                 fullWidth
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={handleSearchKeyPress}
-                placeholder="Search documents, ask questions, or describe what you're looking for..."
+                placeholder="Ask me anything about your documents... 💭"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon />
+                      <SearchIcon sx={{ color: 'rgba(0,0,0,0.6)' }} />
                     </InputAdornment>
                   ),
                   endAdornment: searchQuery && (
                     <InputAdornment position="end">
                       <IconButton onClick={clearSearch} size="small">
-                        <ClearIcon />
+                        <ClearIcon sx={{ color: 'rgba(0,0,0,0.6)' }} />
                       </IconButton>
                     </InputAdornment>
                   )
                 }}
-                sx={{ mb: 2 }}
+                sx={{ 
+                  mb: 3,
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    borderRadius: 3,
+                    fontSize: '1.1rem',
+                    backdropFilter: 'blur(10px)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255,255,255,1)',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'rgba(255,255,255,1)',
+                      boxShadow: '0 0 0 3px rgba(255,255,255,0.3)'
+                    }
+                  },
+                  '& .MuiOutlinedInput-input': {
+                    py: 2
+                  }
+                }}
               />
               
-              <Stack direction="row" spacing={2} alignItems="center">
+              <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
                 <Button
                   variant="contained"
                   onClick={handleSearch}
                   disabled={!searchQuery.trim() || isSearching}
                   startIcon={<SearchIcon />}
+                  sx={{
+                    backgroundColor: 'rgba(255,255,255,0.2)',
+                    color: 'white',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255,255,255,0.3)',
+                    },
+                    '&:disabled': {
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      color: 'rgba(255,255,255,0.5)'
+                    }
+                  }}
                 >
-                  {isSearching ? 'Searching...' : 'Search'}
+                  {isSearching ? 'Searching...' : 'Search Documents'}
                 </Button>
-                
-                {/* Quick Search Chips */}
+              </Stack>
+              
+              {/* Quick Search Suggestions */}
+              <Box>
+                <Typography variant="body2" sx={{ mb: 1, opacity: 0.8 }}>
+                  💡 Try these searches:
+                </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {['COVID-19 vaccine', 'FDA approval', 'clinical trial'].map((term) => (
+                  {['COVID-19 vaccine side effects', 'FDA approval documents', 'clinical trial results', 'medical research papers'].map((term) => (
                     <Chip
                       key={term}
                       label={term}
@@ -528,15 +925,23 @@ function EnhancedDocuments() {
                         setTimeout(handleSearch, 100);
                       }}
                       sx={{ 
-                        background: alpha(theme.palette.primary.main, 0.1),
-                        '&:hover': { background: alpha(theme.palette.primary.main, 0.2) }
+                        backgroundColor: 'rgba(255,255,255,0.2)',
+                        color: 'white',
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        backdropFilter: 'blur(10px)',
+                        '&:hover': { 
+                          backgroundColor: 'rgba(255,255,255,0.3)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                        },
+                        transition: 'all 0.2s ease'
                       }}
                     />
                   ))}
                 </Box>
-              </Stack>
-            </CardContent>
-          </Card>
+              </Box>
+            </Box>
+          </Paper>
           
           {renderSearchResults()}
         </Box>
@@ -544,42 +949,158 @@ function EnhancedDocuments() {
       
       {/* Browse Tab Content */}
       <TabPanel value={activeTab} index={0}>
-        <Card sx={{ flex: 1, m: 3, mt: 0 }}>
-          <CardContent sx={{ height: '100%', p: 0 }}>
-            {isLoading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-                <CircularProgress />
+        <Box sx={{ p: 3 }}>
+          {/* Enhanced Header with Stats */}
+          <Box sx={{ mb: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Box>
+                <Typography 
+                  variant="h5" 
+                  sx={{ 
+                    fontWeight: 600, 
+                    mb: 0.5,
+                    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+                    letterSpacing: '-0.01em'
+                  }}
+                >
+                  📚 Document Collection
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary"
+                  sx={{
+                    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif'
+                  }}
+                >
+                  {totalDocuments} documents • Updated {new Date().toLocaleDateString()}
+                </Typography>
               </Box>
-            ) : error ? (
-              <Alert severity="error" sx={{ m: 2 }}>
-                Failed to load documents: {error.message}
-              </Alert>
-            ) : (
-              <DataGrid
-                rows={documents}
-                columns={columns}
-                rowCount={totalDocuments}
-                loading={isLoading}
-                pageSizeOptions={[25, 50, 100]}
-                paginationModel={{ page, pageSize }}
-                paginationMode="server"
-                onPaginationModelChange={(model) => {
-                  console.log('Pagination model change:', model);
-                  setPage(model.page);
-                  setPageSize(model.pageSize);
-                }}
-                checkboxSelection
-                disableSelectionOnClick
-                autoHeight
-                sx={{
-                  '& .MuiDataGrid-main': {
-                    overflow: 'visible'
-                  }
-                }}
-              />
-            )}
-          </CardContent>
-        </Card>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Chip 
+                  label={`${documents.filter(d => d.file_type === 'pdf').length} PDFs`} 
+                  color="error" 
+                  variant="outlined" 
+                  size="small"
+                  sx={{
+                    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif'
+                  }}
+                />
+                <Chip 
+                  label={`${documents.filter(d => d.file_type === 'docx').length} DOCs`} 
+                  color="primary" 
+                  variant="outlined" 
+                  size="small"
+                  sx={{
+                    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif'
+                  }}
+                />
+                <Chip 
+                  label={`${documents.filter(d => d.extraction_method?.includes('llava') || d.extraction_method?.includes('llamaparse')).length} AI Processed`} 
+                  color="secondary" 
+                  variant="outlined" 
+                  size="small"
+                  sx={{
+                    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif'
+                  }}
+                />
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Document Cards Grid */}
+          {isLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+              <Box sx={{ textAlign: 'center' }}>
+                <CircularProgress size={48} sx={{ mb: 2 }} />
+                <Typography variant="h6" color="text.secondary">
+                  Loading documents...
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Fetching your document library
+                </Typography>
+              </Box>
+            </Box>
+          ) : error ? (
+            <Alert 
+              severity="error" 
+              sx={{ 
+                m: 2,
+                '& .MuiAlert-message': {
+                  fontSize: '1rem'
+                }
+              }}
+            >
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Failed to load documents
+              </Typography>
+              {error.message}
+            </Alert>
+          ) : documents.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <DocumentIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+              <Typography variant="h5" color="text.secondary" sx={{ mb: 1 }}>
+                No documents found
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Start by uploading some documents to your library
+              </Typography>
+            </Box>
+          ) : (
+            <>
+              <Grid container spacing={3}>
+                {documents.map((document) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={document.id}>
+                    <DocumentCard
+                      document={document}
+                      onClick={(doc) => navigate(`/document/${doc.id}`)}
+                      onMenuClick={(e, doc) => handleMenuClick(e, doc)}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+
+              {/* Enhanced Pagination */}
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Button
+                    variant="outlined"
+                    disabled={page === 0}
+                    onClick={() => setPage(page - 1)}
+                  >
+                    Previous
+                  </Button>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Page {page + 1} of {Math.ceil(totalDocuments / pageSize)}
+                    </Typography>
+                    <Select
+                      value={pageSize}
+                      onChange={(e) => setPageSize(e.target.value)}
+                      size="small"
+                      sx={{ minWidth: 80 }}
+                    >
+                      <MenuItem value={25}>25</MenuItem>
+                      <MenuItem value={50}>50</MenuItem>
+                      <MenuItem value={100}>100</MenuItem>
+                    </Select>
+                    <Typography variant="body2" color="text.secondary">
+                      per page
+                    </Typography>
+                  </Box>
+                  
+                  <Button
+                    variant="outlined"
+                    disabled={page >= Math.ceil(totalDocuments / pageSize) - 1}
+                    onClick={() => setPage(page + 1)}
+                  >
+                    Next
+                  </Button>
+                </Stack>
+              </Box>
+            </>
+          )}
+        </Box>
       </TabPanel>
 
       {/* Actions Menu */}
@@ -592,7 +1113,13 @@ function EnhancedDocuments() {
         }}
       >
         <MenuItem onClick={() => handleView(selectedDoc)}>
-          <ViewIcon sx={{ mr: 1 }} /> View
+          <ViewIcon sx={{ mr: 1 }} /> Standard View
+        </MenuItem>
+        <MenuItem onClick={() => {
+          handleMenuClose();
+          navigate(`/professional-document/${selectedDoc.id}`);
+        }}>
+          <AssignmentIcon sx={{ mr: 1 }} /> Professional View
         </MenuItem>
         <MenuItem onClick={() => handleDownload(selectedDoc)}>
           <DownloadIcon sx={{ mr: 1 }} /> Download

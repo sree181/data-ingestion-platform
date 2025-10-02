@@ -17,6 +17,7 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
+  Button,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -32,7 +33,7 @@ import {
   Description as DocumentIcon,
 } from '@mui/icons-material';
 import { useQuery } from 'react-query';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
 import ImageGallery from '../components/ImageGallery';
 
@@ -94,6 +95,7 @@ const getEntityColor = (entityType) => {
 
 function DocumentViewer() {
   const { documentId } = useParams();
+  const navigate = useNavigate();
   
   // Fetch document details
   const { data: document, isLoading, error } = useQuery(
@@ -140,9 +142,27 @@ function DocumentViewer() {
     <Box sx={{ p: 3 }}>
       {/* Document Header */}
       <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          {document.title}
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+          <Typography variant="h4" gutterBottom sx={{ mb: 0 }}>
+            {document.title}
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={() => navigate(`/professional-document/${documentId}`)}
+            sx={{ 
+              background: 'linear-gradient(135deg, #495057 0%, #343A40 100%)',
+              color: 'white',
+              fontWeight: 600,
+              px: 3,
+              '&:hover': {
+                background: 'linear-gradient(135deg, #6C757D 0%, #495057 100%)'
+              }
+            }}
+            startIcon={<ClauseIcon />}
+          >
+            Switch to Professional View
+          </Button>
+        </Box>
         
         {document.ai_summary && (
           <Alert severity="info" sx={{ mb: 2 }}>

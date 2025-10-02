@@ -71,6 +71,10 @@ from processors.openai_entity_extractor import OpenAIEntityExtractor
 from processors.openai_vision_processor import OpenAIVisionProcessor
 from storage.image_storage_manager import ImageStorageManager
 # from database import DatabaseManager
+class DatabaseManager:
+    def __init__(self, database_url): pass
+    async def connect(self): pass
+    async def close(self): pass
 # from utils.logging_config import setup_logging
 
 # Simple logging setup
@@ -381,7 +385,53 @@ class DocumentProcessor:
             processed_data["content"] = text_content["text"]
             processed_data["metadata"].update(text_content.get("metadata", {}))
             
-            # Step 1.5: Process extracted images (multimodal enhancement)
+            # Step 1.5: Analyze document structure with LLM (for Professional Viewer)
+            try:
+                from services.llm_document_analyzer import llm_analyzer
+                
+                logger.info("Analyzing document structure with LLM", filename=filename)
+                document_structure = await llm_analyzer.analyze_document_structure(
+                    content=text_content["text"],
+                    document_title=filename
+                )
+                
+                # Store document structure analysis
+                processed_data["document_structure"] = {
+                    "sections": [
+                        {
+                            "id": section.id,
+                            "title": section.title,
+                            "start_position": section.start_position,
+                            "end_position": section.end_position,
+                            "section_type": section.section_type,
+                            "confidence": section.confidence,
+                            "word_count": section.word_count,
+                            "key_points": section.key_points,
+                            "page_number": section.page_number,
+                            "color": llm_analyzer.section_colors.get(section.section_type, "#fafafa")
+                        }
+                        for section in document_structure.sections
+                    ],
+                    "document_type": document_structure.document_type,
+                    "total_pages": document_structure.total_pages,
+                    "total_words": document_structure.total_words,
+                    "confidence": document_structure.confidence,
+                    "analysis_timestamp": document_structure.analysis_timestamp,
+                    "fallback_navigation": document_structure.fallback_navigation
+                }
+                
+                logger.info("Document structure analysis completed", 
+                           filename=filename,
+                           sections_count=len(document_structure.sections),
+                           document_type=document_structure.document_type)
+                
+            except Exception as e:
+                logger.warning("Failed to analyze document structure during ingestion", 
+                             filename=filename, 
+                             error=str(e))
+                processed_data["document_structure"] = None
+            
+            # Step 1.6: Process extracted images (multimodal enhancement)
             extracted_images = text_content.get("images", [])
             image_entities = []
             image_metadata = []

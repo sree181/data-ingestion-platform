@@ -14,6 +14,8 @@ from elasticsearch import AsyncElasticsearch
 
 # Import our OpenAI entity extractor and LlamaParse
 from processors.openai_entity_extractor import OpenAIEntityExtractor
+from processors.multi_model_entity_extractor import MultiModelEntityExtractor
+from models.ai_models import model_registry, model_factory
 from processors.llamaparse_processor import LlamaParseProcessor
 from processors.legal_clause_extractor import LegalClauseExtractor
 from processors.vector_embedder import VectorEmbedder
@@ -22,6 +24,14 @@ from processors.vector_embedder import VectorEmbedder
 class TextProcessRequest(BaseModel):
     text: str
     title: str = "Untitled Document"
+    model_name: str = "gpt-4"  # Default to GPT-4
+
+class PubMedArticleRequest(BaseModel):
+    title: str
+    content: str
+    metadata: dict
+    medical_entities: list = []
+    space_id: str
 
 # Setup logging
 logger = structlog.get_logger(__name__)
@@ -40,6 +50,7 @@ app.add_middleware(
 
 # Global variables
 openai_entity_extractor = None
+multi_model_extractor = None
 llamaparse_processor = None
 legal_clause_extractor = None
 vector_embedder = None
@@ -48,7 +59,7 @@ elasticsearch_client = None
 @app.on_event("startup")
 async def startup_event():
     """Initialize services on startup"""
-    global openai_entity_extractor, llamaparse_processor, legal_clause_extractor, vector_embedder, elasticsearch_client
+    global openai_entity_extractor, multi_model_extractor, llamaparse_processor, legal_clause_extractor, vector_embedder, elasticsearch_client
     
     logger.info("🚀 Starting Document Processor initialization...")
     
@@ -57,15 +68,18 @@ async def startup_event():
         openai_api_key = os.getenv("OPENAI_API_KEY")
         logger.info("Environment variables loaded", openai_api_key_available=bool(openai_api_key))
         
-        # Initialize OpenAI entity extractor
+        # Initialize multi-model entity extractor with phi3:mini (local, no API key needed)
+        multi_model_extractor = MultiModelEntityExtractor(
+            model_name="phi3:mini",  # Use local phi3:mini model
+            api_key=openai_api_key,  # Optional, only needed for OpenAI models
+            base_url="http://ollama:11434"  # Ollama service URL in Docker network
+        )
+        await multi_model_extractor.initialize()
+        logger.info("Multi-model entity extractor initialized successfully", model="phi3:mini")
+        
+        # Also initialize OpenAI extractor if API key available
         if openai_api_key:
-            openai_entity_extractor = OpenAIEntityExtractor(
-                api_key=openai_api_key,
-                model=os.getenv("OPENAI_MODEL", "gpt-4")
-            )
-            logger.info("OpenAI entity extractor initialized successfully")
-        else:
-            logger.warning("OpenAI API key not found, entity extraction will be disabled")
+            logger.info("OpenAI API key available, can also use OpenAI models")
 
         # Initialize LlamaParse processor for multimodal processing
         llamaparse_api_key = os.getenv("LLAMAPARSE_API_KEY")
@@ -189,27 +203,122 @@ async def health_check():
         "timestamp": "2024-01-01T00:00:00Z"
     }
 
+@app.get("/api/v1/models/available")
+async def get_available_models():
+    """Get list of available AI models"""
+    try:
+        models = model_registry.list_models()
+        model_list = []
+        
+        for model in models:
+            model_info = {
+                "name": model.name,
+                "provider": model.provider.value,
+                "capabilities": [cap.value for cap in model.capabilities],
+                "max_tokens": model.max_tokens,
+                "cost_per_1k_tokens": model.cost_per_1k_tokens,
+                "description": model.description,
+                "is_local": model.is_local,
+                "requires_api_key": model.requires_api_key
+            }
+            model_list.append(model_info)
+        
+        logger.info("Available models retrieved", count=len(model_list))
+        return {"models": model_list}
+        
+    except Exception as e:
+        logger.error("Failed to get available models", error=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve available models")
+
+@app.post("/api/v1/models/test/{model_name}")
+async def test_model(model_name: str, request: dict):
+    """Test if a model is available and working"""
+    try:
+        # Get model info from registry
+        model_info = model_registry.get_model(model_name)
+        if not model_info:
+            raise HTTPException(status_code=404, detail=f"Model '{model_name}' not found.")
+        
+        # Create model instance using factory
+        api_key = os.getenv("OPENAI_API_KEY") if model_info.provider.value == "openai" else None
+        base_url = "http://ollama:11434" if model_info.provider.value == "ollama" else None
+        
+        model_instance = await model_factory.create_model(
+            model_name=model_name,
+            api_key=api_key,
+            base_url=base_url
+        )
+        
+        if not model_instance:
+            raise HTTPException(status_code=503, detail=f"Failed to initialize model '{model_name}'.")
+        
+        # Test with a simple prompt
+        test_prompt = "Hello, this is a test. Please respond with 'Model is working'."
+        try:
+            response = await model_instance.generate_text(test_prompt, max_tokens=50)
+            
+            logger.info("Model test successful", model=model_name, response=response[:100])
+            return {
+                "success": True,
+                "message": "Model is working correctly",
+                "test_response": response[:200],
+                "model_info": {
+                    "name": model_instance.model_info.name,
+                    "provider": model_instance.model_info.provider.value,
+                    "is_local": model_instance.model_info.is_local
+                }
+            }
+        except Exception as test_error:
+            logger.error("Model test failed", model=model_name, error=str(test_error))
+            return {
+                "success": False,
+                "message": f"Model test failed: {str(test_error)}",
+                "model_info": {
+                    "name": model_instance.model_info.name,
+                    "provider": model_instance.model_info.provider.value,
+                    "is_local": model_instance.model_info.is_local
+                }
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("Model test error", model=model_name, error=str(e))
+        raise HTTPException(status_code=500, detail=f"Model test failed: {str(e)}")
+
 @app.post("/process-text")
 async def process_text(request: TextProcessRequest):
-    """Process text and extract entities using OpenAI"""
+    """Process text and extract entities using selected model"""
     try:
-        if not openai_entity_extractor:
-            raise HTTPException(status_code=503, detail="OpenAI entity extractor not available")
+        # Determine base_url for Ollama models (Phi3, Llama)
+        base_url = None
+        if any(keyword in request.model_name.lower() for keyword in ["phi3", "llama"]):
+            base_url = "http://ollama:11434"
         
-        logger.info("Processing text", title=request.title, text_length=len(request.text))
+        # Initialize multi-model extractor
+        multi_model_extractor = MultiModelEntityExtractor(
+            model_name=request.model_name,
+            api_key=os.getenv("OPENAI_API_KEY"),
+            base_url=base_url
+        )
+        
+        if not await multi_model_extractor.initialize():
+            raise HTTPException(status_code=503, detail=f"Failed to initialize model: {request.model_name}")
+        
+        logger.info("Processing text", title=request.title, text_length=len(request.text), model=request.model_name)
         
         # Extract entities and relationships
-        results = await openai_entity_extractor.extract_entities_and_relationships(
+        results = await multi_model_extractor.extract_entities_and_relationships(
             request.text, request.title
         )
         
         # Get document insights
-        insights = await openai_entity_extractor.extract_document_insights(
+        insights = await multi_model_extractor.extract_document_insights(
             request.text, request.title
         )
         
         # Generate highlighted content
-        highlighted_content = openai_entity_extractor.highlight_entities_in_text(
+        highlighted_content = multi_model_extractor.highlight_entities_in_text(
             request.text, results.get("entities", [])
         )
         
@@ -234,7 +343,12 @@ async def process_text(request: TextProcessRequest):
             "document_summary": results.get("document_summary", ""),
             "highlighted_content": highlighted_content,
             "document_insights": insights,
-            "processing_status": "completed"
+            "processing_status": "completed",
+            "model_metadata": {
+                "model_name": request.model_name,
+                "provider": multi_model_extractor.model.model_info.provider.value if multi_model_extractor.model else "unknown",
+                "is_local": multi_model_extractor.model.model_info.is_local if multi_model_extractor.model else False
+            }
         }
         
     except Exception as e:
@@ -244,12 +358,15 @@ async def process_text(request: TextProcessRequest):
 @app.post("/process-file")
 async def process_file(
     file: UploadFile = File(...),
-    space_id: str = Form(None)
+    space_id: str = Form(None),
+    model: str = Form("phi3:mini")  # Accept model parameter, default to phi3:mini
 ):
     """Process uploaded file and extract entities"""
     try:
-        if not openai_entity_extractor:
-            raise HTTPException(status_code=503, detail="OpenAI entity extractor not available")
+        logger.info("Received file processing request", filename=file.filename, space_id=space_id, model=model)
+        
+        if not multi_model_extractor and not openai_entity_extractor:
+            raise HTTPException(status_code=503, detail="No AI model available for entity extraction")
         
         # Read file content
         content = await file.read()
@@ -357,9 +474,13 @@ async def process_file(
             except UnicodeDecodeError:
                 raise HTTPException(status_code=400, detail="File must be a text file or PDF")
         
-        # Process the text with OpenAI
-        request = TextProcessRequest(text=text_content, title=file.filename or "Uploaded File")
-        text_result = await process_text(request)
+        # Process the text with the selected model
+        text_request = TextProcessRequest(
+            text=text_content, 
+            title=file.filename or "Uploaded File",
+            model_name=model  # Use the model parameter from the form
+        )
+        text_result = await process_text(text_request)
         
         # Extract legal clauses if available
         legal_clauses_result = None
@@ -423,6 +544,76 @@ async def process_file(
     except Exception as e:
         logger.error("File processing failed", error=str(e), filename=file.filename)
         raise HTTPException(status_code=500, detail=f"File processing failed: {str(e)}")
+
+@app.post("/process-pubmed-article")
+async def process_pubmed_article(request: PubMedArticleRequest):
+    """Process PubMed article with medical concept extraction"""
+    try:
+        logger.info("Processing PubMed article", title=request.title, pmid=request.metadata.get("pmid"))
+        
+        # Process text with OpenAI entity extraction
+        text_result = await process_text(TextProcessRequest(
+            text=request.content,
+            title=request.title
+        ))
+        
+        # Add medical entities to the result
+        if request.medical_entities:
+            text_result["medical_entities"] = request.medical_entities
+            text_result["medical_concept_count"] = len(request.medical_entities)
+            
+            # Categorize medical concepts by type
+            concept_types = {}
+            for entity in request.medical_entities:
+                concept_type = entity.get("type", "UNKNOWN")
+                if concept_type not in concept_types:
+                    concept_types[concept_type] = []
+                concept_types[concept_type].append(entity)
+            
+            text_result["medical_concept_types"] = concept_types
+        
+        # Add PubMed metadata
+        text_result["pubmed_metadata"] = request.metadata
+        text_result["source"] = "pubmed"
+        text_result["document_type"] = "research_article"
+        
+        # Generate vector embedding if available
+        if vector_embedder:
+            try:
+                logger.info("Generating vector embedding for PubMed article", title=request.title)
+                content_vector = await vector_embedder.embed_text(request.content)
+                text_result["content_vector"] = content_vector
+                logger.info("Vector embedding generated successfully", 
+                           title=request.title,
+                           embedding_dimensions=len(content_vector))
+            except Exception as e:
+                logger.error("Vector embedding generation failed", error=str(e), title=request.title)
+                text_result["content_vector"] = []
+        
+        # Index the document into Elasticsearch
+        if elasticsearch_client:
+            try:
+                await index_document_to_elasticsearch(
+                    request.title, 
+                    request.content, 
+                    text_result, 
+                    [],  # No images for PubMed articles
+                    request.space_id
+                )
+                logger.info("PubMed article indexed to Elasticsearch successfully", 
+                           title=request.title, 
+                           space_id=request.space_id)
+            except Exception as e:
+                logger.error("Failed to index PubMed article to Elasticsearch", 
+                           error=str(e), 
+                           title=request.title, 
+                           space_id=request.space_id)
+        
+        return text_result
+        
+    except Exception as e:
+        logger.error("PubMed article processing failed", error=str(e), title=request.title)
+        raise HTTPException(status_code=500, detail=f"PubMed article processing failed: {str(e)}")
 
 if __name__ == "__main__":
     # Run the server

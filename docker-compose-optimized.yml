@@ -8,7 +8,7 @@ services:
       - cluster.name=data-platform
       - discovery.type=single-node
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
       - xpack.security.enabled=false
       - xpack.security.enrollment.enabled=false
     ulimits:
@@ -123,7 +123,12 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_HOST_NAME: kafka
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -196,9 +201,12 @@ services:
       - MINIO_ACCESS_KEY=admin
       - MINIO_SECRET_KEY=minio123
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - OPENAI_API_KEY=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
+      - OPENAI_MODEL=gpt-4
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
+      - ./Searchable:/app/Searchable:ro
 
   # Document Processing Service with LlamaParse
   document-processor:
@@ -233,6 +241,34 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
 
+  # PubMed Integration Service
+  pubmed-integration:
+    build:
+      context: ./services/pubmed-integration
+      dockerfile: Dockerfile
+    container_name: pubmed-integration
+    ports:
+      - "8007:8005"
+    depends_on:
+      - document-processor
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4}
+    volumes:
+      - ./data:/app/data
+
+  # Ollama Service for Local AI Models
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    restart: unless-stopped
+
   # Entity Extraction & Knowledge Graph Builder
   knowledge-builder:
     build:
@@ -249,7 +285,7 @@ services:
       - NEO4J_PASSWORD=password123
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_API_KEY=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
       - SPACY_MODEL=en_core_web_lg
     volumes:
       - ./data:/app/data
@@ -307,7 +343,7 @@ services:
     environment:
       - FIRECRAWL_API_KEY=fc-7669b1d6be7a48a8bd22daf82e3b04b3
       - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/dataplatform
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_API_KEY=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
     ports:
       - "8003:8003"
     depends_on:
@@ -326,7 +362,7 @@ services:
     container_name: document-chat
     environment:
       - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/dataplatform
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_API_KEY=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
       - ELASTICSEARCH_HOST=elasticsearch
       - ELASTICSEARCH_PORT=9200
     ports:
@@ -346,7 +382,7 @@ services:
       dockerfile: Dockerfile
     container_name: frontend-ui
     ports:
-      - "3002:80"
+      - "3000:80"
     depends_on:
       - api-gateway
     restart: unless-stopped
@@ -362,7 +398,7 @@ services:
     ports:
       - "8005:8005"
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_KEY=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
       - OPENAI_MODEL=gpt-4
       - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/dataplatform
       - ELASTICSEARCH_URL=http://elasticsearch:9200
@@ -386,7 +422,7 @@ services:
     ports:
       - "8006:8006"
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_KEY=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
       - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/dataplatform
       - ELASTICSEARCH_URL=http://elasticsearch:9200
     volumes:
@@ -414,6 +450,7 @@ volumes:
   redis_data:
   prometheus_data:
   grafana_data:
+  ollama_data:
 
 networks:
   default:

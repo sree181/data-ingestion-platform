@@ -122,7 +122,7 @@ class User(Base):
     
     # Relationships
     organization = relationship("Organization", back_populates="users")
-    project_memberships = relationship("ProjectMember", back_populates="user")
+    project_memberships = relationship("ProjectMember", back_populates="user", foreign_keys="ProjectMember.user_id")
     audit_logs = relationship("AuditLog", back_populates="user")
     sessions = relationship("UserSession", back_populates="user")
 
@@ -186,7 +186,7 @@ class ProjectMember(Base):
     
     # Relationships
     project = relationship("Project", back_populates="members")
-    user = relationship("User", back_populates="project_memberships")
+    user = relationship("User", back_populates="project_memberships", foreign_keys=[user_id])
     inviter = relationship("User", foreign_keys=[invited_by])
     delegator = relationship("User", foreign_keys=[delegated_by])
     
@@ -281,6 +281,97 @@ class UserSession(Base):
     
     # Relationships
     user = relationship("User", back_populates="sessions")
+
+class SecurityAlert(Base):
+    __tablename__ = "security_alerts"
+    
+    id = Column(Integer, primary_key=True)
+    alert_type = Column(String(100), nullable=False)
+    message = Column(Text, nullable=False)
+    threat_level = Column(String(20), nullable=False)  # critical, high, medium, low
+    
+    # Context
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+    
+    # Status
+    status = Column(String(20), default="active")  # active, resolved, dismissed
+    resolved_at = Column(DateTime, nullable=True)
+    resolved_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    
+    # Timing
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", foreign_keys=[user_id])
+    project = relationship("Project")
+    resolver = relationship("User", foreign_keys=[resolved_by])
+
+class ComplianceAssessment(Base):
+    __tablename__ = "compliance_assessments"
+    
+    id = Column(Integer, primary_key=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
+    framework = Column(String(50), nullable=False)  # sox, gdpr, hipaa, etc.
+    
+    # Assessment Results
+    compliance_percentage = Column(Integer, nullable=False)
+    total_requirements = Column(Integer, nullable=False)
+    compliant_requirements = Column(Integer, nullable=False)
+    
+    # Status
+    status = Column(String(20), default="in_progress")  # in_progress, completed, failed
+    
+    # Timing
+    assessment_date = Column(DateTime, default=datetime.utcnow)
+    completed_at = Column(DateTime, nullable=True)
+    
+    # Relationships
+    project = relationship("Project")
+
+class EncryptionKey(Base):
+    __tablename__ = "encryption_keys"
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    key_type = Column(String(50), nullable=False)  # aes256, rsa2048, etc.
+    classification = Column(Enum(SecurityClassification), nullable=False)
+    
+    # Key Data (encrypted)
+    encrypted_key = Column(Text, nullable=False)
+    key_hash = Column(String(255), nullable=False)
+    
+    # Status
+    status = Column(String(20), default="active")  # active, inactive, rotated
+    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime, nullable=True)
+    
+    # Usage
+    usage_count = Column(Integer, default=0)
+    last_used = Column(DateTime, nullable=True)
+
+class DataClassification(Base):
+    __tablename__ = "data_classifications"
+    
+    id = Column(Integer, primary_key=True)
+    document_id = Column(String(255), nullable=False)
+    classification = Column(Enum(SecurityClassification), nullable=False)
+    
+    # Classification Details
+    confidence_score = Column(Integer, nullable=False)  # 0-100
+    classification_method = Column(String(50), nullable=False)  # manual, automatic, ml
+    keywords_found = Column(JSON, nullable=True)
+    
+    # Context
+    classified_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+    
+    # Timing
+    classified_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User")
+    project = relationship("Project")
 
 # Pydantic Models for API
 class ProjectSecurityConfig(BaseModel):

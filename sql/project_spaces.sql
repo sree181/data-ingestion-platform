@@ -12,6 +12,16 @@ CREATE TABLE IF NOT EXISTS project_spaces (
     created_by UUID NOT NULL REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Security fields
+    security_classification VARCHAR(20) DEFAULT 'internal',
+    encryption_enabled BOOLEAN DEFAULT TRUE,
+    requires_mfa BOOLEAN DEFAULT FALSE,
+    compliance_frameworks JSONB DEFAULT '[]',
+    ip_whitelist JSONB DEFAULT '[]',
+    data_retention_days INTEGER DEFAULT 365,
+    allowed_domains JSONB DEFAULT '[]',
+    
     UNIQUE(name, created_by) -- Prevent duplicate space names per user
 );
 

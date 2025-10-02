@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createTheme } from '@mui/material/styles';
+import { sophisticatedGrayTheme, sophisticatedGrayDarkTheme } from './SophisticatedGrayTheme';
 
 const ThemeContext = createContext();
 
@@ -11,52 +12,71 @@ export const useTheme = () => {
   return context;
 };
 
-// Light theme configuration
+// Sophisticated Gray Theme Configuration - Based on Trendy Gray Palette
 const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0',
+      main: '#495057',        // Gunmetal Gray
+      light: '#6C757D',       // Medium Gray
+      dark: '#343A40',        // Dark Gray
+      contrastText: '#FFFFFF'
     },
     secondary: {
-      main: '#9c27b0',
-      light: '#ba68c8',
-      dark: '#7b1fa2',
+      main: '#69369E',        // Purple & Gray accent
+      light: '#7951A8',       // Light Purple
+      dark: '#565454',        // Dark Violet-Gray
+      contrastText: '#FFFFFF'
     },
     background: {
-      default: '#f8fafc',
-      paper: '#ffffff',
+      default: '#F8F9FA',     // Light Gray background
+      paper: '#FFFFFF',       // Pure white for cards
+      secondary: '#E9ECEF',   // Secondary background
     },
     text: {
-      primary: '#1a202c',
-      secondary: '#4a5568',
+      primary: '#212529',     // Dark gray text
+      secondary: '#6C757D',   // Medium gray text
+      disabled: '#ADB5BD',    // Light gray text
     },
     success: {
-      main: '#2e7d32',
-      light: '#4caf50',
-      dark: '#1b5e20',
+      main: '#5B676D',        // Muted success (Blue & Anvil Gray)
+      light: '#848689',
+      dark: '#536569',
     },
     error: {
-      main: '#d32f2f',
-      light: '#ef5350',
-      dark: '#c62828',
+      main: '#6C757D',        // Muted error (Silver Gray)
+      light: '#868686',
+      dark: '#565656',
     },
     warning: {
-      main: '#ed6c02',
-      light: '#ff9800',
-      dark: '#e65100',
+      main: '#7951A8',        // Purple accent for warnings
+      light: '#9DA9AD',
+      dark: '#69369E',
     },
     info: {
-      main: '#0288d1',
-      light: '#03a9f4',
-      dark: '#01579b',
+      main: '#0C4377',        // Blue & Anvil Gray
+      light: '#226096',
+      dark: '#536569',
     },
-    divider: '#e2e8f0',
+    divider: '#DEE2E6',       // Light gray divider
     action: {
-      hover: 'rgba(0, 0, 0, 0.04)',
-      selected: 'rgba(0, 0, 0, 0.08)',
+      hover: 'rgba(73, 80, 87, 0.04)',
+      selected: 'rgba(73, 80, 87, 0.08)',
+      disabled: 'rgba(73, 80, 87, 0.26)',
+      disabledBackground: 'rgba(73, 80, 87, 0.12)',
+    },
+    // Custom gray scale for consistent usage
+    grey: {
+      50: '#F8F9FA',
+      100: '#E9ECEF',
+      200: '#DEE2E6',
+      300: '#CED4DA',
+      400: '#ADB5BD',
+      500: '#6C757D',
+      600: '#495057',
+      700: '#343A40',
+      800: '#232323',
+      900: '#1F262A',
     },
   },
   typography: {
@@ -281,7 +301,7 @@ export const ThemeContextProvider = ({ children }) => {
     setIsDarkMode(!isDarkMode);
   };
 
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const theme = isDarkMode ? sophisticatedGrayDarkTheme : sophisticatedGrayTheme;
 
   return (
     <ThemeContext.Provider

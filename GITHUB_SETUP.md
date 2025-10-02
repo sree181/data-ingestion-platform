@@ -25,7 +25,7 @@ git remote add origin https://github.com/YOUR_USERNAME/data-ingestion-platform.g
 git push -u origin main
 
 # Push development branch
-git push -u origin development
+    git push -u origin development
 ```
 
 ### 3. Set Branch Protection Rules (Recommended)

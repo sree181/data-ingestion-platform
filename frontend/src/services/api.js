@@ -2,10 +2,130 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: '/api/v1', // This will be proxied by nginx to the API gateway
-  timeout: 10000,
+  baseURL: '/api/v1', // Use relative URL - nginx will proxy to backend
+  timeout: 30000, // 30 seconds default timeout
   maxRedirects: 5, // Follow redirects
 });
+
+// Add request interceptor for authentication
+api.interceptors.request.use(
+  (config) => {
+    // Get token from localStorage
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for token refresh
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      try {
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (refreshToken) {
+          const response = await api.post('/auth/refresh', {
+            refresh_token: refreshToken
+          });
+          
+          const { access_token } = response.data;
+          localStorage.setItem('access_token', access_token);
+          
+          // Retry original request with new token
+          originalRequest.headers.Authorization = `Bearer ${access_token}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        // Refresh failed, redirect to login
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        window.location.href = '/login';
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
+// Authentication functions
+export const authService = {
+  // Login with email and password
+  login: async (email, password, mfaToken = null) => {
+    const response = await api.post('/auth/login', {
+      email,
+      password,
+      mfa_token: mfaToken
+    });
+    
+    // Store tokens
+    if (response.data.access_token) {
+      localStorage.setItem('access_token', response.data.access_token);
+      localStorage.setItem('refresh_token', response.data.refresh_token);
+    }
+    
+    return response.data;
+  },
+  
+  // Setup MFA
+  setupMfa: async (userId) => {
+    const response = await api.post('/auth/mfa/setup', {
+      user_id: userId
+    });
+    return response.data;
+  },
+  
+  // Verify MFA setup
+  verifyMfa: async (userId, token, secret) => {
+    const response = await api.post('/auth/mfa/verify', {
+      user_id: userId,
+      token,
+      secret
+    });
+    return response.data;
+  },
+  
+  // Refresh token
+  refreshToken: async () => {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+    
+    const response = await api.post('/auth/refresh', {
+      refresh_token: refreshToken
+    });
+    
+    // Update stored token
+    localStorage.setItem('access_token', response.data.access_token);
+    
+    return response.data;
+  },
+  
+  // Get current user info
+  getCurrentUser: async () => {
+    const response = await api.get('/auth/me');
+    return response.data;
+  },
+  
+  // Logout
+  logout: () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    window.location.href = '/login';
+  }
+};
 
 // API service functions
 export const apiService = {
@@ -41,11 +161,14 @@ export const apiService = {
       params.append('q', '*'); // Query for all documents (wildcard)
       params.append('size', size.toString());
       params.append('from', (page * size).toString());
+      params.append('_t', Date.now().toString()); // Cache buster
       
-      console.log(`API Request: page=${page}, size=${size}, from=${page * size}`);
+      console.log(`🔍 API Request: page=${page}, size=${size}, from=${page * size}`);
       const response = await api.get(`/search?${params.toString()}`);
       
-      console.log(`API Response: total=${response.data.total}, results=${response.data.results?.length}, first_doc=${response.data.results?.[0]?._source?.title}`);
+      console.log(`📊 API Response: total=${response.data.total}, results=${response.data.results?.length}`);
+      console.log(`📄 First doc:`, response.data.results?.[0]?._source?.title);
+      console.log(`📄 Last doc:`, response.data.results?.[response.data.results?.length - 1]?._source?.title);
       
       return {
         total: response.data.total || 0,
@@ -234,7 +357,7 @@ export const apiService = {
     }
   },
 
-  getEntityNetwork: async (entityId, depth = 2, confidenceThreshold = 0.5) => {
+  getEntityNetworkByEntityId: async (entityId, depth = 2, confidenceThreshold = 0.5) => {
     try {
       const params = {
         depth: depth,
@@ -289,7 +412,7 @@ export const apiService = {
   // Project Spaces API
   getProjectSpaces: async () => {
     try {
-      const response = await api.get('/spaces');
+      const response = await api.get('/spaces/');
       return response.data;
     } catch (error) {
       console.error('Get project spaces API error:', error);
@@ -299,7 +422,7 @@ export const apiService = {
 
   createProjectSpace: async (spaceData) => {
     try {
-      const response = await api.post('/spaces', spaceData);
+      const response = await api.post('/spaces/', spaceData);
       return response.data;
     } catch (error) {
       console.error('Create project space API error:', error);
@@ -327,13 +450,17 @@ export const apiService = {
     }
   },
 
-  deleteProjectSpace: async (spaceId) => {
+  deleteProjectSpace: async (spaceId, authLevel = 'owner') => {
     try {
-      const response = await api.delete(`/spaces/${spaceId}`);
+      // Pass auth_level as a query parameter with proper encoding
+      const params = new URLSearchParams({ auth_level: authLevel });
+      const response = await api.delete(`/spaces/${spaceId}?${params.toString()}`);
       return response.data;
     } catch (error) {
       console.error('Delete project space API error:', error);
-      throw new Error('Failed to delete project space');
+      // Include backend error details if available
+      const errorMessage = error.response?.data?.detail || 'Failed to delete project space';
+      throw new Error(errorMessage);
     }
   },
 
@@ -346,6 +473,65 @@ export const apiService = {
       throw new Error('Failed to get space analytics');
     }
   },
+
+  // Document Ingestion APIs
+  getLocalFiles: async (spaceId, fileType = null) => {
+    try {
+      const params = fileType ? { file_type: fileType } : {};
+      const response = await api.get(`/spaces/${spaceId}/ingestion/local-files`, { params });
+      return response.data;
+    } catch (error) {
+      console.error('Get local files API error:', error);
+      throw new Error('Failed to get local files');
+    }
+  },
+
+  startBatchIngestion: async (spaceId, ingestionRequest) => {
+    try {
+      console.log('📤 Sending batch ingestion request to:', `/spaces/${spaceId}/ingestion/start`);
+      console.log('📤 Request payload:', JSON.stringify(ingestionRequest, null, 2));
+      
+      const response = await api.post(`/spaces/${spaceId}/ingestion/start`, ingestionRequest);
+      return response.data;
+    } catch (error) {
+      console.error('Start batch ingestion API error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      throw new Error(`Failed to start batch ingestion: ${error.response?.data?.detail || error.message}`);
+    }
+  },
+
+  getIngestionStatus: async (spaceId) => {
+    try {
+      const response = await api.get(`/spaces/${spaceId}/ingestion/status`);
+      return response.data;
+    } catch (error) {
+      console.error('Get ingestion status API error:', error);
+      throw new Error('Failed to get ingestion status');
+    }
+  },
+
+  // LLM-based document structure analysis
+  analyzeDocumentStructure: async (documentId) => {
+    try {
+      const response = await api.get(`/documents/${documentId}/structure`, {
+        timeout: 180000  // 3 minutes timeout for OpenAI GPT-4 analysis
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Document structure analysis API error:', error);
+      throw new Error('Failed to analyze document structure');
+    }
+  },
+
+  // Advanced Analytics - Real Data Features
+  getTopicExtraction: () => api.get('/analytics/topic-extraction'),
+  getDocumentRelationships: () => api.get('/analytics/document-relationships'),
+  getLegalRiskAssessment: () => api.get('/analytics/legal-risk-assessment'),
+  getEntityNetwork: () => api.get('/analytics/entity-network'),
+  getSentimentAnalysis: () => api.get('/analytics/sentiment-analysis'),
+  getContentFlow: () => api.get('/analytics/content-flow'),
+  getTemporalEvolution: () => api.get('/analytics/temporal-evolution'),
 };
 
 // Transform Elasticsearch result to UI format
@@ -436,3 +622,4 @@ function extractHighlights(tags) {
 }
 
 export default apiService;
+export { api };

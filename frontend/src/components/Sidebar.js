@@ -27,6 +27,7 @@ import {
   Chat as ChatIcon,
   Folder as SpacesIcon,
   Business as LeaseIcon,
+  Security as SecurityIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 280;
@@ -73,6 +74,12 @@ const menuItems = [
     label: 'Lease Management',
     icon: <LeaseIcon />,
     description: 'Obligation extraction & comparison',
+  },
+  {
+    path: '/security',
+    label: 'Security Dashboard',
+    icon: <SecurityIcon />,
+    description: 'Security & compliance',
   },
 ];
 

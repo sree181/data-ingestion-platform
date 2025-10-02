@@ -39,6 +39,24 @@ services:
       timeout: 5s
       retries: 5
 
+  # Elasticsearch for search and indexing
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   # Apache Kafka for streaming
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
@@ -162,6 +180,7 @@ services:
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
+      - ./Searchable:/app/Searchable
 
   # Document Processing Service
   document-processor:
@@ -187,6 +206,24 @@ services:
       - MINIO_ACCESS_KEY=admin
       - MINIO_SECRET_KEY=minio123
       - LLAMAPARSE_API_KEY=${LLAMAPARSE_API_KEY:-}
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./Searchable:/app/Searchable
+
+  # PubMed Integration Service
+  pubmed-integration:
+    build:
+      context: ./services/pubmed-integration
+      dockerfile: Dockerfile
+    container_name: pubmed-integration
+    ports:
+      - "8005:8005"
+    depends_on:
+      - document-processor
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4}
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
@@ -256,6 +293,7 @@ services:
 volumes:
   minio_data:
   postgres_data:
+  elasticsearch_data:
   zookeeper_data:
   kafka_data:
   chromadb_data:

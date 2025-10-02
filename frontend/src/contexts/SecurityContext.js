@@ -36,7 +36,7 @@ export const SecurityProvider = ({ children }) => {
       setSecurityData(prev => ({ ...prev, loading: true, error: null }));
       
       const params = projectId ? `?project_id=${projectId}` : '';
-      const response = await api.get(`/api/v1/security/dashboard${params}`);
+      const response = await api.get(`/security/dashboard${params}`);
       
       setSecurityData(prev => ({
         ...prev,
@@ -62,35 +62,43 @@ export const SecurityProvider = ({ children }) => {
       if (filters.threat_level) params.append('threat_level', filters.threat_level);
       if (filters.limit) params.append('limit', filters.limit);
       
-      const response = await api.get(`/api/v1/security/monitoring/alerts?${params}`);
+      const response = await api.get(`/security/alerts?${params}`);
       
       setSecurityData(prev => ({
         ...prev,
-        alerts: response.data
+        alerts: Array.isArray(response.data) ? response.data : []
       }));
     } catch (error) {
       console.error('Failed to load security alerts:', error);
+      setSecurityData(prev => ({
+        ...prev,
+        alerts: []
+      }));
     }
   };
 
   // Load compliance frameworks
   const loadComplianceFrameworks = async () => {
     try {
-      const response = await api.get('/api/v1/security/compliance/frameworks');
+      const response = await api.get('/security/compliance/frameworks');
       
       setSecurityData(prev => ({
         ...prev,
-        complianceFrameworks: response.data
+        complianceFrameworks: Array.isArray(response.data) ? response.data : []
       }));
     } catch (error) {
       console.error('Failed to load compliance frameworks:', error);
+      setSecurityData(prev => ({
+        ...prev,
+        complianceFrameworks: []
+      }));
     }
   };
 
   // Assess project compliance
   const assessCompliance = async (projectId, framework) => {
     try {
-      const response = await api.post('/api/v1/security/compliance/assess', {
+      const response = await api.post('/security/compliance/assess', {
         project_id: projectId,
         framework: framework
       });
@@ -105,7 +113,7 @@ export const SecurityProvider = ({ children }) => {
   // Generate compliance report
   const generateComplianceReport = async (projectId, framework, reportType = 'assessment') => {
     try {
-      const response = await api.post('/api/v1/security/compliance/report', {
+      const response = await api.post('/security/compliance/report', {
         project_id: projectId,
         framework: framework,
         report_type: reportType
@@ -121,7 +129,12 @@ export const SecurityProvider = ({ children }) => {
   // Load encryption keys
   const loadEncryptionKeys = async (projectId) => {
     try {
-      const response = await api.get(`/api/v1/security/encryption/keys?project_id=${projectId}`);
+      const params = new URLSearchParams();
+      if (projectId && projectId !== 'undefined') {
+        params.append('project_id', projectId);
+      }
+      
+      const response = await api.get(`/security/encryption/keys?${params.toString()}`);
       
       setSecurityData(prev => ({
         ...prev,
@@ -129,13 +142,17 @@ export const SecurityProvider = ({ children }) => {
       }));
     } catch (error) {
       console.error('Failed to load encryption keys:', error);
+      setSecurityData(prev => ({
+        ...prev,
+        encryptionKeys: []
+      }));
     }
   };
 
   // Create encryption key
   const createEncryptionKey = async (projectId) => {
     try {
-      const response = await api.post('/api/v1/security/encryption/keys', {
+      const response = await api.post('/security/encryption/keys', {
         project_id: projectId
       });
       
@@ -152,7 +169,7 @@ export const SecurityProvider = ({ children }) => {
   // Rotate encryption key
   const rotateEncryptionKey = async (keyId) => {
     try {
-      const response = await api.post(`/api/v1/security/encryption/keys/${keyId}/rotate`);
+      const response = await api.post(`/security/encryption/keys/${keyId}/rotate`);
       
       return response.data;
     } catch (error) {
@@ -172,7 +189,7 @@ export const SecurityProvider = ({ children }) => {
       if (filters.end_date) params.append('end_date', filters.end_date);
       if (filters.limit) params.append('limit', filters.limit);
       
-      const response = await api.get(`/api/v1/security/audit/events?${params}`);
+      const response = await api.get(`/security/audit/events?${params}`);
       
       setSecurityData(prev => ({
         ...prev,
@@ -186,7 +203,7 @@ export const SecurityProvider = ({ children }) => {
   // Log security event
   const logSecurityEvent = async (eventData) => {
     try {
-      const response = await api.post('/api/v1/security/monitoring/events', eventData);
+      const response = await api.post('/security/monitoring/events', eventData);
       
       return response.data;
     } catch (error) {
@@ -198,7 +215,7 @@ export const SecurityProvider = ({ children }) => {
   // Resolve security alert
   const resolveSecurityAlert = async (alertId, resolutionData = {}) => {
     try {
-      const response = await api.post(`/api/v1/security/monitoring/alerts/${alertId}/resolve`, resolutionData);
+      const response = await api.post(`/security/monitoring/alerts/${alertId}/resolve`, resolutionData);
       
       // Reload alerts
       await loadSecurityAlerts();
@@ -214,7 +231,7 @@ export const SecurityProvider = ({ children }) => {
   const loadSecurityHealth = async (projectId = null) => {
     try {
       const params = projectId ? `?project_id=${projectId}` : '';
-      const response = await api.get(`/api/v1/security/health${params}`);
+      const response = await api.get(`/security/health${params}`);
       
       setSecurityData(prev => ({
         ...prev,
@@ -229,7 +246,7 @@ export const SecurityProvider = ({ children }) => {
   const getExecutiveSummary = async (projectId = null) => {
     try {
       const params = projectId ? `?project_id=${projectId}` : '';
-      const response = await api.get(`/api/v1/security/reports/executive-summary${params}`);
+      const response = await api.get(`/security/reports/executive-summary${params}`);
       
       return response.data;
     } catch (error) {

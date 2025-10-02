@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     max_failed_login_attempts: int = int(os.getenv("MAX_FAILED_LOGIN_ATTEMPTS", "5"))
     
     # CORS and Hosts
-    allowed_origins: List[str] = ["http://localhost:3002", "http://localhost:8080", "http://frontend:80"]
+    allowed_origins: List[str] = ["http://localhost:3000", "http://localhost:8080", "http://frontend:80"]
     allowed_hosts: List[str] = ["localhost", "127.0.0.1", "api-gateway"]
     
     # Database
