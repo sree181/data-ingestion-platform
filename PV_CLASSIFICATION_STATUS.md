@@ -206,3 +206,4 @@ docker logs pv-classification-service | tail -20
 **Memory Available**: 5.4GB for Ollama  
 **Model**: Llama 3.2 3B (2.0GB)
 
+

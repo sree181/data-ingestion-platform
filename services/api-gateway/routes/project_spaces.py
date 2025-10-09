@@ -7,6 +7,7 @@ from typing import List, Optional
 import structlog
 from datetime import datetime
 from auth.jwt_auth import get_current_user, require_mfa_verification
+from auth.space_mfa_enforcement import require_space_mfa_verification
 from security.rate_limiter import check_rate_limit
 
 from models.project_spaces import (
@@ -129,7 +130,7 @@ async def get_user_spaces(
 async def delete_project_space(
     space_id: str,
     auth_level: str = Query("owner", description="Required authentication level: owner, admin, member, or viewer"),
-    user: dict = Depends(require_mfa_verification),  # Require MFA for deletions
+    user: dict = Depends(get_current_user),
     spaces_service: ProjectSpacesService = Depends(get_spaces_service),
     request: Request = None
 ):
@@ -158,6 +159,9 @@ async def delete_project_space(
         
         if not user or not user.get("user_id"):
             raise HTTPException(status_code=401, detail="User authentication required")
+        
+        # Enforce MFA if the space requires it
+        user = await require_space_mfa_verification(space_id, request, user)
         
         # Validate authentication level
         valid_levels = ["owner", "admin", "member", "viewer"]
@@ -209,9 +213,9 @@ async def delete_project_space(
         logger.info(f"Space deleted successfully - space_id={space_id}, user_id={str(user['user_id'])}, auth_level={auth_level}")
         return response_data
         
-    except HTTPException:
-        # Re-raise HTTP exceptions as-is
-        raise
+    except HTTPException as e:
+        # Re-raise HTTPExceptions from MFA enforcement
+        raise e
     except PermissionError as e:
         logger.warning(f"Delete authorization failed - space_id={space_id}, user_id={user.get('user_id', 'unknown')}, error={str(e)}")
         raise HTTPException(status_code=403, detail=str(e))
@@ -226,19 +230,24 @@ async def delete_project_space(
 @router.get("/{space_id}", response_model=ProjectSpace)
 async def get_project_space(
     space_id: str,
+    request: Request,
     user: dict = Depends(get_current_user),
     spaces_service: ProjectSpacesService = Depends(get_spaces_service)
 ):
-    """Get a specific project space by ID"""
+    """Get a specific project space by ID with MFA enforcement"""
     try:
+        # Enforce MFA if the space requires it
+        user = await require_space_mfa_verification(space_id, request, user)
+        
         space = await spaces_service.get_space_by_id(space_id, user["user_id"])
         if not space:
             raise HTTPException(status_code=404, detail="Project space not found")
         
         return space
         
-    except HTTPException:
-        raise
+    except HTTPException as e:
+        # Re-raise HTTPExceptions from MFA enforcement
+        raise e
     except Exception as e:
         logger.error("Failed to get project space", error=str(e), space_id=space_id, user_id=user["user_id"])
         raise HTTPException(status_code=500, detail="Failed to retrieve project space")
@@ -248,21 +257,29 @@ async def get_project_space(
 async def update_project_space(
     space_id: str,
     space_data: ProjectSpaceUpdate,
+    request: Request,
     user: dict = Depends(get_current_user),
     spaces_service: ProjectSpacesService = Depends(get_spaces_service)
 ):
-    """Update a project space"""
+    """Update a project space with MFA enforcement"""
     try:
+        # Enforce MFA if the space requires it
+        user = await require_space_mfa_verification(space_id, request, user)
+        
         space = await spaces_service.update_space(space_id, space_data, user["user_id"])
         logger.info("Project space updated", space_id=space_id, user_id=user["user_id"])
         return space
         
+    except HTTPException as e:
+        # Re-raise HTTPExceptions from MFA enforcement
+        logger.info(f"HTTPException caught in update endpoint: {e.status_code} - {e.detail}")
+        raise e
     except PermissionError as e:
         raise HTTPException(status_code=403, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error("Failed to update project space", error=str(e), space_id=space_id, user_id=user["user_id"])
+        logger.error("Failed to update project space", error=str(e), error_type=type(e).__name__, space_id=space_id, user_id=user["user_id"])
         raise HTTPException(status_code=500, detail="Failed to update project space")
 
 

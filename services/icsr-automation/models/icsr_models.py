@@ -271,3 +271,4 @@ class XMLGenerationResponse(BaseModel):
     xml_content: str = Field(..., description="Generated XML content")
     file_name: str = Field(..., description="Generated XML file name")
     validation_status: str = Field(..., description="XML validation status")
+

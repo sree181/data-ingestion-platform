@@ -347,3 +347,4 @@ class ICHE2BR3XMLGenerator:
 
 # Initialize service
 xml_generator = ICHE2BR3XMLGenerator()
+

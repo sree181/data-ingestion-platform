@@ -2083,7 +2083,7 @@ async def get_document_structure(document_id: str):
             
             if document_structure:
                 # Return pre-analyzed structure (instant response!)
-                return {
+    return {
                     "document_id": document_id,
                     "document_title": title,
                     "document_type": document_structure.get("document_type", "unknown"),
@@ -2886,8 +2886,8 @@ async def simple_login(request: LoginRequest):
     
     # Generate token
     token = jwt.encode(payload, secret_key, algorithm=algorithm)
-    
-    return {
+        
+        return {
         "access_token": token,
         "token_type": "bearer",
         "expires_in": 28800,  # 8 hours
@@ -3010,6 +3010,12 @@ async def startup_event():
         await create_default_admin_user()
         
         print("✅ Database connected successfully")
+        
+        # Include space MFA enforcement routes after database is connected
+        from routes.space_mfa_endpoints import router as space_mfa_router
+        app.include_router(space_mfa_router)
+        print("✅ Space MFA enforcement router registered")
+        
     except Exception as e:
         print(f"❌ Failed to connect to database: {e}")
         db_manager = None  # Set to None to prevent errors

@@ -214,3 +214,4 @@ Generate the narrative now:"""
 
 # Initialize service
 narrative_generator = ICSRNarrativeGenerator()
+

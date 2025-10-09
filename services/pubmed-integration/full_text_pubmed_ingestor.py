@@ -454,3 +454,4 @@ if __name__ == "__main__":
         print(f"   PMID: {article.pmid} | PMCID: {article.pmcid or 'N/A'}")
         print(f"   Full text: {'Yes' if article.full_text else 'No'} ({len(article.full_text or '')} chars)")
 
+

@@ -76,3 +76,4 @@ class ICSRExtractionResponse(BaseModel):
     extracted_data: Dict[str, Any]
     confidence: float
     validation_errors: List[str] = []
+

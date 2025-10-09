@@ -1146,3 +1146,4 @@ Future enhancements including active learning, continuous model improvement, and
 ---
 
 *This document provides a comprehensive technical overview of the PV classification methodology. For implementation details, code examples, and deployment instructions, refer to the accompanying technical documentation and source code repositories.*
+

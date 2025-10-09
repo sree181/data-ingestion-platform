@@ -256,3 +256,4 @@ class RuleBasedClassifier:
 # Singleton instance
 rule_based_classifier = RuleBasedClassifier()
 
+

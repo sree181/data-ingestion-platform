@@ -86,3 +86,4 @@ echo "2. Check Elasticsearch: curl http://localhost:9200/documents/_search?q=pro
 echo "3. View in Document Library UI"
 echo ""
 
+

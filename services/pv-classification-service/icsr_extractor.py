@@ -384,3 +384,4 @@ Extract the data now:"""
 
 # Initialize service
 icsr_extractor = ICSRExtractor()
+

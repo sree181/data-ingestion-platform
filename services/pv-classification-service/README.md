@@ -257,3 +257,4 @@ For issues or questions:
 - Verify Ollama: `docker exec -it ollama ollama list`
 - Test endpoint: `curl http://localhost:8012/health`
 
+

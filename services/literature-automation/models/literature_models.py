@@ -83,3 +83,4 @@ class ICSRExtractionResponse(BaseModel):
     confidence: float = Field(..., description="Extraction confidence score")
     validation_errors: List[str] = Field(default=[], description="Data validation errors")
     processing_time: Optional[float] = Field(None, description="Processing time in seconds")
+

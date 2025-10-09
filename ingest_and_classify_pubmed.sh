@@ -139,3 +139,4 @@ echo "  ✅ Classified: $CLASSIFIED"
 echo "  ❌ Failed: $FAILED"
 echo ""
 echo "📊 View results at: http://localhost:3000/documents"
+
