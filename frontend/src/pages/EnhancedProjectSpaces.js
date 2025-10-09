@@ -100,12 +100,53 @@ import {
   CloudUpload as UploadIcon,
   Api as ApiIcon,
   Folder as FolderIcon,
-  SmartToy as SmartToyIcon
+  SmartToy as SmartToyIcon,
+  Science as ScienceIcon
 } from '@mui/icons-material';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 import ModelSelector from '../components/ModelSelector';
 import LoginDialog from '../components/LoginDialog';
 import { useAuth } from '../contexts/AuthContext';
+
+// Source configuration for multi-source ingestion
+const SOURCE_CONFIG = {
+  clinicaltrials: {
+    name: 'ClinicalTrials.gov',
+    icon: <BusinessIcon />,
+    color: '#1976d2',
+    description: 'Clinical trials worldwide',
+    enabled: true
+  },
+  fda: {
+    name: 'FDA OpenFDA',
+    icon: <SecurityIcon />,
+    color: '#d32f2f',
+    description: 'Drug safety & adverse events',
+    enabled: true
+  },
+  chembl: {
+    name: 'ChEMBL',
+    icon: <ScienceIcon />,
+    color: '#388e3c',
+    description: 'Chemical compounds & bioactivity',
+    enabled: false, // Requires API key
+    requiresApiKey: true
+  },
+  semanticscholar: {
+    name: 'Semantic Scholar',
+    icon: <DocumentsIcon />,
+    color: '#7b1fa2',
+    description: 'AI-powered research papers',
+    enabled: true
+  },
+  europepmc: {
+    name: 'Europe PMC',
+    icon: <DocumentsIcon />,
+    color: '#f57c00',
+    description: 'European research papers',
+    enabled: true
+  }
+};
 
 const SECURITY_CLASSIFICATIONS = [
   { value: 'public', label: 'Public', color: 'success', icon: '🌍' },
@@ -206,6 +247,19 @@ function EnhancedProjectSpaces() {
   const [availableModels, setAvailableModels] = useState([]);
   const [modelLoading, setModelLoading] = useState(false);
   
+  // Multi-source ingestion state
+  const [ingestionQuery, setIngestionQuery] = useState('');
+  const [selectedIngestionSources, setSelectedIngestionSources] = useState(['clinicaltrials', 'fda', 'europepmc']);
+  const [maxResultsPerSource, setMaxResultsPerSource] = useState(5);
+  const [enableAIAnalysis, setEnableAIAnalysis] = useState(true);
+  const [enableEntityExtraction, setEnableEntityExtraction] = useState(true);
+  const [enableRelationshipExtraction, setEnableRelationshipExtraction] = useState(true);
+  const [isIngesting, setIsIngesting] = useState(false);
+  const [ingestionJobId, setIngestionJobId] = useState(null);
+  const [ingestionProgress, setIngestionProgress] = useState(0);
+  const [ingestionStatus, setIngestionStatus] = useState('');
+  const [ingestionStatusData, setIngestionStatusData] = useState(null);
+  
   // Form states
   const [newProject, setNewProject] = useState({
     name: '',
@@ -267,7 +321,6 @@ function EnhancedProjectSpaces() {
   const [localFiles, setLocalFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState(new Set());
   const [loadingFiles, setLoadingFiles] = useState(false);
-  const [ingestionStatus, setIngestionStatus] = useState(null);
   const [loadingIngestion, setLoadingIngestion] = useState(false);
   
   const [memberInvitation, setMemberInvitation] = useState({
@@ -306,7 +359,7 @@ function EnhancedProjectSpaces() {
       console.log('📡 Making API call to get ingestion status for project:', selectedProject.id);
       const statusResponse = await apiService.getIngestionStatus(selectedProject.id);
       console.log('📊 Polling ingestion status:', statusResponse);
-      setIngestionStatus(statusResponse);
+      setIngestionStatusData(statusResponse);
       
       console.log('✅ Updated ingestion status');
       console.log('🔍 Current ingestionStatus state after update:', statusResponse);
@@ -431,6 +484,85 @@ function EnhancedProjectSpaces() {
   const handleModelSelect = (modelName) => {
     setSelectedModel(modelName);
     console.log('Model selected:', modelName);
+  };
+
+  // Multi-source ingestion functions
+  const handleStartIngestion = async () => {
+    if (!ingestionQuery.trim()) {
+      alert('Please enter a search query for ingestion');
+      return;
+    }
+    
+    if (selectedIngestionSources.length === 0) {
+      alert('Please select at least one data source');
+      return;
+    }
+
+    try {
+      setIsIngesting(true);
+      setIngestionStatus('Starting ingestion...');
+      setIngestionProgress(0);
+
+      const response = await apiService.startIngestion({
+        query: ingestionQuery,
+        sources: selectedIngestionSources,
+        max_results_per_source: maxResultsPerSource,
+        project_space_id: selectedProject.id,
+        processing_options: {
+          model_name: selectedModel,
+          enable_ai_analysis: enableAIAnalysis,
+          enable_entity_extraction: enableEntityExtraction,
+          enable_relationship_extraction: enableRelationshipExtraction
+        }
+      });
+
+      setIngestionJobId(response.job_id);
+      setIngestionStatus('Ingestion started successfully');
+      alert(`Ingestion job started: ${response.job_id}`);
+      
+      // Start monitoring the job
+      monitorIngestionJob(response.job_id);
+      
+    } catch (error) {
+      console.error('Ingestion error:', error);
+      alert('Failed to start ingestion: ' + (error.message || 'Unknown error'));
+      setIsIngesting(false);
+      setIngestionStatus('Failed to start ingestion');
+    }
+  };
+
+  // Monitor ingestion job progress
+  const monitorIngestionJob = async (jobId) => {
+    const checkStatus = async () => {
+      try {
+        const response = await apiService.getIngestionJobStatus(jobId);
+        const { status, progress } = response;
+        
+        setIngestionStatus(status);
+        setIngestionProgress(progress || 0);
+        
+        if (status === 'completed') {
+          setIsIngesting(false);
+          setIngestionStatus('Ingestion completed successfully');
+          alert('Ingestion completed successfully!');
+          // Refresh project data to show new documents
+          loadProjects();
+        } else if (status === 'failed') {
+          setIsIngesting(false);
+          setIngestionStatus('Ingestion failed');
+          alert('Ingestion failed: ' + (response.error || 'Unknown error'));
+        } else if (status === 'running') {
+          // Continue monitoring
+          setTimeout(checkStatus, 2000);
+        }
+      } catch (error) {
+        console.error('Error monitoring ingestion job:', error);
+        setIsIngesting(false);
+        setIngestionStatus('Error monitoring job');
+      }
+    };
+    
+    checkStatus();
   };
 
   const handleAuthRequired = () => {
@@ -818,7 +950,7 @@ function EnhancedProjectSpaces() {
       await loadProjects();
       
       // Humanized success message
-      const timestamp = new Date(response.timestamp).toLocaleString();
+      const timestamp = response.timestamp ? new Date(response.timestamp).toLocaleString() : 'Unknown time';
       const isAfterHours = !isBusinessHours && isAdmin;
       
       alert(`✅ Workspace Deleted Successfully!\n\n` +
@@ -1488,7 +1620,7 @@ Type "DELETE ALL" to confirm:`;
     }
   };
 
-  const handleStartIngestion = async () => {
+  const handleStartLocalIngestion = async () => {
     if (!selectedProject || selectedFiles.size === 0) return;
     
     // Check authentication
@@ -2145,59 +2277,138 @@ Type "DELETE ALL" to confirm:`;
                   </Card>
                 </Grid>
 
-                {/* External APIs Section */}
+                {/* Multi-Source Ingestion Section */}
                 <Grid item xs={12} md={6}>
                   <Card variant="outlined" sx={{ p: 2 }}>
                     <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <ApiIcon />
-                      External API Sources
+                      Multi-Source Ingestion
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      Connect to external APIs to fetch and ingest documents automatically.
+                      Search and ingest documents from multiple external data sources.
                     </Typography>
                     
                     <Stack spacing={2}>
-                      <Button
-                        variant="outlined"
-                        startIcon={<ApiIcon />}
+                      {/* Search Query */}
+                      <TextField
                         fullWidth
-                        onClick={() => setShowPubMedDialog(true)}
-                      >
-                        Configure PubMed API
-                      </Button>
+                        label="Search Query"
+                        placeholder="Enter search query (e.g., 'COVID-19 vaccine efficacy')"
+                        value={ingestionQuery}
+                        onChange={(e) => setIngestionQuery(e.target.value)}
+                        size="small"
+                      />
                       
+                      {/* Data Sources Selection */}
+                      <Box>
+                        <Typography variant="subtitle2" gutterBottom>
+                          Select Data Sources
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                          {Object.entries(SOURCE_CONFIG).map(([sourceId, config]) => (
+                            <Chip
+                              key={sourceId}
+                              label={config.name}
+                              icon={config.icon}
+                              color={selectedIngestionSources.includes(sourceId) ? 'primary' : 'default'}
+                              variant={selectedIngestionSources.includes(sourceId) ? 'filled' : 'outlined'}
+                              onClick={() => {
+                                if (selectedIngestionSources.includes(sourceId)) {
+                                  setSelectedIngestionSources(prev => prev.filter(s => s !== sourceId));
+                                } else {
+                                  setSelectedIngestionSources(prev => [...prev, sourceId]);
+                                }
+                              }}
+                              disabled={!config.enabled}
+                              size="small"
+                              sx={{
+                                '&.MuiChip-filled': {
+                                  bgcolor: config.color,
+                                  color: 'white'
+                                }
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </Box>
+                      
+                      {/* Advanced Options */}
+                      <Box>
+                        <Typography variant="subtitle2" gutterBottom>
+                          Advanced Options
+                        </Typography>
+                        <Grid container spacing={1}>
+                          <Grid item xs={6}>
+                            <TextField
+                              fullWidth
+                              label="Max Results per Source"
+                              type="number"
+                              value={maxResultsPerSource}
+                              onChange={(e) => setMaxResultsPerSource(parseInt(e.target.value) || 5)}
+                              inputProps={{ min: 1, max: 50 }}
+                              size="small"
+                            />
+                          </Grid>
+                          <Grid item xs={6}>
+                            <FormControl fullWidth size="small">
+                              <InputLabel>AI Model</InputLabel>
+                              <Select
+                                value={selectedModel}
+                                onChange={(e) => setSelectedModel(e.target.value)}
+                                label="AI Model"
+                              >
+                                <MenuItem value="phi3:mini">Phi3 Mini</MenuItem>
+                                <MenuItem value="llama3.1:8b">Llama 3.1 8B</MenuItem>
+                                <MenuItem value="gpt-4">GPT-4</MenuItem>
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                        </Grid>
+                        
+                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 1 }}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={enableAIAnalysis}
+                                onChange={(e) => setEnableAIAnalysis(e.target.checked)}
+                                size="small"
+                              />
+                            }
+                            label="AI Analysis"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={enableEntityExtraction}
+                                onChange={(e) => setEnableEntityExtraction(e.target.checked)}
+                                size="small"
+                              />
+                            }
+                            label="Entity Extraction"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={enableRelationshipExtraction}
+                                onChange={(e) => setEnableRelationshipExtraction(e.target.checked)}
+                                size="small"
+                              />
+                            }
+                            label="Relationships"
+                          />
+                        </Box>
+                      </Box>
+                      
+                      {/* Start Ingestion Button */}
                       <Button
-                        variant="outlined"
-                        startIcon={<SmartToyIcon />}
+                        variant="contained"
+                        startIcon={isIngesting ? <CircularProgress size={16} /> : <UploadIcon />}
                         fullWidth
-                        onClick={() => setShowModelSelector(true)}
+                        onClick={handleStartIngestion}
+                        disabled={isIngesting || !ingestionQuery || selectedIngestionSources.length === 0}
                         sx={{ mt: 1 }}
                       >
-                        Select AI Model ({selectedModel})
-                      </Button>
-                      
-                      <Button
-                        variant="outlined"
-                        startIcon={<ApiIcon />}
-                        fullWidth
-                        onClick={() => {
-                          // TODO: Implement Contract API connector
-                          alert('Contract API connector will be implemented here');
-                        }}
-                      >
-                        Configure Contract APIs
-                      </Button>
-                      
-                      <Button
-                        variant="outlined"
-                        startIcon={<ApiIcon />}
-                        fullWidth
-                        onClick={() => {
-                          // TODO: Implement Custom API connector
-                          alert('Custom API connector will be implemented here');
-                        }}
-                      >
-                        Add Custom API
+                        {isIngesting ? 'Ingesting...' : 'Start Multi-Source Ingestion'}
                       </Button>
                     </Stack>
                   </Card>
@@ -2229,19 +2440,41 @@ Type "DELETE ALL" to confirm:`;
                       </Button>
                     </Box>
                     
+                    {/* Multi-Source Ingestion Progress */}
+                    {isIngesting && (
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="subtitle2" gutterBottom>
+                          Multi-Source Ingestion Progress
+                        </Typography>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={ingestionProgress} 
+                          sx={{ mb: 1 }}
+                        />
+                        <Typography variant="body2" color="text.secondary">
+                          {ingestionStatus} ({ingestionProgress}%)
+                        </Typography>
+                        {ingestionJobId && (
+                          <Typography variant="caption" color="text.secondary">
+                            Job ID: {ingestionJobId}
+                          </Typography>
+                        )}
+                      </Box>
+                    )}
+                    
                     {/* Debug information */}
                     <Box sx={{ mb: 2, p: 1, backgroundColor: '#f5f5f5', borderRadius: 1, fontSize: '12px' }}>
-                      <Typography variant="caption" color="text.secondary">
-                        Debug: ingestionStatus = {JSON.stringify(ingestionStatus, null, 2)}
+                      <Typography variant="caption" color="text.secondary" component="pre">
+                        {`Debug: ingestionStatusData = ${JSON.stringify(ingestionStatusData, null, 2) || 'null'}`}
                       </Typography>
                     </Box>
                     
-                    {ingestionStatus ? (
+                    {ingestionStatusData ? (
                       <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} md={3}>
                           <Box textAlign="center" p={2} sx={{ backgroundColor: 'success.light', borderRadius: 2 }}>
                             <Typography variant="h4" fontWeight={600} color="success.dark">
-                              {ingestionStatus.total_documents || 0}
+                              {ingestionStatusData.total_documents || 0}
                             </Typography>
                             <Typography variant="body2" color="success.dark">
                               Total Documents
@@ -2252,7 +2485,7 @@ Type "DELETE ALL" to confirm:`;
                         <Grid item xs={12} sm={6} md={3}>
                           <Box textAlign="center" p={2} sx={{ backgroundColor: 'info.light', borderRadius: 2 }}>
                             <Typography variant="h4" fontWeight={600} color="info.dark">
-                              {ingestionStatus.success_rate || 0}%
+                              {ingestionStatusData.success_rate || 0}%
                             </Typography>
                             <Typography variant="body2" color="info.dark">
                               Success Rate
@@ -2263,7 +2496,7 @@ Type "DELETE ALL" to confirm:`;
                         <Grid item xs={12} sm={6} md={3}>
                           <Box textAlign="center" p={2} sx={{ backgroundColor: 'warning.light', borderRadius: 2 }}>
                             <Typography variant="h4" fontWeight={600} color="warning.dark">
-                              {ingestionStatus.active_jobs || 0}
+                              {ingestionStatusData.active_jobs || 0}
                             </Typography>
                             <Typography variant="body2" color="warning.dark">
                               Active Jobs
@@ -2288,24 +2521,24 @@ Type "DELETE ALL" to confirm:`;
                           Loading ingestion status...
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Debug: ingestionStatus = {JSON.stringify(ingestionStatus)}
+                          {`Debug: ingestionStatus = ${JSON.stringify(ingestionStatus) || 'null'}`}
                         </Typography>
                       </Box>
                     )}
 
-                    {ingestionStatus?.jobs && ingestionStatus.jobs.length > 0 ? (
+                    {ingestionStatusData?.jobs && ingestionStatusData.jobs.length > 0 ? (
                       <Box mt={3}>
                         <Typography variant="body2" color="text.secondary" gutterBottom>
                           Recent Ingestion Jobs
                         </Typography>
-                        {ingestionStatus.jobs.slice(0, 3).map((job, index) => (
+                        {ingestionStatusData.jobs.slice(0, 3).map((job, index) => (
                           <Box key={job.job_id} sx={{ mb: 1, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
                             <Box display="flex" justifyContent="space-between" alignItems="center">
                               <Typography variant="body2" fontWeight={500}>
                                 Job {index + 1}: {job.status}
                               </Typography>
                               <Typography variant="caption" color="text.secondary">
-                                {new Date(job.created_at).toLocaleString()}
+                                {job.created_at ? new Date(job.created_at).toLocaleString() : 'Unknown date'}
                               </Typography>
                             </Box>
                             <Typography variant="body2" color="text.secondary">
@@ -2435,7 +2668,7 @@ Type "DELETE ALL" to confirm:`;
                       <TableRow key={log.id}>
                         <TableCell>
                           <Typography variant="body2">
-                            {new Date(log.timestamp).toLocaleString()}
+                            {log.timestamp ? new Date(log.timestamp).toLocaleString() : 'Unknown date'}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -4152,7 +4385,7 @@ Type "DELETE ALL" to confirm:`;
           
           <Button
             variant="contained"
-            onClick={handleStartIngestion}
+            onClick={handleStartLocalIngestion}
             disabled={selectedFiles.size === 0 || loadingIngestion}
             startIcon={loadingIngestion ? <CircularProgress size={16} /> : <UploadIcon />}
           >

@@ -29,11 +29,16 @@ async def get_spaces_service() -> Optional[ProjectSpacesService]:
         # Import the global database manager from main.py
         from main import db_manager
         
+        print(f"DEBUG: Database manager: {db_manager}")
+        print(f"DEBUG: Database pool: {db_manager.pool if db_manager else None}")
+        
         if db_manager is None or db_manager.pool is None:
             logger.warning("Database not available, returning None for mock data fallback")
             return None
         
-        return ProjectSpacesService(db_manager.pool)
+        service = ProjectSpacesService(db_manager.pool)
+        print(f"DEBUG: Created spaces service: {service}")
+        return service
     except Exception as e:
         logger.error("Failed to create spaces service", error=str(e))
         return None
@@ -163,7 +168,7 @@ async def delete_project_space(
                 detail=f"Invalid authentication level. Must be one of: {', '.join(valid_levels)}"
             )
         
-        logger.info(f"Delete space request - space_id={space_id}, user_id={user['user_id']}, auth_level={auth_level}")
+        logger.info(f"Delete space request - space_id={space_id}, user_id={str(user['user_id'])}, auth_level={auth_level}")
         
         # Rate limiting check
         is_limited, rate_info = check_rate_limit(request, "sensitive", "delete_space", user["user_id"])
@@ -191,7 +196,7 @@ async def delete_project_space(
         response_data = {
             "success": True,
             "message": "Project space deleted successfully",
-            "deleted_by": user["user_id"],
+            "deleted_by": str(user["user_id"]),  # Convert UUID to string
             "auth_level_used": auth_level,
             "space_id": space_id,
             "timestamp": datetime.utcnow().isoformat(),
@@ -202,7 +207,7 @@ async def delete_project_space(
             }
         }
         
-        logger.info(f"Space deleted successfully - space_id={space_id}, user_id={user['user_id']}, auth_level={auth_level}")
+        logger.info(f"Space deleted successfully - space_id={space_id}, user_id={str(user['user_id'])}, auth_level={auth_level}")
         return response_data
         
     except HTTPException:
@@ -361,7 +366,9 @@ async def get_space_documents(
 ):
     """Get all documents in a project space"""
     try:
+        print(f"DEBUG: Getting documents for space {space_id}, user {user['user_id']}, page {page}, size {page_size}")
         documents, total = await spaces_service.get_space_documents(space_id, user["user_id"], page, page_size)
+        print(f"DEBUG: Retrieved {len(documents)} documents, total {total}")
         return SpaceDocumentList(
             documents=documents,
             total=total,

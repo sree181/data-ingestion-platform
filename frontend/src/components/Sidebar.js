@@ -15,19 +15,19 @@ import {
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
-  Search as SearchIcon,
-  Upload as UploadIcon,
   Description as DocumentsIcon,
-  Analytics as AnalyticsIcon,
-  AccountTree as KnowledgeIcon,
-  DataObject as DataIcon,
-  TrendingUp as TrendingUpIcon,
-  Gavel as InvestigationIcon,
   Psychology as EntityIcon,
   Chat as ChatIcon,
   Folder as SpacesIcon,
-  Business as LeaseIcon,
   Security as SecurityIcon,
+  Dashboard as BoardIcon,
+  Public as UnifiedSearchIcon,
+  Settings as SourceConfigIcon,
+  Hub as HubIcon,
+  AccountTree as WorkflowIcon,
+  Science as LiteratureIcon,
+  Email as ICSRIcon,
+  RateReview as ICSRReviewIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 280;
@@ -46,6 +46,12 @@ const menuItems = [
     description: 'Overview & insights',
   },
   {
+    path: '/unified-search',
+    label: 'Unified Search',
+    icon: <UnifiedSearchIcon />,
+    description: 'Search across all sources',
+  },
+  {
     path: '/documents',
     label: 'Document Library',
     icon: <DocumentsIcon />,
@@ -58,10 +64,22 @@ const menuItems = [
     description: 'Chat with documents',
   },
   {
-    path: '/investigation',
-    label: 'Investigation',
-    icon: <InvestigationIcon />,
-    description: 'Palantir-style analysis',
+    path: '/knowledge-hub',
+    label: 'Knowledge Hub',
+    icon: <HubIcon />,
+    description: 'Explore knowledge graph',
+  },
+  {
+    path: '/investigations',
+    label: 'Investigation Boards',
+    icon: <BoardIcon />,
+    description: 'Build & analyze entity networks',
+  },
+  {
+    path: '/workflow-builder',
+    label: 'Workflow Builder',
+    icon: <WorkflowIcon />,
+    description: 'Visual pipeline automation',
   },
   {
     path: '/entity-enrichment',
@@ -70,10 +88,22 @@ const menuItems = [
     description: 'Web scraping & enrichment',
   },
   {
-    path: '/lease-management',
-    label: 'Lease Management',
-    icon: <LeaseIcon />,
-    description: 'Obligation extraction & comparison',
+    path: '/source-configuration',
+    label: 'Source Configuration',
+    icon: <SourceConfigIcon />,
+    description: 'Manage data sources',
+  },
+  {
+    path: '/icsr-automation',
+    label: 'ICSR Automation',
+    icon: <ICSRIcon />,
+    description: 'Email processing & ICSR validation',
+  },
+  {
+    path: '/icsr-reviewer',
+    label: 'ICSR Reviewer',
+    icon: <ICSRReviewIcon />,
+    description: 'Review & approve extracted ICSRs',
   },
   {
     path: '/security',

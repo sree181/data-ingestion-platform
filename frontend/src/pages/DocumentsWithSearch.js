@@ -46,7 +46,7 @@ import {
   SmartToy as BotIcon,
   Person as PersonIcon
 } from '@mui/icons-material';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 import axios from 'axios';
 
 // API instance for chat

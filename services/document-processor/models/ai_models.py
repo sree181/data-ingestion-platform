@@ -164,7 +164,10 @@ class OpenAIModel(AIModel):
             {
                 "entities": [{"name": "entity_name", "type": "entity_type", "confidence": 0.9}],
                 "relationships": [{"subject": "entity1", "predicate": "relationship", "object": "entity2", "confidence": 0.8}],
-                "key_concepts": ["concept1", "concept2"],
+                "key_concepts": [
+                    {"concept": "concept1", "importance": 0.9, "related_entities": "entity1, entity2"},
+                    {"concept": "concept2", "importance": 0.8, "related_entities": "entity3, entity4"}
+                ],
                 "document_summary": "Brief summary of the document"
             }"""
             
@@ -302,7 +305,10 @@ class OllamaModel(AIModel):
             {
                 "entities": [{"name": "entity_name", "type": "entity_type", "confidence": 0.9}],
                 "relationships": [{"subject": "entity1", "predicate": "relationship", "object": "entity2", "confidence": 0.8}],
-                "key_concepts": ["concept1", "concept2"],
+                "key_concepts": [
+                    {"concept": "concept1", "importance": 0.9, "related_entities": "entity1, entity2"},
+                    {"concept": "concept2", "importance": 0.8, "related_entities": "entity3, entity4"}
+                ],
                 "document_summary": "Brief summary of the document"
             }"""
             

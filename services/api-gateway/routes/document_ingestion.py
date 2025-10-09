@@ -390,6 +390,7 @@ async def process_single_file(file_path: str, space_id: str, job_id: str, proces
     """Process a single file through the document processor"""
     try:
         import httpx
+        from graph_db.integration_service import Neo4jIntegrationService
         
         processing_options = processing_options or {}
         model_name = processing_options.get('model', 'phi3:mini')  # Default to phi3:mini
@@ -426,6 +427,44 @@ async def process_single_file(file_path: str, space_id: str, job_id: str, proces
                        response_length=len(response.text))
             
             if response.status_code == 200:
+                # Parse AI results from response
+                ai_results = response.json()
+                doc_id = ai_results.get('document_id')
+                
+                # Sync to Neo4j if we have entities
+                entities = ai_results.get('entities', [])
+                relationships = ai_results.get('relationships', [])
+                
+                if entities and doc_id:
+                    try:
+                        neo4j_service = Neo4jIntegrationService(
+                            neo4j_uri="bolt://neo4j:7687",
+                            neo4j_user="neo4j",
+                            neo4j_password="password123"
+                        )
+                        
+                        doc_metadata = {
+                            "title": filename,
+                            "source": "local_upload",
+                            "space_id": space_id
+                        }
+                        
+                        await neo4j_service.process_document_to_neo4j(
+                            doc_id,
+                            {"entities": entities, "relationships": relationships},
+                            doc_metadata
+                        )
+                        
+                        logger.info("Synced to Neo4j", 
+                                   file=file_path, 
+                                   doc_id=doc_id,
+                                   entities=len(entities),
+                                   relationships=len(relationships))
+                    except Exception as neo_error:
+                        logger.warning("Failed to sync to Neo4j (non-fatal)", 
+                                      file=file_path, 
+                                      error=str(neo_error))
+                
                 logger.info("File processed successfully", file=file_path, job_id=job_id)
                 return True
             else:

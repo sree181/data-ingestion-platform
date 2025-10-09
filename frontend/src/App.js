@@ -33,7 +33,18 @@ import Chat from './pages/Chat';
 import ProjectSpaces from './pages/ProjectSpaces';
 import LeaseManagement from './pages/LeaseManagement';
 import EnhancedProjectSpaces from './pages/EnhancedProjectSpaces';
+import OptimizedProjectSpaces from './pages/OptimizedProjectSpaces';
+import EnhancedProjectSpacesOptimized from './pages/EnhancedProjectSpacesOptimized';
 import SecurityDashboard from './pages/SecurityDashboard';
+import UnifiedSearch from './pages/UnifiedSearch';
+import SourceConfiguration from './pages/SourceConfiguration';
+import KnowledgeHub from './pages/KnowledgeHub';
+import InvestigationBoards from './pages/InvestigationBoards';
+import InvestigationBoardCanvas from './pages/InvestigationBoardCanvas';
+import WorkflowBuilder from './pages/WorkflowBuilder';
+import LiteratureAutomation from './pages/LiteratureAutomation';
+import ICSRAutomation from './pages/ICSRAutomation';
+import ICSRReviewer from './pages/ICSRReviewer';
 import Login from './pages/Login';
 import { SecurityProvider } from './contexts/SecurityContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -92,10 +103,19 @@ function AppContent() {
                         <Route path="professional-document/:documentId" element={<ProfessionalDocumentViewer />} />
 
                         <Route path="knowledge" element={<KnowledgeGraph />} />
+                        <Route path="knowledge-hub" element={<KnowledgeHub />} />
+                        <Route path="investigations" element={<InvestigationBoards />} />
+                        <Route path="investigations/:boardId" element={<InvestigationBoardCanvas />} />
                         <Route path="investigation" element={<EnhancedInvestigativeWorkspace />} />
+                        <Route path="workflow-builder" element={<WorkflowBuilder />} />
                         <Route path="entity-enrichment" element={<EntityEnrichment />} />
-                        <Route path="spaces" element={<EnhancedProjectSpaces />} />
+                        <Route path="spaces" element={<EnhancedProjectSpacesOptimized />} />
                         <Route path="lease-management" element={<LeaseManagement />} />
+                        <Route path="unified-search" element={<UnifiedSearch />} />
+                        <Route path="source-configuration" element={<SourceConfiguration />} />
+                        <Route path="literature-automation" element={<LiteratureAutomation />} />
+                        <Route path="icsr-automation" element={<ICSRAutomation />} />
+                        <Route path="icsr-reviewer" element={<ICSRReviewer />} />
                         <Route path="security" element={<ProtectedRoute requiredLevel="admin"><SecurityDashboard /></ProtectedRoute>} />
                       </Routes>
                     </Box>

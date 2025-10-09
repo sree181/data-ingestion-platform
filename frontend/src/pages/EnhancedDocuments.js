@@ -55,9 +55,14 @@ import {
   CalendarToday as CalendarIcon,
   LocalOffer as TagIcon,
   Visibility as VisibilityIcon,
-  Assignment as AssignmentIcon
+  Assignment as AssignmentIcon,
+  Warning as WarningIcon,
+  Science as ScienceIcon,
+  Article as ArticleIcon,
+  Block as BlockIcon,
+  VerifiedUser as VerifiedIcon
 } from '@mui/icons-material';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 
 
 
@@ -97,6 +102,7 @@ function EnhancedDocuments() {
   const [isSearching, setIsSearching] = useState(false);
   const [viewMode, setViewMode] = useState('table'); // table or grid
   const [sortBy, setSortBy] = useState('relevance');
+  const [classificationFilter, setClassificationFilter] = useState('all'); // Filter by PV classification
   
   // Dialog states
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -125,8 +131,16 @@ function EnhancedDocuments() {
   );
 
   // Extract documents and total count
-  const documents = documentsData?.documents || [];
+  const allDocuments = (documentsData?.results || []).map(hit => ({
+    ...hit._source,
+    id: hit._id
+  }));
   const totalDocuments = documentsData?.total || 0;
+  
+  // Apply classification filter
+  const documents = classificationFilter === 'all' 
+    ? allDocuments 
+    : allDocuments.filter(doc => doc.classification === classificationFilter);
   
   // Menu handling
   const handleMenuOpen = (event, doc) => {
@@ -425,6 +439,42 @@ function EnhancedDocuments() {
     </Box>
   );
 
+  // PV Classification Config
+  const pvClassificationConfig = {
+    'ICSR': { 
+      icon: <WarningIcon />, 
+      color: '#d32f2f', 
+      bgColor: '#ffebee',
+      label: 'ICSR',
+      description: 'Individual Case Safety Report'
+    },
+    'Safety_Information': { 
+      icon: <ScienceIcon />, 
+      color: '#1976d2', 
+      bgColor: '#e3f2fd',
+      label: 'Safety Info',
+      description: 'Safety Information'
+    },
+    'Non-ICSR': { 
+      icon: <ArticleIcon />, 
+      color: '#0288d1', 
+      bgColor: '#e1f5fe',
+      label: 'Non-ICSR',
+      description: 'General Medical Literature'
+    },
+    'Rejected': { 
+      icon: <BlockIcon />, 
+      color: '#757575', 
+      bgColor: '#f5f5f5',
+      label: 'Rejected',
+      description: 'Not Relevant for PV'
+    }
+  };
+
+  const getPVClassificationConfig = (classification) => {
+    return pvClassificationConfig[classification] || null;
+  };
+
   // Balanced Theme - Gray backgrounds with vibrant content colors
   const documentTypeConfig = {
     pdf: { icon: '📄', color: '#e53e3e', bgColor: '#F8F9FA', lightColor: '#fed7d7' },
@@ -447,20 +497,24 @@ function EnhancedDocuments() {
   const DocumentCard = ({ document, onClick, onMenuClick }) => {
     const typeConfig = getDocumentTypeConfig(document.file_type);
     const processingColor = getProcessingBadgeColor(document.extraction_method);
+    const pvConfig = getPVClassificationConfig(document.classification);
     
     return (
       <Card
         sx={{
-          height: 360,
+          height: pvConfig ? 420 : 360, // Taller for PV classified documents
           display: 'flex',
           flexDirection: 'column',
           cursor: 'pointer',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'relative',
           overflow: 'hidden',
+          border: pvConfig ? `2px solid ${pvConfig.color}40` : 'none',
           '&:hover': {
             transform: 'translateY(-8px)',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
+            boxShadow: pvConfig 
+              ? `0 20px 40px ${pvConfig.color}30`
+              : '0 20px 40px rgba(0,0,0,0.12)',
             '& .document-actions': {
               opacity: 1,
               transform: 'translateY(0)'
@@ -490,7 +544,7 @@ function EnhancedDocuments() {
             }}
           >
             {typeConfig.icon}
-          </Typography>
+            </Typography>
           
           {/* File Type Badge */}
           <Chip
@@ -553,10 +607,80 @@ function EnhancedDocuments() {
             }}
           >
             {document.title || 'Untitled Document'}
-          </Typography>
+            </Typography>
+
+          {/* PV Classification Badge */}
+          {pvConfig && (
+            <Box sx={{ mb: 1.5 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                <Tooltip title={`${pvConfig.description} • Confidence: ${Math.round((document.classification_confidence || 0) * 100)}%`}>
+                  <Chip
+                    icon={pvConfig.icon}
+                    label={`${pvConfig.label} (${Math.round((document.classification_confidence || 0) * 100)}%)`}
+                    sx={{
+                      backgroundColor: pvConfig.bgColor,
+                      color: pvConfig.color,
+                      fontWeight: 700,
+                      fontSize: '0.75rem',
+                      border: `1.5px solid ${pvConfig.color}`,
+                      '& .MuiChip-icon': {
+                        color: pvConfig.color
+                      }
+                    }}
+                  />
+                </Tooltip>
+                
+                {/* Ensemble Metadata - NEW */}
+                {document.ensemble_models_used && document.ensemble_models_used.length > 0 && (
+                  <Tooltip title={`Models: ${document.ensemble_models_used.join(' → ')}`}>
+                    <Chip
+                      label={`⚡ ${document.ensemble_models_used.length} model${document.ensemble_models_used.length > 1 ? 's' : ''}`}
+                      size="small"
+                      sx={{
+                        backgroundColor: '#f3e5f5',
+                        color: '#7b1fa2',
+                        fontSize: '0.7rem',
+                        fontWeight: 600
+                      }}
+                    />
+                  </Tooltip>
+                )}
+                
+                {document.processing_time_ms && (
+                  <Tooltip title={`Processing time: ${document.processing_time_ms}ms`}>
+                    <Chip
+                      label={`${(document.processing_time_ms / 1000).toFixed(1)}s`}
+                      size="small"
+                      sx={{
+                        backgroundColor: '#e3f2fd',
+                        color: '#1976d2',
+                        fontSize: '0.7rem',
+                        fontWeight: 600
+                      }}
+                    />
+                  </Tooltip>
+                )}
+                
+                {document.classification_cost !== undefined && (
+                  <Tooltip title={`Classification cost: $${document.classification_cost.toFixed(4)}`}>
+                    <Chip
+                      label={document.classification_cost === 0 ? 'Free' : `$${document.classification_cost.toFixed(4)}`}
+                      size="small"
+                      sx={{
+                        backgroundColor: document.classification_cost === 0 ? '#e8f5e9' : '#fff3e0',
+                        color: document.classification_cost === 0 ? '#2e7d32' : '#e65100',
+                        fontSize: '0.7rem',
+                        fontWeight: 600
+                      }}
+                    />
+                  </Tooltip>
+                )}
+              </Box>
+          </Box>
+          )}
 
           {/* Metadata Row */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
             <Chip
               icon={<CalendarIcon />}
               label={document.created_at ? new Date(document.created_at).toLocaleDateString() : 'Unknown'}
@@ -574,7 +698,7 @@ function EnhancedDocuments() {
                 sx={{ fontSize: '0.7rem' }}
               />
             )}
-          </Box>
+        </Box>
 
           {/* Content Preview */}
           {document.content && (
@@ -596,15 +720,56 @@ function EnhancedDocuments() {
             </Typography>
           )}
 
-          {/* Entity Tags */}
-          {document.metadata?.openai_entities && document.metadata.openai_entities.length > 0 && (
+          {/* Classification Entities - Highlighted entities used by model */}
+          {pvConfig && document.classification_entities && document.classification_entities.length > 0 && (
+            <Box sx={{ mt: 1 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, display: 'block', mb: 0.5 }}>
+                🎯 Classification Evidence:
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {document.classification_entities.slice(0, 3).map((entity, idx) => (
+                  <Tooltip 
+                    key={idx} 
+                    title={`${entity.type} • ${Math.round(entity.confidence * 100)}% confidence • ${entity.relevance}`}
+                    arrow
+                  >
+        <Chip
+                      label={entity.entity}
+          size="small"
+                      icon={<VerifiedIcon sx={{ fontSize: '0.9rem !important' }} />}
+                      sx={{
+                        fontSize: '0.65rem',
+                        height: 22,
+                        backgroundColor: pvConfig.bgColor,
+                        borderColor: pvConfig.color,
+                        border: `1px solid ${pvConfig.color}`,
+                        color: pvConfig.color,
+                        fontWeight: 600,
+                        '& .MuiChip-icon': {
+                          color: pvConfig.color
+                        }
+                      }}
+                    />
+                  </Tooltip>
+                ))}
+                {document.classification_entities.length > 3 && (
+                  <Typography variant="caption" color={pvConfig.color} sx={{ alignSelf: 'center', ml: 0.5, fontWeight: 600 }}>
+                    +{document.classification_entities.length - 3}
+                  </Typography>
+                )}
+              </Box>
+            </Box>
+          )}
+
+          {/* Entity Tags - Regular extracted entities */}
+          {!pvConfig && document.metadata?.openai_entities && document.metadata.openai_entities.length > 0 && (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
               {document.metadata.openai_entities.slice(0, 3).map((entity, idx) => (
                 <Chip
                   key={idx}
                   label={entity.text}
                   size="small"
-                  variant="outlined"
+          variant="outlined"
                   sx={{
                     fontSize: '0.65rem',
                     height: 20,
@@ -639,8 +804,8 @@ function EnhancedDocuments() {
         >
           <Box sx={{ display: 'flex', gap: 0.5 }}>
             <Tooltip title="Standard View">
-              <IconButton
-                size="small"
+        <IconButton
+          size="small"
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/document/${document.id}`);
@@ -651,7 +816,7 @@ function EnhancedDocuments() {
                 }}
               >
                 <ViewIcon fontSize="small" />
-              </IconButton>
+        </IconButton>
             </Tooltip>
             <Tooltip title="Professional View">
               <IconButton
@@ -745,7 +910,7 @@ function EnhancedDocuments() {
             }}
           >
             📚 Document Library
-          </Typography>
+        </Typography>
           <Typography 
             variant="h6" 
             sx={{ 
@@ -758,13 +923,29 @@ function EnhancedDocuments() {
           </Typography>
           
           {/* Quick Stats */}
-          <Stack direction="row" spacing={3} sx={{ mt: 2 }}>
+          <Stack direction="row" spacing={3} sx={{ mt: 2, flexWrap: 'wrap' }}>
             <Box>
               <Typography variant="h4" sx={{ fontWeight: 600 }}>
                 {totalDocuments}
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.8 }}>
                 Total Documents
+        </Typography>
+            </Box>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 600 }}>
+                {documents.filter(d => d.classification === 'ICSR').length}
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                🚨 ICSRs
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 600 }}>
+                {documents.filter(d => d.classification === 'Safety_Information').length}
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                🔬 Safety Info
               </Typography>
             </Box>
             <Box>
@@ -773,14 +954,6 @@ function EnhancedDocuments() {
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.8 }}>
                 AI Processed
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="h4" sx={{ fontWeight: 600 }}>
-                {new Set(documents.flatMap(d => d.metadata?.openai_entities?.map(e => e.text) || [])).size}
-              </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                Unique Entities
               </Typography>
             </Box>
           </Stack>
@@ -975,41 +1148,76 @@ function EnhancedDocuments() {
                   {totalDocuments} documents • Updated {new Date().toLocaleDateString()}
                 </Typography>
               </Box>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <Chip 
-                  label={`${documents.filter(d => d.file_type === 'pdf').length} PDFs`} 
-                  color="error" 
-                  variant="outlined" 
-                  size="small"
+            </Box>
+            
+            {/* PV Classification Filters */}
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block', fontWeight: 600 }}>
+                📋 Filter by PV Classification:
+              </Typography>
+              <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                <Chip
+                  label={`All (${allDocuments.length})`}
+                  onClick={() => setClassificationFilter('all')}
+                  color={classificationFilter === 'all' ? 'primary' : 'default'}
+                  variant={classificationFilter === 'all' ? 'filled' : 'outlined'}
+                  sx={{ fontWeight: classificationFilter === 'all' ? 600 : 400 }}
+                />
+                <Chip
+                  icon={<WarningIcon />}
+                  label={`ICSR (${allDocuments.filter(d => d.classification === 'ICSR').length})`}
+                  onClick={() => setClassificationFilter('ICSR')}
                   sx={{
-                    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif'
+                    backgroundColor: classificationFilter === 'ICSR' ? '#d32f2f' : 'transparent',
+                    color: classificationFilter === 'ICSR' ? 'white' : '#d32f2f',
+                    borderColor: '#d32f2f',
+                    fontWeight: classificationFilter === 'ICSR' ? 600 : 400,
+                    '& .MuiChip-icon': { color: classificationFilter === 'ICSR' ? 'white' : '#d32f2f' }
                   }}
                 />
-                <Chip 
-                  label={`${documents.filter(d => d.file_type === 'docx').length} DOCs`} 
-                  color="primary" 
-                  variant="outlined" 
-                  size="small"
+                <Chip
+                  icon={<ScienceIcon />}
+                  label={`Safety Info (${allDocuments.filter(d => d.classification === 'Safety_Information').length})`}
+                  onClick={() => setClassificationFilter('Safety_Information')}
                   sx={{
-                    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif'
+                    backgroundColor: classificationFilter === 'Safety_Information' ? '#1976d2' : 'transparent',
+                    color: classificationFilter === 'Safety_Information' ? 'white' : '#1976d2',
+                    borderColor: '#1976d2',
+                    fontWeight: classificationFilter === 'Safety_Information' ? 600 : 400,
+                    '& .MuiChip-icon': { color: classificationFilter === 'Safety_Information' ? 'white' : '#1976d2' }
                   }}
                 />
-                <Chip 
-                  label={`${documents.filter(d => d.extraction_method?.includes('llava') || d.extraction_method?.includes('llamaparse')).length} AI Processed`} 
-                  color="secondary" 
-                  variant="outlined" 
-                  size="small"
+                <Chip
+                  icon={<ArticleIcon />}
+                  label={`Non-ICSR (${allDocuments.filter(d => d.classification === 'Non-ICSR').length})`}
+                  onClick={() => setClassificationFilter('Non-ICSR')}
                   sx={{
-                    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif'
+                    backgroundColor: classificationFilter === 'Non-ICSR' ? '#0288d1' : 'transparent',
+                    color: classificationFilter === 'Non-ICSR' ? 'white' : '#0288d1',
+                    borderColor: '#0288d1',
+                    fontWeight: classificationFilter === 'Non-ICSR' ? 600 : 400,
+                    '& .MuiChip-icon': { color: classificationFilter === 'Non-ICSR' ? 'white' : '#0288d1' }
                   }}
                 />
-              </Box>
+                <Chip
+                  icon={<BlockIcon />}
+                  label={`Rejected (${allDocuments.filter(d => d.classification === 'Rejected').length})`}
+                  onClick={() => setClassificationFilter('Rejected')}
+                  sx={{
+                    backgroundColor: classificationFilter === 'Rejected' ? '#757575' : 'transparent',
+                    color: classificationFilter === 'Rejected' ? 'white' : '#757575',
+                    borderColor: '#757575',
+                    fontWeight: classificationFilter === 'Rejected' ? 600 : 400,
+                    '& .MuiChip-icon': { color: classificationFilter === 'Rejected' ? 'white' : '#757575' }
+                  }}
+                />
+              </Stack>
             </Box>
           </Box>
 
           {/* Document Cards Grid */}
-          {isLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+            {isLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
               <Box sx={{ textAlign: 'center' }}>
                 <CircularProgress size={48} sx={{ mb: 2 }} />
                 <Typography variant="h6" color="text.secondary">
@@ -1019,11 +1227,11 @@ function EnhancedDocuments() {
                   Fetching your document library
                 </Typography>
               </Box>
-            </Box>
-          ) : error ? (
+              </Box>
+            ) : error ? (
             <Alert 
               severity="error" 
-              sx={{ 
+                sx={{
                 m: 2,
                 '& .MuiAlert-message': {
                   fontSize: '1rem'

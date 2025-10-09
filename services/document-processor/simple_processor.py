@@ -145,6 +145,23 @@ async def index_document_to_elasticsearch(filename: str, content: str, processed
                content_preview=content[:100] if isinstance(content, str) else f"Binary data: {len(content)} bytes")
     
     # Create Elasticsearch document
+    # Clean null values from processed_data
+    entities = processed_data.get("entities")
+    if entities is None:
+        entities = []
+    relationships = processed_data.get("relationships")
+    if relationships is None:
+        relationships = []
+    key_concepts = processed_data.get("key_concepts")
+    if key_concepts is None:
+        key_concepts = []
+    document_summary = processed_data.get("document_summary")
+    if document_summary is None:
+        document_summary = ""
+    document_insights = processed_data.get("document_insights")
+    if document_insights is None:
+        document_insights = {}
+    
     es_document = {
         "title": filename,
         "content": content,
@@ -155,16 +172,15 @@ async def index_document_to_elasticsearch(filename: str, content: str, processed
         "has_images": processed_data.get("has_images", False),
         "image_count": processed_data.get("image_count", 0),
         "extraction_method": processed_data.get("extraction_method", "basic"),
-        "openai_entities": processed_data.get("entities", []),
-        "openai_relationships": processed_data.get("relationships", []),
-        "openai_key_concepts": processed_data.get("key_concepts", []),
-        "openai_summary": processed_data.get("document_summary", ""),
-        "document_insights": processed_data.get("document_insights", {}),
+        "openai_entities": entities,
+        "openai_relationships": relationships,
+        "openai_key_concepts": key_concepts,
+        "openai_summary": document_summary,
+        "document_insights": document_insights,
         "legal_clauses": processed_data.get("legal_clauses", []),
         "clause_contexts": processed_data.get("clause_contexts", []),
         "clause_count": processed_data.get("clause_count", 0),
         "legal_extraction_method": processed_data.get("legal_extraction_method", ""),
-        "content_vector": processed_data.get("content_vector", []),
         "space_id": space_id,
         "metadata": {
             "processing_timestamp": datetime.now().isoformat(),
@@ -180,6 +196,11 @@ async def index_document_to_elasticsearch(filename: str, content: str, processed
     if images:
         es_document["extracted_images"] = images
         es_document["image_metadata"] = [{"path": img.get("image_path", ""), "type": img.get("image_type", "unknown")} for img in images]
+    
+    # Add content_vector only if it exists and has valid dimensions
+    content_vector = processed_data.get("content_vector", [])
+    if content_vector and len(content_vector) > 0:
+        es_document["content_vector"] = content_vector
     
     try:
         # Index document
@@ -527,7 +548,7 @@ async def process_file(
                            embedding_dimensions=len(content_vector))
             except Exception as e:
                 logger.error("Vector embedding generation failed", error=str(e), filename=file.filename)
-                text_result["content_vector"] = []
+                # Don't set content_vector if it fails - let the indexing function handle it
         
         # Index the document into Elasticsearch
         if elasticsearch_client:
@@ -544,6 +565,54 @@ async def process_file(
     except Exception as e:
         logger.error("File processing failed", error=str(e), filename=file.filename)
         raise HTTPException(status_code=500, detail=f"File processing failed: {str(e)}")
+
+@app.post("/process-external-document")
+async def process_external_document(request: dict):
+    """Process external document from multi-source ingestion"""
+    try:
+        logger.info("Processing external document", 
+                   title=request.get("title"), 
+                   source=request.get("source"),
+                   document_type=request.get("document_type"))
+        
+        # Process text with AI analysis
+        text_result = await process_text(TextProcessRequest(
+            text=request.get("content", ""),
+            title=request.get("title", ""),
+            model_name=request.get("model_name", "phi3:mini")
+        ))
+        
+        # Add source-specific metadata
+        text_result["source"] = request.get("source")
+        text_result["source_id"] = request.get("source_id")
+        text_result["document_type"] = request.get("document_type")
+        text_result["external_source"] = True
+        text_result["extraction_method"] = "multi_source_external"
+        
+        # Add additional metadata from request
+        text_result["url"] = request.get("url")
+        text_result["doi"] = request.get("doi")
+        text_result["pmid"] = request.get("pmid")
+        text_result["pmcid"] = request.get("pmcid")
+        text_result["publication_date"] = request.get("publication_date")
+        text_result["authors"] = request.get("authors", [])
+        text_result["keywords"] = request.get("keywords", [])
+        
+        # NOTE: We do NOT index here - the ingestion service will index with all metadata
+        # This allows the ingestion service to combine AI results with full document metadata
+        
+        logger.info("External document processed successfully with AI analysis", 
+                   title=request.get("title"),
+                   entities_count=len(text_result.get("entities", [])),
+                   relationships_count=len(text_result.get("relationships", [])))
+        
+        return text_result
+        
+    except Exception as e:
+        logger.error("External document processing failed", 
+                    error=str(e), 
+                    title=request.get("title"))
+        raise HTTPException(status_code=500, detail=f"External document processing failed: {str(e)}")
 
 @app.post("/process-pubmed-article")
 async def process_pubmed_article(request: PubMedArticleRequest):
@@ -588,7 +657,7 @@ async def process_pubmed_article(request: PubMedArticleRequest):
                            embedding_dimensions=len(content_vector))
             except Exception as e:
                 logger.error("Vector embedding generation failed", error=str(e), title=request.title)
-                text_result["content_vector"] = []
+                # Don't set content_vector if it fails - let the indexing function handle it
         
         # Index the document into Elasticsearch
         if elasticsearch_client:

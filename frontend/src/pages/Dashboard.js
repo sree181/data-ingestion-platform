@@ -20,7 +20,7 @@ import {
   alpha,
 } from '@mui/material';
 import { useQuery } from 'react-query';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 import {
   Description as DocumentsIcon,
   Search as SearchIcon,

@@ -40,7 +40,7 @@ import {
   ExpandLess as ExpandLessIcon,
   Clear as ClearIcon
 } from '@mui/icons-material';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 
 function Documents() {
   const navigate = useNavigate();

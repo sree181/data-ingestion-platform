@@ -29,7 +29,7 @@ import {
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import toast from 'react-hot-toast';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 
 const ACCEPTED_FILE_TYPES = {
   'application/pdf': ['.pdf'],

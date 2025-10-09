@@ -223,7 +223,7 @@ const SecurityDashboard = () => {
                     </TableCell>
                     <TableCell>
                       <Typography variant="caption">
-                        {new Date(alert.timestamp).toLocaleString()}
+                        {alert.timestamp ? new Date(alert.timestamp).toLocaleString() : 'Unknown time'}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -324,7 +324,7 @@ const SecurityDashboard = () => {
               </ListItemIcon>
               <ListItemText
                 primary={event.action}
-                secondary={`${event.user} - ${new Date(event.timestamp).toLocaleString()}`}
+                secondary={`${event.user} - ${event.timestamp ? new Date(event.timestamp).toLocaleString() : 'Unknown time'}`}
               />
             </ListItem>
           ))}

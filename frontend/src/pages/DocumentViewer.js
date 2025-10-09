@@ -34,7 +34,7 @@ import {
 } from '@mui/icons-material';
 import { useQuery } from 'react-query';
 import { useParams, useNavigate } from 'react-router-dom';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 import ImageGallery from '../components/ImageGallery';
 
 // Entity type icon mapping
@@ -164,6 +164,116 @@ function DocumentViewer() {
           </Button>
         </Box>
         
+        {/* PV Classification Badge */}
+        {document.classification && (
+          <Box sx={{ mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
+              <Chip
+                label={`${document.classification} (${Math.round((document.classification_confidence || 0) * 100)}% confidence)`}
+                sx={{
+                  backgroundColor: document.classification === 'ICSR' ? '#ffebee' : 
+                                  document.classification === 'Safety_Information' ? '#e3f2fd' :
+                                  document.classification === 'Non-ICSR' ? '#e1f5fe' : '#f5f5f5',
+                  color: document.classification === 'ICSR' ? '#d32f2f' : 
+                         document.classification === 'Safety_Information' ? '#1976d2' :
+                         document.classification === 'Non-ICSR' ? '#0288d1' : '#757575',
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  padding: '20px 16px',
+                  border: `2px solid ${document.classification === 'ICSR' ? '#d32f2f' : 
+                                       document.classification === 'Safety_Information' ? '#1976d2' :
+                                       document.classification === 'Non-ICSR' ? '#0288d1' : '#757575'}`,
+                }}
+              />
+            </Box>
+            
+            {/* Ensemble Metadata - NEW */}
+            {(document.ensemble_models_used || document.processing_time_ms || document.classification_cost !== undefined) && (
+              <Alert severity="info" sx={{ mb: 2 }}>
+                <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+                  ⚡ Ensemble Classification Details
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                  {document.ensemble_models_used && document.ensemble_models_used.length > 0 && (
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#7b1fa2' }}>
+                        Models Used:
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
+                        {document.ensemble_models_used.map((model, idx) => (
+                          <Chip
+                            key={idx}
+                            label={model.replace('_', '-')}
+                            size="small"
+                            sx={{
+                              backgroundColor: '#f3e5f5',
+                              color: '#7b1fa2',
+                              fontWeight: 600,
+                              textTransform: 'capitalize'
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+                  
+                  {document.processing_time_ms && (
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#1976d2' }}>
+                        Processing Time:
+                      </Typography>
+                      <Typography variant="body2" sx={{ mt: 0.5 }}>
+                        {(document.processing_time_ms / 1000).toFixed(2)} seconds
+                      </Typography>
+                    </Box>
+                  )}
+                  
+                  {document.classification_cost !== undefined && (
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: document.classification_cost === 0 ? '#2e7d32' : '#e65100' }}>
+                        Cost:
+                      </Typography>
+                      <Typography variant="body2" sx={{ mt: 0.5 }}>
+                        {document.classification_cost === 0 ? 'Free (Rule-based)' : `$${document.classification_cost.toFixed(4)}`}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              </Alert>
+            )}
+          </Box>
+        )}
+
+        {/* PV Classification Entities */}
+        {document.classification_entities && document.classification_entities.length > 0 && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+              🎯 Classification Evidence (Entities used by AI for classification):
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {document.classification_entities.map((entity, idx) => (
+                <Chip
+                  key={idx}
+                  label={`${entity.entity} (${entity.type})`}
+                  size="medium"
+                  sx={{
+                    backgroundColor: '#e8f5e9',
+                    borderColor: '#4caf50',
+                    border: '1.5px solid',
+                    color: '#2e7d32',
+                    fontWeight: 600,
+                  }}
+                />
+              ))}
+            </Box>
+            {document.classification_reasoning && (
+              <Typography variant="body2" sx={{ mt: 2, fontStyle: 'italic' }}>
+                <strong>Reasoning:</strong> {document.classification_reasoning}
+              </Typography>
+            )}
+          </Alert>
+        )}
+
         {document.ai_summary && (
           <Alert severity="info" sx={{ mb: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold">AI Summary:</Typography>

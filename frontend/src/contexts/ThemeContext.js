@@ -80,7 +80,7 @@ const lightTheme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+    fontFamily: '"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
     h1: {
       fontSize: '2.5rem',
       fontWeight: 600,
@@ -128,7 +128,7 @@ const lightTheme = createTheme({
           borderRadius: 8,
           fontWeight: 500,
           padding: '8px 16px',
-          fontFamily: 'Inter',
+          fontFamily: 'IBM Plex Sans',
         },
       },
     },
@@ -200,7 +200,7 @@ const darkTheme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+    fontFamily: '"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
     h1: {
       fontSize: '2.5rem',
       fontWeight: 600,
@@ -248,7 +248,7 @@ const darkTheme = createTheme({
           borderRadius: 8,
           fontWeight: 500,
           padding: '8px 16px',
-          fontFamily: 'Inter',
+          fontFamily: 'IBM Plex Sans',
         },
       },
     },

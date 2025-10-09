@@ -10,9 +10,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ensure Inter applies to all elements */
+/* Ensure IBM Plex Sans applies to all elements */
 body, html, #root {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif !important;
 }
@@ -32,24 +32,25 @@ body, html, #root {
 .MuiDialogTitle-root,
 .MuiDialogContent-root,
 .MuiTooltip-tooltip {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif !important;
 }
 
-/* Apply Inter to form elements */
+/* Apply IBM Plex Sans to form elements */
 input, textarea, select, button {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif !important;
 }
 
-/* Ensure headings use Inter */
+/* Ensure headings use IBM Plex Sans with enhanced weight */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif !important;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 /* Global reset and base styles */
@@ -61,7 +62,7 @@ h1, h2, h3, h4, h5, h6 {
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif !important;
   -webkit-font-smoothing: antialiased;
@@ -69,9 +70,9 @@ body {
   background-color: #f8fafc;
 }
 
-/* Code elements should still use monospace */
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+/* Code elements use IBM Plex Mono */
+code, pre, .monospace {
+  font-family: 'IBM Plex Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace !important;
 }
 
@@ -98,40 +99,42 @@ code {
 
 /* Loading states and transitions */
 .loading-text {
-  font-family: 'Inter', sans-serif !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
   font-weight: 500;
 }
 
-/* Ensure React Hot Toast uses Inter */
+/* Ensure React Hot Toast uses IBM Plex Sans */
 [data-testid="toast"] {
-  font-family: 'Inter', sans-serif !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
 }
 
 /* Override any remaining font declarations */
 .MuiCssBaseline-root {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif !important;
 }
 
 /* Sidebar specific styling */
 .sidebar-title {
-  font-family: 'Inter', sans-serif !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
   font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
 }
 
 .sidebar-subtitle {
-  font-family: 'Inter', sans-serif !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
   font-weight: 400 !important;
 }
 
 /* TopBar specific styling */
 .topbar-title {
-  font-family: 'Inter', sans-serif !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
   font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
 }
 
 .topbar-subtitle {
-  font-family: 'Inter', sans-serif !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
   font-weight: 400 !important;
 }

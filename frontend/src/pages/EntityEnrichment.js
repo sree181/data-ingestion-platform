@@ -856,7 +856,7 @@ function EntityEnrichment() {
                 Total Entities
               </Typography>
               <Typography variant="h4">
-                {entityStats.total.toLocaleString()}
+                {(entityStats.total || 0).toLocaleString()}
               </Typography>
             </CardContent>
           </Card>

@@ -48,7 +48,7 @@ import {
 } from '@mui/icons-material';
 import { useTheme } from '../contexts/ThemeContext';
 import toast from 'react-hot-toast';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 
 // Icon mapping for display
 const iconMap = {

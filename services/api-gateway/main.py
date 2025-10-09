@@ -145,6 +145,66 @@ print("✅ Security router registered")
 app.include_router(model_management_router)
 print("✅ Model management router registered")
 
+# Import unified search routes
+from routes.unified_search import router as unified_search_router
+app.include_router(unified_search_router)
+print("✅ Unified search router registered")
+
+# Import source management routes
+from routes.source_management import router as source_management_router
+app.include_router(source_management_router)
+print("✅ Source management router registered")
+
+# Import multi-source ingestion routes
+from routes.multi_source_ingestion import router as multi_source_router
+app.include_router(multi_source_router)
+print("✅ Multi-source ingestion router registered")
+
+# Import knowledge hub routes
+from routes.knowledge_hub import router as knowledge_hub_router
+app.include_router(knowledge_hub_router)
+print("✅ Knowledge Hub router registered")
+
+# Import investigation board routes
+from routes.investigation import router as investigation_router
+app.include_router(investigation_router)
+print("✅ Investigation Board router registered")
+
+# Import source configuration routes
+from routes.source_config import router as source_config_router
+app.include_router(source_config_router)
+print("✅ Source Configuration router registered")
+
+# Import workflow routes
+from routes.workflow import router as workflow_router
+app.include_router(workflow_router)
+print("✅ Workflow router registered")
+
+# Import literature automation routes
+from routes.literature_automation import router as literature_router
+app.include_router(literature_router)
+print("✅ Literature Automation router registered")
+
+# Import ICSR automation routes
+from routes.icsr_automation import router as icsr_router
+app.include_router(icsr_router)
+print("✅ ICSR Automation router registered")
+
+# Import PV Classification routes (NEW MODULE - does not affect existing code)
+from routes.pv_classification import router as pv_classification_router
+app.include_router(pv_classification_router)
+print("✅ PV Classification router registered")
+
+# Import ICSR Review routes
+from routes.icsr_review import router as icsr_review_router
+app.include_router(icsr_review_router)
+print("✅ ICSR Review router registered")
+
+# Import Documents routes
+from routes.documents import router as documents_router
+app.include_router(documents_router)
+print("✅ Documents router registered")
+
 # Import LLM document analyzer
 from services.llm_document_analyzer import llm_analyzer
 

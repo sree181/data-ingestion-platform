@@ -44,3 +44,9 @@ python-dateutil==2.8.2
 # Additional utilities
 python-dotenv==1.0.0
 httpx==0.25.2
+
+# PubMed integration
+pymed==0.8.9
+
+# OpenAI for entity chat
+openai==1.12.0

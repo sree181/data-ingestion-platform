@@ -70,6 +70,19 @@ class MultiModelEntityExtractor:
             # Use the model's entity extraction method
             result = await self.model.extract_entities(text, document_title)
             
+            # Convert key_concepts from strings to objects if needed
+            key_concepts = result.get("key_concepts", [])
+            if key_concepts and isinstance(key_concepts[0], str):
+                # Convert string array to object array
+                converted_concepts = []
+                for i, concept in enumerate(key_concepts):
+                    converted_concepts.append({
+                        "concept": concept,
+                        "importance": 0.9 - (i * 0.1),  # Decreasing importance
+                        "related_entities": ""  # Will be filled by AI if available
+                    })
+                result["key_concepts"] = converted_concepts
+            
             # Add metadata
             result["extraction_metadata"] = {
                 "model": self.model_name,

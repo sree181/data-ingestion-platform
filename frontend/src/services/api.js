@@ -3,7 +3,7 @@ import axios from 'axios';
 // Create axios instance with base configuration
 const api = axios.create({
   baseURL: '/api/v1', // Use relative URL - nginx will proxy to backend
-  timeout: 30000, // 30 seconds default timeout
+  timeout: 90000, // 90 seconds timeout (LLM responses can take 30-60s)
   maxRedirects: 5, // Follow redirects
 });
 
@@ -156,26 +156,30 @@ export const apiService = {
   // Get all documents with pagination
   getDocuments: async (page = 0, size = 25, filters = {}) => {
     try {
-      // Use the search endpoint with empty query to get all documents
+      // Use the documents search endpoint
       const params = new URLSearchParams();
       params.append('q', '*'); // Query for all documents (wildcard)
+      params.append('page', page.toString());
       params.append('size', size.toString());
-      params.append('from', (page * size).toString());
-      params.append('_t', Date.now().toString()); // Cache buster
       
-      console.log(`🔍 API Request: page=${page}, size=${size}, from=${page * size}`);
-      const response = await api.get(`/search?${params.toString()}`);
+      // Add filters if provided
+      if (filters.classification) {
+        params.append('classification', filters.classification);
+      }
+      if (filters.source) {
+        params.append('source', filters.source);
+      }
+      
+      console.log(`🔍 API Request: page=${page}, size=${size}`);
+      const response = await api.get(`/docs-list/search?${params.toString()}`);
       
       console.log(`📊 API Response: total=${response.data.total}, results=${response.data.results?.length}`);
-      console.log(`📄 First doc:`, response.data.results?.[0]?._source?.title);
-      console.log(`📄 Last doc:`, response.data.results?.[response.data.results?.length - 1]?._source?.title);
+      if (response.data.results && response.data.results.length > 0) {
+        console.log(`📄 First doc:`, response.data.results[0]?._source?.title);
+        console.log(`📄 Last doc:`, response.data.results[response.data.results.length - 1]?._source?.title);
+      }
       
-      return {
-        total: response.data.total || 0,
-        documents: (response.data.results || []).map(transformElasticsearchResult),
-        page,
-        size,
-      };
+      return response.data; // Return the whole response (already has results array)
     } catch (error) {
       console.error('Documents API error:', error);
       throw new Error('Failed to fetch documents');
@@ -534,23 +538,269 @@ export const apiService = {
   getTemporalEvolution: () => api.get('/analytics/temporal-evolution'),
 };
 
+// Add new API methods for unified search and source management
+const extendedApiService = {
+  ...apiService,
+  
+  // Unified search endpoints
+  unifiedSearch: async (params) => {
+    try {
+      const response = await api.get('/unified-search/', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Unified search API error:', error);
+      throw new Error('Failed to perform unified search');
+    }
+  },
+
+  // Source management endpoints (using new source-config API)
+  getSources: async () => {
+    try {
+      const response = await api.get('/source-config/sources');
+      return response.data;
+    } catch (error) {
+      console.error('Get sources API error:', error);
+      throw new Error('Failed to get sources');
+    }
+  },
+
+  getSourceHealth: async () => {
+    try {
+      const response = await api.get('/source-config/health');
+      return response.data;
+    } catch (error) {
+      console.error('Get source health API error:', error);
+      throw new Error('Failed to get source health');
+    }
+  },
+
+  enableSource: async (sourceId) => {
+    try {
+      const response = await api.post(`/source-config/sources/${sourceId}/toggle`, {
+        enabled: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Enable source API error:', error);
+      throw new Error('Failed to enable source');
+    }
+  },
+
+  disableSource: async (sourceId) => {
+    try {
+      const response = await api.post(`/source-config/sources/${sourceId}/toggle`, {
+        enabled: false
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Disable source API error:', error);
+      throw new Error('Failed to disable source');
+    }
+  },
+
+  updateSourceConfig: async (sourceId, config) => {
+    try {
+      const response = await api.put(`/source-config/sources/${sourceId}`, config);
+      return response.data;
+    } catch (error) {
+      console.error('Update source config API error:', error);
+      throw new Error('Failed to update source config');
+    }
+  },
+
+  testSourceConnection: async (sourceId) => {
+    try {
+      const response = await api.post(`/source-config/sources/${sourceId}/health-check`);
+      return response.data;
+    } catch (error) {
+      console.error('Test source connection API error:', error);
+      throw new Error('Failed to test source connection');
+    }
+  },
+  
+  refreshSource: async (sourceId) => {
+    try {
+      const response = await api.post(`/source-config/sources/${sourceId}/refresh`);
+      return response.data;
+    } catch (error) {
+      console.error('Refresh source API error:', error);
+      throw new Error('Failed to refresh source');
+    }
+  },
+  
+  getSourceStatistics: async () => {
+    try {
+      const response = await api.get('/source-config/statistics');
+      return response.data;
+    } catch (error) {
+      console.error('Get source statistics API error:', error);
+      throw new Error('Failed to get source statistics');
+    }
+  },
+
+  // Multi-source ingestion endpoints
+  startIngestion: async (params) => {
+    try {
+      const response = await api.post('/ingestion/start', params);
+      return response.data;
+    } catch (error) {
+      console.error('Start ingestion API error:', error);
+      throw new Error('Failed to start ingestion');
+    }
+  },
+
+  getIngestionJobStatus: async (jobId) => {
+    try {
+      const response = await api.get(`/ingestion/jobs/${jobId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get ingestion job status API error:', error);
+      throw new Error('Failed to get ingestion job status');
+    }
+  },
+
+  listIngestionJobs: async () => {
+    try {
+      const response = await api.get('/ingestion/jobs');
+      return response.data;
+    } catch (error) {
+      console.error('List ingestion jobs API error:', error);
+      throw new Error('Failed to list ingestion jobs');
+    }
+  },
+
+  // Knowledge Hub endpoints
+  getKnowledgeHubStatistics: async () => {
+    try {
+      const response = await api.get('/knowledge-hub/statistics');
+      return response.data;
+    } catch (error) {
+      console.error('Get knowledge hub statistics API error:', error);
+      throw new Error('Failed to get knowledge hub statistics');
+    }
+  },
+
+  getKnowledgeHubFullGraph: async () => {
+    try {
+      const response = await api.get('/knowledge-hub/full-graph');
+      return response.data;
+    } catch (error) {
+      console.error('Get full knowledge hub graph API error:', error);
+      throw new Error('Failed to get full knowledge hub graph');
+    }
+  },
+
+  getKnowledgeHubEntityTypes: async () => {
+    try {
+      const response = await api.get('/knowledge-hub/entity-types');
+      return response.data;
+    } catch (error) {
+      console.error('Get knowledge hub entity types API error:', error);
+      throw new Error('Failed to get knowledge hub entity types');
+    }
+  },
+
+  searchKnowledgeHubEntities: async (query, entityTypes = null, limit = 10) => {
+    try {
+      const params = { query, limit };
+      if (entityTypes && entityTypes.length > 0) {
+        params.entity_types = entityTypes.join(',');
+      }
+      const response = await api.get('/knowledge-hub/search', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Search knowledge hub entities API error:', error);
+      throw new Error('Failed to search knowledge hub entities');
+    }
+  },
+
+  getKnowledgeHubEntity: async (entityName, depth = 2) => {
+    try {
+      const response = await api.get(`/knowledge-hub/entity/${encodeURIComponent(entityName)}`, {
+        params: { depth }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Get knowledge hub entity API error:', error);
+      throw new Error('Failed to get knowledge hub entity');
+    }
+  },
+
+  getKnowledgeHubEntityDetails: async (entityId) => {
+    try {
+      const response = await api.get(`/knowledge-hub/entity/details/${encodeURIComponent(entityId)}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get knowledge hub entity details API error:', error);
+      throw new Error('Failed to get knowledge hub entity details');
+    }
+  },
+
+  getKnowledgeHubPath: async (fromEntity, toEntity, maxDepth = 5) => {
+    try {
+      const response = await api.get('/knowledge-hub/path', {
+        params: { from: fromEntity, to: toEntity, max_depth: maxDepth }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Get knowledge hub path API error:', error);
+      throw new Error('Failed to get knowledge hub path');
+    }
+  },
+
+  // Get entity source documents
+  getEntitySources: async (entityName, spaceId = null, limit = 20) => {
+    try {
+      const response = await api.get(`/knowledge-hub/entity/${encodeURIComponent(entityName)}/sources`, {
+        params: { space_id: spaceId, limit }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Get entity sources API error:', error);
+      throw new Error('Failed to get entity source documents');
+    }
+  },
+
+  // Entity chat endpoint
+  chatWithEntity: async (entityName, message, conversationHistory = [], spaceId = null) => {
+    try {
+      const response = await api.post(`/knowledge-hub/entity/${encodeURIComponent(entityName)}/chat`, {
+        message,
+        conversation_history: conversationHistory,
+        space_id: spaceId
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Entity chat API error:', error);
+      throw new Error('Failed to chat with entity');
+    }
+  },
+};
+
 // Transform Elasticsearch result to UI format
 function transformElasticsearchResult(esResult) {
   const source = esResult._source || {};
   const metadata = source.metadata || {};
   
+  // Handle external documents vs regular documents
+  const isExternalDocument = source.external_source === true;
+  
+  // For external documents, use keywords as tags
+  const tags = isExternalDocument ? (source.keywords || []) : (source.tags || []);
+  const categories = isExternalDocument ? [] : (source.categories || []);
+  
   return {
     id: esResult._id,
     title: source.title || metadata.filename || 'Untitled Document',
     content: source.content || '',
-    category: getCategoryFromTags(source.categories || source.tags || []),
+    category: getCategoryFromTags(categories.length > 0 ? categories : tags),
     date: formatDate(metadata.upload_date || source.created_at || new Date().toISOString()),
     fileType: source.file_type || getFileTypeFromFilename(metadata.filename || ''),
     size: formatFileSize(metadata.file_size || 0),
-    highlights: extractHighlights(source.tags || []),
+    highlights: extractHighlights(tags),
     score: esResult._score || 0,
-    tags: source.tags || [],
-    categories: source.categories || [],
+    tags: tags,
+    categories: categories,
     metadata: metadata,
     filename: metadata.filename || '',
     uploadDate: metadata.upload_date || source.created_at || '',
@@ -561,6 +811,11 @@ function transformElasticsearchResult(esResult) {
     extraction_method: source.extraction_method || 'Basic',
     entities: source.openai_entities?.length || 0,
     confidence: source.confidence || 0,
+    // Add external document specific fields
+    ai_processed: source.ai_processed || false,
+    external_source: source.external_source || false,
+    source: source.source || 'unknown',
+    document_type: source.document_type || 'unknown',
   };
 }
 
@@ -576,6 +831,14 @@ function getCategoryFromTags(categories) {
       regulatory: 'Regulatory',
       fda: 'Regulatory',
       research: 'Research',
+      // External document specific mappings
+      'clinical_trial': 'Clinical Trial',
+      'drug_label': 'Drug Label',
+      'research_paper': 'Research Paper',
+      'chemical_compound': 'Chemical Compound',
+      'phase': 'Clinical Trial',
+      'status': 'Clinical Trial',
+      'study type': 'Clinical Trial',
     };
     
     for (const category of categories) {
@@ -621,5 +884,256 @@ function extractHighlights(tags) {
   return Array.isArray(tags) ? tags.slice(0, 5) : [];
 }
 
-export default apiService;
+// Investigation Board API methods
+extendedApiService.investigationBoard = {
+  // Board operations
+  getBoards: async (spaceId = null) => {
+    const params = spaceId ? { space_id: spaceId } : {};
+    const response = await api.get('/investigations/boards', { params });
+    return response.data;
+  },
+  
+  createBoard: async (boardData) => {
+    const response = await api.post('/investigations/boards', boardData);
+    return response.data;
+  },
+  
+  getBoard: async (boardId) => {
+    const response = await api.get(`/investigations/boards/${boardId}`);
+    return response.data;
+  },
+  
+  updateBoard: async (boardId, updates) => {
+    const response = await api.put(`/investigations/boards/${boardId}`, updates);
+    return response.data;
+  },
+  
+  deleteBoard: async (boardId) => {
+    await api.delete(`/investigations/boards/${boardId}`);
+  },
+  
+  // Entity operations
+  pinEntity: async (pinData) => {
+    const response = await api.post('/investigations/pin', pinData);
+    return response.data;
+  },
+  
+  unpinEntity: async (pinId, boardId) => {
+    await api.delete(`/investigations/pin/${pinId}`, { 
+      params: { board_id: boardId }
+    });
+  },
+  
+  updatePinnedEntity: async (pinId, updates) => {
+    const response = await api.put(`/investigations/pin/${pinId}`, updates);
+    return response.data;
+  },
+  
+  // Finding operations
+  addFinding: async (findingData) => {
+    const response = await api.post('/investigations/findings', findingData);
+    return response.data;
+  },
+  
+  updateFinding: async (findingId, updates) => {
+    const response = await api.put(`/investigations/findings/${findingId}`, updates);
+    return response.data;
+  },
+  
+  deleteFinding: async (findingId) => {
+    await api.delete(`/investigations/findings/${findingId}`);
+  },
+  
+  // Connection operations
+  createConnection: async (connectionData) => {
+    const response = await api.post('/investigations/connections', connectionData);
+    return response.data;
+  },
+  
+  deleteConnection: async (boardId, sourceEntityId, targetEntityId) => {
+    await api.delete('/investigations/connections', {
+      params: { board_id: boardId, source_entity_id: sourceEntityId, target_entity_id: targetEntityId }
+    });
+  },
+  
+  // Export
+  exportBoard: async (boardId) => {
+    const response = await api.get(`/investigations/boards/${boardId}/export`);
+    return response.data;
+  },
+  
+  // Get documents for a pinned entity
+  getEntityDocuments: async (pinId) => {
+    const response = await api.get(`/investigations/pin/${pinId}/documents`);
+    return response.data;
+  },
+  
+  // Get entity-specific AI suggestions
+  getEntitySuggestions: async (pinId, limit = 10) => {
+    const response = await api.get(`/investigations/pin/${pinId}/suggestions`, {
+      params: { limit }
+    });
+    return response.data;
+  },
+  
+  // Generate AI investigation report
+  generateReport: async (boardId, format = 'markdown', template = 'comprehensive') => {
+    const response = await api.post(`/investigations/boards/${boardId}/generate-report`, null, {
+      params: { format, template }
+    });
+    return response.data;
+  },
+  
+  // AI Suggestions
+  getSuggestions: async (boardId, limit = 10) => {
+    const response = await api.get(`/investigations/boards/${boardId}/suggestions`, {
+      params: { limit }
+    });
+    return response.data;
+  },
+  
+  getMissingConnections: async (boardId) => {
+    const response = await api.get(`/investigations/boards/${boardId}/missing-connections`);
+    return response.data;
+  },
+  
+  batchAddSuggestions: async (boardId, entityNames, connections) => {
+    const response = await api.post(`/investigations/boards/${boardId}/suggestions/batch-add`, {
+      entity_names: entityNames,
+      connections: connections
+    });
+    return response.data;
+  }
+};
+
+// ============ Workflow Builder API (Standalone Service) ============
+// Create separate axios instance for workflow service
+// Use relative URL so it goes through nginx proxy
+const workflowApi = axios.create({
+  baseURL: '/api/v1', // Proxied through nginx to workflow-builder:8008
+  timeout: 90000,
+});
+
+// Add auth interceptor for workflow API
+workflowApi.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+extendedApiService.workflow = {
+  // Execute a workflow
+  execute: async (workflowId, nodes, edges) => {
+    const response = await workflowApi.post('/workflows/execute', {
+      workflow_id: workflowId,
+      nodes,
+      edges
+    });
+    return response.data;
+  },
+  
+  // Get execution status
+  getStatus: async (executionId) => {
+    const response = await workflowApi.get(`/workflows/execution/${executionId}/status`);
+    return response.data;
+  },
+  
+  // Save workflow
+  save: async (title, description, nodes, edges, tags = [], isTemplate = false) => {
+    const response = await workflowApi.post('/workflows/save', {
+      title,
+      description,
+      nodes,
+      edges,
+      tags,
+      is_template: isTemplate
+    });
+    return response.data;
+  },
+  
+  // List workflows
+  list: async (isTemplate = null) => {
+    const params = isTemplate !== null ? { is_template: isTemplate } : {};
+    const response = await workflowApi.get('/workflows/list', { params });
+    return response.data;
+  },
+  
+  // Get workflow by ID
+  get: async (workflowId) => {
+    const response = await workflowApi.get(`/workflows/${workflowId}`);
+    return response.data;
+  },
+  
+  // Delete workflow
+  delete: async (workflowId) => {
+    const response = await workflowApi.delete(`/workflows/${workflowId}`);
+    return response.data;
+  },
+  
+  // List templates
+  listTemplates: async () => {
+    const response = await workflowApi.get('/workflows/templates/list');
+    return response.data;
+  },
+  
+  // Use template
+  useTemplate: async (templateId) => {
+    const response = await workflowApi.post(`/workflows/templates/${templateId}/use`);
+    return response.data;
+  },
+  
+  // Health check
+  health: async () => {
+    const response = await workflowApi.get('/../../health'); // Root health endpoint
+    return response.data;
+  }
+};
+
+// ICSR Review API methods
+extendedApiService.icsr = {
+  // List pending ICSRs
+  listPending: async () => {
+    const response = await api.get('/icsr/list/pending');
+    return response.data;
+  },
+  
+  // Extract ICSR data
+  extract: async (documentId) => {
+    const response = await api.post(`/icsr/extract/${documentId}`);
+    return response.data;
+  },
+  
+  // Get ICSR data
+  get: async (documentId) => {
+    const response = await api.get(`/icsr/${documentId}`);
+    return response.data;
+  },
+  
+  // Update ICSR data
+  update: async (documentId, data) => {
+    const response = await api.put(`/icsr/${documentId}`, data);
+    return response.data;
+  },
+  
+  // Approve ICSR
+  approve: async (data) => {
+    const response = await api.post('/icsr/approve', data);
+    return response.data;
+  },
+  
+  // Download XML
+  downloadXML: async (documentId) => {
+    const response = await api.get(`/icsr/${documentId}/xml`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  }
+};
+
+export default extendedApiService;
 export { api };

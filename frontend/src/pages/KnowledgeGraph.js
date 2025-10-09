@@ -30,7 +30,7 @@ import {
   LocalHospital as MedicalIcon,
 } from '@mui/icons-material';
 import { useQuery } from 'react-query';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 import * as d3 from 'd3';
 
 function KnowledgeGraph() {

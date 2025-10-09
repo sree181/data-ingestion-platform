@@ -77,7 +77,7 @@ import {
 } from '@mui/icons-material';
 import { useQuery } from 'react-query';
 import { useParams, useNavigate } from 'react-router-dom';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 
 // Professional annotation types for legal and medical professionals
 const ANNOTATION_TYPES = {
@@ -1108,7 +1108,7 @@ function ProfessionalDocumentViewer() {
                           </ListItemIcon>
                           <ListItemText
                             primary={bookmark.title}
-                            secondary={new Date(bookmark.timestamp).toLocaleString()}
+                            secondary={bookmark.timestamp ? new Date(bookmark.timestamp).toLocaleString() : 'Unknown time'}
                           />
                         </ListItemButton>
                       </ListItem>
@@ -1284,7 +1284,7 @@ function ProfessionalDocumentViewer() {
                     {document?.metadata?.word_count && (
                       <Typography variant="caption" sx={{ color: '#6c757d', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <MenuBookIcon sx={{ fontSize: '0.9rem' }} />
-                        {document.metadata.word_count.toLocaleString()} words
+                        {(document.metadata?.word_count || 0).toLocaleString()} words
                       </Typography>
                     )}
                     {documentStructure?.analysis_confidence && (

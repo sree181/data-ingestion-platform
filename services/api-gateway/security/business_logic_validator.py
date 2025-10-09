@@ -57,12 +57,16 @@ class BusinessLogicValidator:
                 logger.info("Admin override enabled - bypassing business hours restriction", 
                            user_id=user_id, user_role=user_role)
             
-            # Check 2: Minimum membership duration
-            membership_duration_result = await self._validate_membership_duration(
-                user_id, space_id, space_details
-            )
-            if not membership_duration_result.valid:
-                return membership_duration_result
+            # Check 2: Minimum membership duration (can be bypassed by admin)
+            if not admin_override:
+                membership_duration_result = await self._validate_membership_duration(
+                    user_id, space_id, space_details
+                )
+                if not membership_duration_result.valid:
+                    return membership_duration_result
+            else:
+                logger.info("Admin override enabled - bypassing membership duration restriction", 
+                           user_id=user_id, user_role=user_role)
             
             # Check 3: Daily deletion limit
             daily_limit_result = await self._validate_daily_deletion_limit(user_id)

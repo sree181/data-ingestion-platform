@@ -454,7 +454,7 @@ class ProjectSpacesService:
                             "auth_level_used": auth_level,
                             "user_role": user_role,
                             "deletion_reason": deletion_reason,
-                            "space_created_by": space_details['created_by'],
+                            "space_created_by": str(space_details['created_by']),
                             "space_created_at": space_details['created_at'].isoformat() if space_details['created_at'] else None,
                             "security_classification": space_details['security_classification'],
                             "business_validation": business_validation.to_dict()
@@ -646,7 +646,7 @@ class ProjectSpacesService:
             raise
     
     async def get_space_documents(self, space_id: str, user_id: str, page: int = 1, page_size: int = 20) -> Tuple[List[SpaceDocument], int]:
-        """Get all documents in a project space"""
+        """Get all documents in a project space (including external documents from Elasticsearch)"""
         try:
             # Use the user_id from JWT token directly
             actual_user_id = user_id
@@ -656,6 +656,10 @@ class ProjectSpacesService:
                 raise PermissionError("Access denied to space")
             
             offset = (page - 1) * page_size
+            
+            # Get PostgreSQL documents
+            postgres_documents = []
+            postgres_total = 0
             
             async with self.pool.acquire() as conn:
                 # Get documents with pagination
@@ -672,14 +676,13 @@ class ProjectSpacesService:
                 )
                 
                 # Get total count
-                total_count = await conn.fetchval(
+                postgres_total = await conn.fetchval(
                     "SELECT COUNT(*) FROM space_documents WHERE space_id = $1",
                     space_id
                 )
                 
-                documents = []
                 for row in rows:
-                    documents.append(SpaceDocument(
+                    postgres_documents.append(SpaceDocument(
                         id=str(row['id']),
                         space_id=str(row['space_id']),
                         document_id=row['document_id'],
@@ -692,8 +695,88 @@ class ProjectSpacesService:
                         created_at=row['created_at'],
                         document_created_at=row['document_created_at']
                     ))
-                
-                return documents, total_count
+            
+            # Get external documents from Elasticsearch
+            external_documents = []
+            external_total = 0
+            
+            logger.info(f"Searching for external documents in space {space_id}")
+            
+            try:
+                import httpx
+                async with httpx.AsyncClient() as client:
+                    # Search for external documents with this space_id
+                    es_query = {
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {"term": {"space_id.keyword": space_id}},
+                                    {"term": {"external_source": true}}
+                                ]
+                            }
+                        },
+                        "size": page_size,
+                        "from": offset,
+                        "sort": [{"created_at": {"order": "desc"}}]
+                    }
+                    
+                    response = await client.post(
+                        "http://elasticsearch:9200/documents/_search",
+                        json=es_query,
+                        headers={"Content-Type": "application/json"},
+                        timeout=10
+                    )
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        hits = data.get("hits", {}).get("hits", [])
+                        external_total = data.get("hits", {}).get("total", {}).get("value", 0)
+                        logger.info(f"Found {external_total} external documents, processing {len(hits)} hits")
+                        
+                        for hit in hits:
+                            doc = hit["_source"]
+                            external_documents.append(SpaceDocument(
+                                id=hit["_id"],
+                                space_id=space_id,
+                                document_id=hit["_id"],
+                                filename=doc.get("title", "External Document"),
+                                status="completed",
+                                progress=100,
+                                tags=doc.get("keywords", []),
+                                metadata={
+                                    "source": doc.get("source", "unknown"),
+                                    "document_type": doc.get("document_type", "unknown"),
+                                    "ai_processed": doc.get("ai_processed", False),
+                                    "external_source": true,
+                                    "url": doc.get("url"),
+                                    "doi": doc.get("doi"),
+                                    "pmid": doc.get("pmid"),
+                                    "pmcid": doc.get("pmcid"),
+                                    "publication_date": doc.get("publication_date"),
+                                    "authors": doc.get("authors", [])
+                                },
+                                added_by=actual_user_id,
+                                created_at=doc.get("created_at", "2025-01-01T00:00:00Z"),
+                                document_created_at=doc.get("created_at", "2025-01-01T00:00:00Z")
+                            ))
+                            
+            except Exception as e:
+                logger.warning(f"Failed to get external documents from Elasticsearch: {e}")
+            
+            # Combine and sort documents
+            all_documents = postgres_documents + external_documents
+            all_documents.sort(key=lambda x: x.created_at, reverse=True)
+            
+            # Apply pagination to combined results
+            start_idx = (page - 1) * page_size
+            end_idx = start_idx + page_size
+            paginated_documents = all_documents[start_idx:end_idx]
+            
+            total_count = postgres_total + external_total
+            
+            logger.info(f"Returning {len(paginated_documents)} documents (PostgreSQL: {len(postgres_documents)}, External: {len(external_documents)})")
+            
+            return paginated_documents, total_count
                 
         except Exception as e:
             logger.error("Failed to get space documents", error=str(e), space_id=space_id)

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workflow Builder Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .node {
+            border: 2px solid #ccc;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            width: 200px;
+        }
+        .node.pending { border-color: #gray; background: #f5f5f5; }
+        .node.running { border-color: #2196F3; background: #E3F2FD; animation: pulse 1s infinite; }
+        .node.completed { border-color: #4CAF50; background: #E8F5E9; }
+        .node.failed { border-color: #f44336; background: #FFEBEE; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        button:hover { background: #1976D2; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        
+        #log {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry { margin: 5px 0; }
+        .log-info { color: #2196F3; }
+        .log-success { color: #4CAF50; }
+        .log-error { color: #f44336; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Workflow Builder - Real-Time Test</h1>
+    
+    <button id="runBtn" onclick="runWorkflow()">▶️ Run Workflow</button>
+    <button onclick="clearLog()">🗑️ Clear Log</button>
+    
+    <div id="nodes">
+        <div class="node pending" id="node1">
+            <h3>📄 Upload Documents</h3>
+            <div id="status1">Status: <strong>pending</strong></div>
+        </div>
+        <div class="node pending" id="node2">
+            <h3>🤖 AI Processing</h3>
+            <div id="status2">Status: <strong>pending</strong></div>
+        </div>
+        <div class="node pending" id="node3">
+            <h3>🕸️ Knowledge Graph</h3>
+            <div id="status3">Status: <strong>pending</strong></div>
+        </div>
+        <div class="node pending" id="node4">
+            <h3>📊 Generate Report</h3>
+            <div id="status4">Status: <strong>pending</strong></div>
+        </div>
+    </div>
+    
+    <h2>📋 Execution Log</h2>
+    <div id="log"></div>
+    
+    <script>
+        let executionId = null;
+        let pollInterval = null;
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        function updateNodeStatus(nodeId, status, result) {
+            const node = document.getElementById(nodeId);
+            const statusDiv = document.getElementById(`status${nodeId.replace('node', '')}`);
+            
+            // Remove all status classes
+            node.classList.remove('pending', 'running', 'completed', 'failed');
+            node.classList.add(status);
+            
+            statusDiv.innerHTML = `Status: <strong>${status}</strong>`;
+            
+            if (result && result.message) {
+                statusDiv.innerHTML += `<br><small>${result.message}</small>`;
+            }
+        }
+        
+        async function runWorkflow() {
+            const btn = document.getElementById('runBtn');
+            btn.disabled = true;
+            clearLog();
+            
+            // Reset all nodes
+            ['node1', 'node2', 'node3', 'node4'].forEach(id => {
+                updateNodeStatus(id, 'pending', null);
+            });
+            
+            log('🚀 Starting workflow execution...', 'info');
+            
+            const workflow = {
+                workflow_id: `test_${Date.now()}`,
+                nodes: [
+                    { id: 'node1', type: 'upload', position: {x: 100, y: 200}, data: {label: 'Upload', type: 'upload'} },
+                    { id: 'node2', type: 'aiProcessing', position: {x: 400, y: 200}, data: {label: 'AI', type: 'aiProcessing'} },
+                    { id: 'node3', type: 'knowledgeGraph', position: {x: 700, y: 200}, data: {label: 'Graph', type: 'knowledgeGraph'} },
+                    { id: 'node4', type: 'report', position: {x: 1000, y: 200}, data: {label: 'Report', type: 'report'} }
+                ],
+                edges: [
+                    { id: 'e1-2', source: 'node1', target: 'node2' },
+                    { id: 'e2-3', source: 'node2', target: 'node3' },
+                    { id: 'e3-4', source: 'node3', target: 'node4' }
+                ]
+            };
+            
+            try {
+                const response = await fetch('http://localhost:8008/api/v1/workflows/execute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(workflow)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    executionId = result.execution_id;
+                    log(`✅ Workflow started! Execution ID: ${executionId}`, 'success');
+                    log('📊 Polling for status updates every 500ms...', 'info');
+                    
+                    // Start polling
+                    pollInterval = setInterval(pollStatus, 500);
+                } else {
+                    log(`❌ Failed to start workflow: ${result.message}`, 'error');
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                btn.disabled = false;
+            }
+        }
+        
+        async function pollStatus() {
+            if (!executionId) return;
+            
+            try {
+                const response = await fetch(`http://localhost:8008/api/v1/workflows/execution/${executionId}/status`);
+                const result = await response.json();
+                
+                if (result.success && result.execution) {
+                    const execution = result.execution;
+                    
+                    // Update each node
+                    Object.keys(execution.nodes).forEach(nodeId => {
+                        const nodeStatus = execution.nodes[nodeId];
+                        updateNodeStatus(nodeId, nodeStatus.status, nodeStatus.result);
+                    });
+                    
+                    // Check if complete
+                    if (execution.status === 'completed') {
+                        clearInterval(pollInterval);
+                        log('🎉 Workflow completed successfully!', 'success');
+                        log(`📊 Results: ${JSON.stringify(execution.results, null, 2)}`, 'success');
+                        document.getElementById('runBtn').disabled = false;
+                    } else if (execution.status === 'failed') {
+                        clearInterval(pollInterval);
+                        log(`❌ Workflow failed: ${execution.error}`, 'error');
+                        document.getElementById('runBtn').disabled = false;
+                    }
+                }
+            } catch (error) {
+                console.error('Poll error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

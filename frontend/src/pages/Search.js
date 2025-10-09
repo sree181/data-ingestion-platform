@@ -35,7 +35,7 @@ import {
   ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
 import { useQuery } from 'react-query';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 
 const popularSearches = [
   'COVID-19 vaccine',
@@ -274,7 +274,7 @@ function Search() {
             
             {searchResults && (
               <Typography variant="body2" color="text.secondary">
-                {searchResults.total.toLocaleString()} results found
+                {(searchResults.total || 0).toLocaleString()} results found
               </Typography>
             )}
           </Box>
