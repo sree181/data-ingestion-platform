@@ -83,6 +83,15 @@ class ProjectSpaceUpdate(BaseModel):
     color: Optional[str] = Field(None, pattern=r"^#[0-9A-Fa-f]{6}$", description="Hex color code")
     icon: Optional[str] = Field(None, description="Icon name for UI")
     settings: Optional[Dict[str, Any]] = Field(None, description="Space-specific settings")
+    
+    # Security fields
+    security_classification: Optional[SecurityClassification] = Field(None, description="Security classification level")
+    encryption_enabled: Optional[bool] = Field(None, description="Encryption at rest enabled")
+    requires_mfa: Optional[bool] = Field(None, description="Multi-factor authentication required")
+    compliance_frameworks: Optional[List[str]] = Field(None, description="Compliance frameworks")
+    ip_whitelist: Optional[List[str]] = Field(None, description="Allowed IP addresses/ranges")
+    data_retention_days: Optional[int] = Field(None, ge=1, le=3650, description="Data retention period in days")
+    allowed_domains: Optional[List[str]] = Field(None, description="Allowed email domains for invitations")
 
 
 class ProjectSpace(BaseModel):

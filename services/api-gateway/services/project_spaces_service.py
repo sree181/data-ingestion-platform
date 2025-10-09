@@ -200,6 +200,11 @@ class ProjectSpacesService:
             if not await self._check_space_permission(space_id, user_id, SpacePermission.ADMIN):
                 raise PermissionError("Insufficient permissions to update space")
             
+            logger.info(f"Updating space {space_id}")
+            logger.debug(f"Security classification: {space_data.security_classification}")
+            logger.debug(f"Requires MFA: {space_data.requires_mfa}")
+            logger.debug(f"Compliance frameworks: {space_data.compliance_frameworks}")
+            
             # Build update query dynamically
             update_fields = []
             params = []
@@ -230,21 +235,64 @@ class ProjectSpacesService:
                 params.append(space_data.settings)
                 param_count += 1
             
+            # Security fields
+            if space_data.security_classification is not None:
+                logger.debug(f"Updating security_classification to {space_data.security_classification.value}")
+                update_fields.append(f"security_classification = ${param_count}")
+                params.append(space_data.security_classification.value)
+                param_count += 1
+            
+            if space_data.encryption_enabled is not None:
+                update_fields.append(f"encryption_enabled = ${param_count}")
+                params.append(space_data.encryption_enabled)
+                param_count += 1
+            
+            if space_data.requires_mfa is not None:
+                update_fields.append(f"requires_mfa = ${param_count}")
+                params.append(space_data.requires_mfa)
+                param_count += 1
+            
+            if space_data.compliance_frameworks is not None:
+                compliance_frameworks_json = json.dumps(space_data.compliance_frameworks)
+                update_fields.append(f"compliance_frameworks = ${param_count}")
+                params.append(compliance_frameworks_json)
+                param_count += 1
+            
+            if space_data.ip_whitelist is not None:
+                ip_whitelist_json = json.dumps(space_data.ip_whitelist)
+                update_fields.append(f"ip_whitelist = ${param_count}")
+                params.append(ip_whitelist_json)
+                param_count += 1
+            
+            if space_data.data_retention_days is not None:
+                update_fields.append(f"data_retention_days = ${param_count}")
+                params.append(space_data.data_retention_days)
+                param_count += 1
+            
+            if space_data.allowed_domains is not None:
+                allowed_domains_json = json.dumps(space_data.allowed_domains)
+                update_fields.append(f"allowed_domains = ${param_count}")
+                params.append(allowed_domains_json)
+                param_count += 1
+            
+            logger.debug(f"Update fields to process: {update_fields}")
+            logger.debug(f"Parameters count: {len(params)}")
+            
             if not update_fields:
+                logger.info("No fields to update, returning current space")
                 return await self.get_space_by_id(space_id, user_id)
             
             update_fields.append("updated_at = CURRENT_TIMESTAMP")
             params.extend([space_id])
             
             async with self.pool.acquire() as conn:
-                await conn.execute(
-                    f"""
+                query = f"""
                     UPDATE project_spaces 
                     SET {', '.join(update_fields)}
                     WHERE id = ${param_count}
-                    """,
-                    *params
-                )
+                    """
+                logger.debug(f"Executing update query: {query}")
+                await conn.execute(query, *params)
                 
                 return await self.get_space_by_id(space_id, user_id)
                 

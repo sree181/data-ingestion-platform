@@ -22,7 +22,6 @@ logger = structlog.get_logger(__name__)
 
 router = APIRouter(prefix="/api/v1/spaces", tags=["Project Spaces"])
 
-
 # Dependency to get project spaces service
 async def get_spaces_service() -> Optional[ProjectSpacesService]:
     try:
