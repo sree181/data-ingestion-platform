@@ -171,7 +171,7 @@ export const apiService = {
       }
       
       console.log(`🔍 API Request: page=${page}, size=${size}`);
-      const response = await api.get(`/docs-list/search?${params.toString()}`);
+      const response = await api.get(`/search?${params.toString()}`);
       
       console.log(`📊 API Response: total=${response.data.total}, results=${response.data.results?.length}`);
       if (response.data.results && response.data.results.length > 0) {
@@ -1134,6 +1134,223 @@ extendedApiService.icsr = {
     return response.data;
   }
 };
+
+// Security API methods
+const securityApi = {
+  // Audit Logging
+  audit: {
+    // Log audit event
+    log: async (eventData) => {
+      const response = await api.post('/audit/log', eventData);
+      return response.data;
+    },
+    
+    // Get audit events
+    getEvents: async (params = {}) => {
+      const response = await api.get('/audit/events', { params });
+      return response.data;
+    },
+    
+    // Get audit statistics
+    getStatistics: async (params = {}) => {
+      const response = await api.get('/audit/statistics', { params });
+      return response.data;
+    },
+    
+    // Get events requiring review
+    getEventsRequiringReview: async (params = {}) => {
+      const response = await api.get('/audit/events/requiring-review', { params });
+      return response.data;
+    },
+    
+    // Get high-risk events
+    getHighRiskEvents: async (params = {}) => {
+      const response = await api.get('/audit/events/high-risk', { params });
+      return response.data;
+    },
+    
+    // Get recent events
+    getRecentEvents: async (hours = 24, params = {}) => {
+      const response = await api.get('/audit/events/recent', { 
+        params: { hours, ...params } 
+      });
+      return response.data;
+    },
+    
+    // Create retention policy
+    createRetentionPolicy: async (policyData) => {
+      const response = await api.post('/audit/retention-policies', policyData);
+      return response.data;
+    },
+    
+    // Create alert
+    createAlert: async (alertData) => {
+      const response = await api.post('/audit/alerts', alertData);
+      return response.data;
+    },
+    
+    // Export audit events
+    exportEvents: async (exportConfig) => {
+      const response = await api.post('/audit/export', exportConfig);
+      return response.data;
+    },
+    
+    // Health check
+    healthCheck: async () => {
+      const response = await api.get('/audit/health');
+      return response.data;
+    }
+  },
+  
+  // Security Dashboard Data
+  dashboard: {
+    // Get security overview
+    getSecurityOverview: async () => {
+      try {
+        // Mock data for now - in production this would call real endpoints
+        return {
+          securityStatus: 'ACTIVE',
+          activeAlerts: 3,
+          complianceScore: 98,
+          auditEvents: 1247,
+          alerts: {
+            critical: 2,
+            high: 1,
+            medium: 0,
+            low: 0
+          },
+          compliance: {
+            gdpr: true,
+            hipaa: true,
+            sox: true,
+            pci: false
+          }
+        };
+      } catch (error) {
+        console.error('Security overview API error:', error);
+        throw error;
+      }
+    },
+    
+    // Get security metrics
+    getSecurityMetrics: async () => {
+      try {
+        // Mock data for now
+        return {
+          loginSuccessRate: 94.2,
+          mfaAdoption: 87.5,
+          encryptionCoverage: 100,
+          complianceScore: 98.1,
+          riskDistribution: {
+            low: 65,
+            medium: 25,
+            high: 8,
+            critical: 2
+          }
+        };
+      } catch (error) {
+        console.error('Security metrics API error:', error);
+        throw error;
+      }
+    },
+    
+    // Get security events timeline
+    getSecurityEventsTimeline: async (hours = 24) => {
+      try {
+        // Mock data for now
+        return [
+          { time: '00:00', login: 45, failed: 2, blocked: 0 },
+          { time: '04:00', login: 32, failed: 1, blocked: 0 },
+          { time: '08:00', login: 78, failed: 5, blocked: 1 },
+          { time: '12:00', login: 95, failed: 3, blocked: 0 },
+          { time: '16:00', login: 67, failed: 4, blocked: 2 },
+          { time: '20:00', login: 52, failed: 2, blocked: 1 },
+          { time: '24:00', login: 38, failed: 1, blocked: 0 }
+        ];
+      } catch (error) {
+        console.error('Security events timeline API error:', error);
+        throw error;
+      }
+    },
+    
+    // Get recent security alerts
+    getRecentSecurityAlerts: async (limit = 10) => {
+      try {
+        // Mock data for now
+        return [
+          {
+            id: 'alert-1',
+            time: '14:32:15',
+            event: 'Multiple failed login attempts',
+            severity: 'Critical',
+            user: 'admin@company.com',
+            ipAddress: '203.0.113.45',
+            status: 'Blocked'
+          },
+          {
+            id: 'alert-2',
+            time: '13:45:22',
+            event: 'Unauthorized data access attempt',
+            severity: 'High',
+            user: 'user123@company.com',
+            ipAddress: '192.168.1.100',
+            status: 'Investigated'
+          },
+          {
+            id: 'alert-3',
+            time: '12:18:33',
+            event: 'Suspicious file download pattern',
+            severity: 'Medium',
+            user: 'researcher@company.com',
+            ipAddress: '10.0.0.50',
+            status: 'Pending'
+          },
+          {
+            id: 'alert-4',
+            time: '11:05:47',
+            event: 'MFA bypass attempt detected',
+            severity: 'Critical',
+            user: 'manager@company.com',
+            ipAddress: '172.16.0.25',
+            status: 'Resolved'
+          }
+        ];
+      } catch (error) {
+        console.error('Recent security alerts API error:', error);
+        throw error;
+      }
+    },
+    
+    // Get user activity
+    getUserActivity: async (hours = 24) => {
+      try {
+        // Mock data for now
+        return {
+          topActiveUsers: [
+            { name: 'John Doe', role: 'Admin', activity: 47, status: 'online' },
+            { name: 'Jane Smith', role: 'Researcher', activity: 32, status: 'online' },
+            { name: 'Mike Johnson', role: 'Analyst', activity: 28, status: 'away' },
+            { name: 'Sarah Wilson', role: 'Manager', activity: 24, status: 'offline' },
+            { name: 'David Brown', role: 'Developer', activity: 19, status: 'online' }
+          ],
+          recentSecurityEvents: [
+            { event: 'Successful MFA login', user: 'admin@company.com', time: '2 min ago', type: 'success' },
+            { event: 'Document access granted', user: 'researcher@company.com', time: '5 min ago', type: 'info' },
+            { event: 'Failed login attempt', user: 'unknown@external.com', time: '8 min ago', type: 'warning' },
+            { event: 'Password changed', user: 'manager@company.com', time: '12 min ago', type: 'info' },
+            { event: 'Suspicious download', user: 'analyst@company.com', time: '15 min ago', type: 'warning' }
+          ]
+        };
+      } catch (error) {
+        console.error('User activity API error:', error);
+        throw error;
+      }
+    }
+  }
+};
+
+// Extend the main API service with security methods
+extendedApiService.security = securityApi;
 
 export default extendedApiService;
 export { api };

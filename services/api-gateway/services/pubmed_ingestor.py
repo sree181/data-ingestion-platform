@@ -1,6 +1,7 @@
 """
 PubMed Targeted Ingestion Service
 Fetches articles based on MeSH terms and publication types for ICSR classification
+Enhanced with PMC full-text retrieval
 """
 
 from pymed import PubMed
@@ -8,6 +9,8 @@ from typing import List, Dict, Optional
 import structlog
 from datetime import datetime
 import asyncio
+import aiohttp
+import xml.etree.ElementTree as ET
 
 logger = structlog.get_logger()
 
@@ -109,11 +112,19 @@ class PubMedTargetedIngestor:
                     # Clean PubMed ID (sometimes contains multiple IDs with newlines)
                     clean_pmid = str(article.pubmed_id).split('\n')[0].split()[0].strip()
                     
+                    # Try to get PMC ID if available
+                    pmcid = None
+                    if hasattr(article, 'pmc') and article.pmc:
+                        pmcid = article.pmc
+                    
+                    # Build basic article data
                     article_data = {
                         'id': f"pubmed_{clean_pmid}",
                         'pmid': clean_pmid,
+                        'pmcid': pmcid,
                         'title': article.title or '',
                         'abstract': article.abstract or '',
+                        'content': article.abstract or '',  # Default to abstract
                         'authors': [
                             f"{author.get('firstname', '')} {author.get('lastname', '')}".strip()
                             for author in (article.authors or [])
@@ -127,8 +138,21 @@ class PubMedTargetedIngestor:
                         'keywords': article.keywords if hasattr(article, 'keywords') else [],
                         'source': 'pubmed',
                         'domain': domain,
-                        'ingested_at': datetime.utcnow().isoformat()
+                        'ingested_at': datetime.utcnow().isoformat(),
+                        'has_full_text': False
                     }
+                    
+                    # Try to fetch full-text from PMC (async)
+                    try:
+                        full_text = await self._get_pmc_full_text(clean_pmid, pmcid)
+                        if full_text and len(full_text) > len(article.abstract or ''):
+                            article_data['content'] = full_text
+                            article_data['has_full_text'] = True
+                            logger.info(f"Retrieved full-text for PMID {clean_pmid}: {len(full_text)} chars")
+                    except Exception as e:
+                        logger.warning(f"Failed to get full-text for PMID {clean_pmid}: {e}")
+                        # Continue with abstract
+                    
                     articles.append(article_data)
                     
                 except Exception as e:
@@ -141,6 +165,153 @@ class PubMedTargetedIngestor:
         except Exception as e:
             logger.error("PubMed fetch failed", domain=domain, error=str(e))
             return []
+    
+    async def _get_pmc_full_text(self, pmid: str, pmcid: Optional[str] = None) -> Optional[str]:
+        """
+        Fetch full-text from PubMed Central (PMC) using E-utilities
+        
+        Uses the efetch endpoint to retrieve JATS XML format full-text
+        for Open Access articles
+        """
+        try:
+            # If we have PMCID, use it directly
+            if pmcid and pmcid.startswith('PMC'):
+                fetch_id = pmcid
+                db = 'pmc'
+            else:
+                # Try to convert PMID to PMCID using elink
+                pmcid = await self._pmid_to_pmcid(pmid)
+                if pmcid:
+                    fetch_id = pmcid
+                    db = 'pmc'
+                else:
+                    logger.info(f"No PMC ID found for PMID {pmid}")
+                    return None
+            
+            # Fetch full-text XML from PMC
+            base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+            params = {
+                'db': db,
+                'id': fetch_id.replace('PMC', ''),  # Remove PMC prefix
+                'rettype': 'full',
+                'retmode': 'xml'
+            }
+            
+            logger.info(f"Fetching PMC full-text for {fetch_id}")
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.get(base_url, params=params) as response:
+                    if response.status == 200:
+                        xml_content = await response.text()
+                        
+                        # Parse XML and extract text
+                        full_text = self._parse_pmc_xml(xml_content)
+                        
+                        if full_text and len(full_text) > 500:
+                            logger.info(f"Retrieved PMC full-text for {fetch_id}: {len(full_text)} chars")
+                            return full_text
+                    else:
+                        logger.warning(f"PMC fetch failed with status {response.status}")
+                        
+        except Exception as e:
+            logger.warning(f"Failed to get PMC full-text for {pmid}: {e}")
+        
+        return None
+    
+    async def _pmid_to_pmcid(self, pmid: str) -> Optional[str]:
+        """Convert PMID to PMCID using elink"""
+        try:
+            base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi"
+            params = {
+                'dbfrom': 'pubmed',
+                'db': 'pmc',
+                'id': pmid,
+                'retmode': 'json'
+            }
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.get(base_url, params=params) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        
+                        # Extract PMCID from response
+                        linksets = data.get('linksets', [])
+                        if linksets and len(linksets) > 0:
+                            linksetdbs = linksets[0].get('linksetdbs', [])
+                            for linksetdb in linksetdbs:
+                                if linksetdb.get('dbto') == 'pmc':
+                                    links = linksetdb.get('links', [])
+                                    if links and len(links) > 0:
+                                        pmcid = f"PMC{links[0]}"
+                                        logger.info(f"Converted PMID {pmid} to {pmcid}")
+                                        return pmcid
+        except Exception as e:
+            logger.warning(f"Failed to convert PMID {pmid} to PMCID: {e}")
+        
+        return None
+    
+    def _parse_pmc_xml(self, xml_content: str) -> Optional[str]:
+        """Parse PMC JATS XML and extract full text"""
+        try:
+            root = ET.fromstring(xml_content)
+            text_parts = []
+            
+            # Extract article title
+            for title in root.iter('article-title'):
+                if title.text:
+                    text_parts.append(f"Title: {title.text.strip()}")
+            
+            # Extract abstract
+            for abstract in root.iter('abstract'):
+                abstract_text = ''.join(abstract.itertext()).strip()
+                if abstract_text:
+                    text_parts.append(f"\nAbstract:\n{abstract_text}")
+            
+            # Extract body sections
+            for body in root.iter('body'):
+                # Get all sections
+                for sec in body.iter('sec'):
+                    # Get section title
+                    sec_title = sec.find('title')
+                    if sec_title is not None and sec_title.text:
+                        text_parts.append(f"\n\n{sec_title.text.strip()}\n")
+                    
+                    # Get all paragraphs in section
+                    for p in sec.findall('p'):
+                        para_text = ''.join(p.itertext()).strip()
+                        if para_text:
+                            text_parts.append(para_text)
+            
+            # Extract conclusions
+            for conclusion in root.iter('conclusion'):
+                conclusion_text = ''.join(conclusion.itertext()).strip()
+                if conclusion_text:
+                    text_parts.append(f"\n\nConclusion:\n{conclusion_text}")
+            
+            # Extract supplementary material references
+            for supplementary in root.iter('supplementary-material'):
+                label = supplementary.find('label')
+                caption = supplementary.find('caption')
+                if label is not None and caption is not None:
+                    label_text = label.text.strip() if label.text else ""
+                    caption_text = ''.join(caption.itertext()).strip()
+                    if label_text or caption_text:
+                        text_parts.append(f"\n{label_text}: {caption_text}")
+            
+            full_text = "\n".join(text_parts)
+            
+            if len(full_text) > 500:
+                return full_text
+            else:
+                logger.warning(f"Parsed text too short: {len(full_text)} chars")
+                return None
+                
+        except ET.ParseError as e:
+            logger.error(f"Failed to parse PMC XML: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Error parsing PMC XML: {e}")
+            return None
     
     def _parse_date(self, date_obj) -> Optional[str]:
         """Parse PubMed date to ISO format"""

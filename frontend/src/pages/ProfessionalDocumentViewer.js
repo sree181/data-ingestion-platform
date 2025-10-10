@@ -271,7 +271,7 @@ function ProfessionalDocumentViewer() {
   const [userType, setUserType] = useState('medical'); // 'legal' or 'medical'
   
   // Fetch document details
-  const { data: document, isLoading, error } = useQuery(
+  const { data: rawDocument, isLoading, error } = useQuery(
     ['document', documentId],
     () => apiService.getDocument(documentId),
     {
@@ -279,6 +279,20 @@ function ProfessionalDocumentViewer() {
       staleTime: 300000, // 5 minutes
     }
   );
+
+  // Normalize classification fields from either flat or nested structure
+  const document = useMemo(() => {
+    if (!rawDocument) return null;
+    const icsr = rawDocument.icsr_classification || {};
+    return {
+      ...rawDocument,
+      classification: rawDocument.classification ?? icsr.classification ?? null,
+      classification_confidence: rawDocument.classification_confidence ?? icsr.confidence ?? null,
+      classification_entities: rawDocument.classification_entities ?? icsr.key_entities ?? [],
+      classification_reasoning: rawDocument.classification_reasoning ?? icsr.reasoning ?? null,
+      classification_cost: rawDocument.classification_cost ?? icsr.cost ?? 0,
+    };
+  }, [rawDocument]);
 
   // Get pre-analyzed document structure from the document data (no separate API call needed!)
   const documentStructure = useMemo(() => {
@@ -417,8 +431,12 @@ function ProfessionalDocumentViewer() {
 
   // Enhanced content with section anchors
   const enhancedContent = useMemo(() => {
-    if (!document?.content) return '';
+    if (!document?.content) {
+      console.log('❌ No document content available');
+      return '';
+    }
     
+    console.log('✅ Document content loaded:', document.content.length, 'characters');
     let content = document.highlighted_content || document.content;
     
     // Inject section anchors based on LLM analysis
@@ -1220,7 +1238,7 @@ function ProfessionalDocumentViewer() {
             <Paper sx={{ 
               m: 1.5, // Reduced margin for better space utilization
               p: 3,    // Reduced padding
-              minHeight: 'calc(100vh - 80px)', // Optimized height
+              minHeight: 'auto', // Allow content to determine height
               backgroundColor: 'white',
               borderRadius: 2, // Reduced border radius for cleaner look
               boxShadow: '0 2px 12px rgba(0,0,0,0.06)', // Subtler shadow
@@ -1374,56 +1392,355 @@ function ProfessionalDocumentViewer() {
                 </Alert>
               )}
 
+              {/* 🎨 REDESIGNED PV Classification Evidence Section - Modern Card Design */}
+              {document?.classification && document?.classification_entities && document.classification_entities.length > 0 && (
+                <Box sx={{ mb: 4 }}>
+                  {/* Modern Header with Glassmorphism */}
+                  <Box sx={{ 
+                    background: document.classification === 'ICSR' 
+                      ? 'linear-gradient(135deg, rgba(211, 47, 47, 0.95) 0%, rgba(198, 40, 40, 0.95) 100%)'
+                      : document.classification === 'Safety_Information'
+                      ? 'linear-gradient(135deg, rgba(25, 118, 210, 0.95) 0%, rgba(21, 101, 192, 0.95) 100%)'
+                      : document.classification === 'Non-ICSR'
+                      ? 'linear-gradient(135deg, rgba(2, 136, 209, 0.95) 0%, rgba(2, 119, 189, 0.95) 100%)'
+                      : 'linear-gradient(135deg, rgba(117, 117, 117, 0.95) 0%, rgba(97, 97, 97, 0.95) 100%)',
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: '16px 16px 0 0',
+                    p: 3,
+                    color: 'white',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+                  }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box sx={{ 
+                          backgroundColor: 'rgba(255,255,255,0.2)', 
+                          borderRadius: '12px', 
+                          p: 1.5,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <ScienceIcon sx={{ fontSize: '2rem' }} />
+                        </Box>
+                        <Box>
+                          <Typography variant="h5" sx={{ fontWeight: 700, fontSize: '1.3rem', letterSpacing: '-0.5px' }}>
+                            🎯 AI Classification Evidence
+                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 0.5 }}>
+                            <Chip 
+                              label={document.classification}
+                              size="small"
+                              sx={{ 
+                                backgroundColor: 'rgba(255,255,255,0.25)',
+                                color: 'white',
+                                fontWeight: 700,
+                                fontSize: '0.75rem',
+                                backdropFilter: 'blur(10px)'
+                              }}
+                            />
+                            <Typography variant="caption" sx={{ opacity: 0.9, fontSize: '0.85rem' }}>
+                              {Math.round((document.classification_confidence || 0) * 100)}% confidence
+                            </Typography>
+                            <Typography variant="caption" sx={{ opacity: 0.9, fontSize: '0.85rem' }}>
+                              • {document.classification_entities.length} entities
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                      <IconButton 
+                        size="small" 
+                        sx={{ color: 'white', backgroundColor: 'rgba(255,255,255,0.15)' }}
+                        onClick={() => {/* Toggle collapse */}}
+                      >
+                        <ExpandMoreIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+
+                  {/* Modern Content Area */}
+                  <Paper sx={{ 
+                    borderRadius: '0 0 16px 16px', 
+                    p: 3, 
+                    backgroundColor: '#fafbfc',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+                  }}>
+                    {/* AI Reasoning - Modern Card */}
+                    {document.classification_reasoning && (
+                      <Card sx={{ 
+                        mb: 3, 
+                        background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                        border: '1px solid rgba(0,0,0,0.08)',
+                        borderRadius: 3,
+                        overflow: 'hidden'
+                      }}>
+                        <CardContent sx={{ p: 0 }}>
+                          <Box sx={{ 
+                            background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                            p: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1
+                          }}>
+                            <ScienceIcon sx={{ color: 'white', fontSize: '1.2rem' }} />
+                            <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 700, fontSize: '0.95rem' }}>
+                              AI Reasoning
+                            </Typography>
+                          </Box>
+                          <Box sx={{ p: 2.5 }}>
+                            <Typography variant="body2" sx={{ 
+                              color: '#495057', 
+                              lineHeight: 1.8,
+                              fontSize: '0.95rem',
+                              fontStyle: 'italic'
+                            }}>
+                              "{document.classification_reasoning}"
+                            </Typography>
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Key Entities - Modern Grid with Enhanced Cards */}
+                    <Box sx={{ mb: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <HighlightIcon sx={{ fontSize: '1.2rem', color: '#667eea' }} />
+                          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#212529', fontSize: '1rem' }}>
+                            Key Evidence ({document.classification_entities.length})
+                          </Typography>
+                        </Box>
+                        <ButtonGroup size="small" variant="outlined">
+                          <Button startIcon={<BookmarkIcon />} sx={{ fontSize: '0.75rem' }}>Save All</Button>
+                          <Button startIcon={<ShareIcon />} sx={{ fontSize: '0.75rem' }}>Export</Button>
+                        </ButtonGroup>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 2.5 }}>
+                      {document.classification_entities.map((entity, idx) => {
+                        const entityColors = {
+                          'Drug': { bg: 'linear-gradient(135deg, #fff9e6 0%, #fff3e0 100%)', border: '#ff9800', icon: '💊', shadow: 'rgba(255, 152, 0, 0.2)' },
+                          'Disease': { bg: 'linear-gradient(135deg, #fff5f5 0%, #ffebee 100%)', border: '#f44336', icon: '🦠', shadow: 'rgba(244, 67, 54, 0.2)' },
+                          'Adverse_Event': { bg: 'linear-gradient(135deg, #ffeef4 0%, #fce4ec 100%)', border: '#e91e63', icon: '⚠️', shadow: 'rgba(233, 30, 99, 0.2)' },
+                          'Medical_Condition': { bg: 'linear-gradient(135deg, #f9f2fb 0%, #f3e5f5 100%)', border: '#9c27b0', icon: '🩺', shadow: 'rgba(156, 39, 176, 0.2)' },
+                          'Treatment': { bg: 'linear-gradient(135deg, #f0f9ff 0%, #e1f5fe 100%)', border: '#03a9f4', icon: '💉', shadow: 'rgba(3, 169, 244, 0.2)' },
+                          'Symptom': { bg: 'linear-gradient(135deg, #fff8f0 0%, #ffe0b2 100%)', border: '#fb8c00', icon: '🌡️', shadow: 'rgba(251, 140, 0, 0.2)' },
+                          'Patient': { bg: 'linear-gradient(135deg, #f0f7ff 0%, #e3f2fd 100%)', border: '#2196f3', icon: '👤', shadow: 'rgba(33, 150, 243, 0.2)' },
+                          'Date': { bg: 'linear-gradient(135deg, #f2f3f8 0%, #e8eaf6 100%)', border: '#3f51b5', icon: '📅', shadow: 'rgba(63, 81, 181, 0.2)' },
+                          'Dosage': { bg: 'linear-gradient(135deg, #f7fbf0 0%, #f1f8e9 100%)', border: '#8bc34a', icon: '⚗️', shadow: 'rgba(139, 195, 74, 0.2)' },
+                          'default': { bg: 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)', border: '#9e9e9e', icon: '🔖', shadow: 'rgba(158, 158, 158, 0.2)' }
+                        };
+                        
+                        const colorConfig = entityColors[entity.type] || entityColors.default;
+                        
+                        return (
+                          <Card key={idx} sx={{ 
+                            background: colorConfig.bg,
+                            border: `2px solid ${colorConfig.border}`,
+                            borderRadius: 3,
+                            boxShadow: `0 2px 12px ${colorConfig.shadow}`,
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            position: 'relative',
+                            overflow: 'visible',
+                            '&:hover': {
+                              transform: 'translateY(-6px) scale(1.02)',
+                              boxShadow: `0 12px 32px ${colorConfig.shadow}, 0 0 0 3px ${colorConfig.border}20`,
+                              '& .action-buttons': {
+                                opacity: 1,
+                                transform: 'translateY(0)'
+                              }
+                            }
+                          }}>
+                            {/* Quick Actions - Appear on Hover */}
+                            <Box 
+                              className="action-buttons"
+                              sx={{ 
+                                position: 'absolute',
+                                top: -12,
+                                right: 8,
+                                opacity: 0,
+                                transform: 'translateY(-4px)',
+                                transition: 'all 0.3s ease',
+                                display: 'flex',
+                                gap: 0.5,
+                                zIndex: 10
+                              }}
+                            >
+                              <Tooltip title="Annotate">
+                                <IconButton size="small" sx={{ 
+                                  backgroundColor: 'white', 
+                                  boxShadow: 2,
+                                  '&:hover': { backgroundColor: colorConfig.border, color: 'white' }
+                                }}>
+                                  <HighlightIcon sx={{ fontSize: '0.9rem' }} />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Add Comment">
+                                <IconButton size="small" sx={{ 
+                                  backgroundColor: 'white', 
+                                  boxShadow: 2,
+                                  '&:hover': { backgroundColor: colorConfig.border, color: 'white' }
+                                }}>
+                                  <CommentIcon sx={{ fontSize: '0.9rem' }} />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Bookmark">
+                                <IconButton size="small" sx={{ 
+                                  backgroundColor: 'white', 
+                                  boxShadow: 2,
+                                  '&:hover': { backgroundColor: colorConfig.border, color: 'white' }
+                                }}>
+                                  <BookmarkBorderIcon sx={{ fontSize: '0.9rem' }} />
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
+
+                            <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                              {/* Entity Header with Enhanced Typography */}
+                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <Typography sx={{ fontSize: '1.5rem' }}>{colorConfig.icon}</Typography>
+                                  <Typography variant="caption" sx={{ 
+                                    fontWeight: 800, 
+                                    color: colorConfig.border,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.8px',
+                                    fontSize: '0.7rem'
+                                  }}>
+                                    {entity.type?.replace('_', ' ')}
+                                  </Typography>
+                                </Box>
+                                <Chip 
+                                  label={`${Math.round(entity.confidence * 100)}%`}
+                                  size="small"
+                                  sx={{ 
+                                    height: 24,
+                                    fontSize: '0.7rem',
+                                    fontWeight: 800,
+                                    backgroundColor: colorConfig.border,
+                                    color: 'white',
+                                    boxShadow: `0 2px 8px ${colorConfig.shadow}`
+                                  }}
+                                />
+                              </Box>
+                              
+                              {/* Entity Text with Modern Typography */}
+                              <Typography variant="body1" sx={{ 
+                                fontWeight: 700,
+                                color: '#1a1a1a',
+                                fontSize: '1rem',
+                                mb: 1.5,
+                                lineHeight: 1.5,
+                                minHeight: '48px',
+                                display: 'flex',
+                                alignItems: 'center'
+                              }}>
+                                "{entity.entity}"
+                              </Typography>
+                              
+                              {/* Enhanced Relevance Badge */}
+                              {entity.relevance && (
+                                <Box sx={{ 
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                  backgroundColor: 'white',
+                                  borderRadius: 2,
+                                  px: 1.5,
+                                  py: 0.5,
+                                  border: `1.5px solid ${colorConfig.border}`,
+                                  boxShadow: '0 2px 4px rgba(0,0,0,0.08)'
+                                }}>
+                                  <FlagIcon sx={{ fontSize: '0.8rem', color: colorConfig.border }} />
+                                  <Typography sx={{ 
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    color: colorConfig.border
+                                  }}>
+                                    {entity.relevance}
+                                  </Typography>
+                                </Box>
+                              )}
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </Box>
+                  </Paper>
+                </Box>
+              )}
+
               {/* Enhanced Document Content with Section Anchors */}
-              <Box
-                onMouseUp={handleTextSelection}
-                sx={{
-                  '& .entity': {
-                    padding: '2px 4px',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      transform: 'scale(1.02)',
-                      boxShadow: 1,
+              {enhancedContent ? (
+                <Box
+                  onMouseUp={handleTextSelection}
+                  sx={{
+                    minHeight: '500px', // Ensure content area is visible
+                    '& .entity': {
+                      padding: '2px 4px',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        transform: 'scale(1.02)',
+                        boxShadow: 1,
+                      },
                     },
-                  },
-                  // Enhanced entity styling
-                  '& .entity-person': { backgroundColor: '#e3f2fd', border: '1px solid #2196f3' },
-                  '& .entity-organization': { backgroundColor: '#f3e5f5', border: '1px solid #9c27b0' },
-                  '& .entity-location': { backgroundColor: '#e8f5e8', border: '1px solid #4caf50' },
-                  '& .entity-drug': { backgroundColor: '#fff3e0', border: '1px solid #ff9800' },
-                  '& .entity-disease': { backgroundColor: '#ffebee', border: '1px solid #f44336' },
-                  '& .entity-treatment': { backgroundColor: '#e1f5fe', border: '1px solid #03a9f4' },
-                  '& .entity-regulation': { backgroundColor: '#f5f5f5', border: '1px solid #757575' },
-                  '& .entity-date': { backgroundColor: '#e8eaf6', border: '1px solid #3f51b5' },
-                  '& .entity-money': { backgroundColor: '#f1f8e9', border: '1px solid #8bc34a' },
-                  '& .entity-concept': { backgroundColor: '#fafafa', border: '1px solid #9e9e9e' },
-                  // Legal clause highlighting
-                  '& .entity-legal-party': { backgroundColor: '#e3f2fd', border: '2px solid #2196f3', fontWeight: 'bold' },
-                  '& .entity-legal-date': { backgroundColor: '#e8eaf6', border: '2px solid #3f51b5', fontWeight: 'bold' },
-                  '& .entity-legal-jurisdiction': { backgroundColor: '#e8f5e8', border: '2px solid #4caf50', fontWeight: 'bold' },
-                  '& .entity-legal-termination': { backgroundColor: '#ffebee', border: '2px solid #f44336', fontWeight: 'bold' },
-                  '& .entity-legal-non-compete': { backgroundColor: '#fff3e0', border: '2px solid #ff9800', fontWeight: 'bold' },
-                  '& .entity-legal-confidentiality': { backgroundColor: '#e1f5fe', border: '2px solid #03a9f4', fontWeight: 'bold' },
-                  '& .entity-legal-ip': { backgroundColor: '#f3e5f5', border: '2px solid #9c27b0', fontWeight: 'bold' },
-                  '& .entity-legal-liability': { backgroundColor: '#ffebee', border: '2px solid #f44336', fontWeight: 'bold' },
-                  '& .entity-legal-payment': { backgroundColor: '#f1f8e9', border: '2px solid #8bc34a', fontWeight: 'bold' },
-                  '& .entity-legal-force-majeure': { backgroundColor: '#fff3e0', border: '2px solid #ff9800', fontWeight: 'bold' },
-                  lineHeight: 1.8,
-                  fontSize: '16px',
-                  fontFamily: '"Inter", "Roboto", sans-serif',
-                  color: '#2C3E50',
-                  '& p': { marginBottom: '1.5rem' },
-                  '& h1, & h2, & h3, & h4, & h5, & h6': { 
-                    fontWeight: 600, 
-                    marginTop: '2rem', 
-                    marginBottom: '1rem',
-                    color: '#34495E'
-                  }
-                }}
-                dangerouslySetInnerHTML={{ __html: enhancedContent }}
-              />
+                    // Enhanced entity styling with more vibrant colors
+                    '& .entity-person': { backgroundColor: '#bbdefb', border: '1.5px solid #1976d2', fontWeight: 600 },
+                    '& .entity-organization': { backgroundColor: '#e1bee7', border: '1.5px solid #7b1fa2', fontWeight: 600 },
+                    '& .entity-location': { backgroundColor: '#c8e6c9', border: '1.5px solid #388e3c', fontWeight: 600 },
+                    '& .entity-drug': { backgroundColor: '#ffe0b2', border: '1.5px solid #f57c00', fontWeight: 600 },
+                    '& .entity-disease': { backgroundColor: '#ffcdd2', border: '1.5px solid #c62828', fontWeight: 600 },
+                    '& .entity-treatment': { backgroundColor: '#b3e5fc', border: '1.5px solid #0277bd', fontWeight: 600 },
+                    '& .entity-regulation': { backgroundColor: '#e0e0e0', border: '1.5px solid #424242', fontWeight: 600 },
+                    '& .entity-date': { backgroundColor: '#c5cae9', border: '1.5px solid #283593', fontWeight: 600 },
+                    '& .entity-money': { backgroundColor: '#dcedc8', border: '1.5px solid #689f38', fontWeight: 600 },
+                    '& .entity-concept': { backgroundColor: '#f5f5f5', border: '1.5px solid #757575', fontWeight: 600 },
+                    // Legal clause highlighting
+                    '& .entity-legal-party': { backgroundColor: '#90caf9', border: '2px solid #1565c0', fontWeight: 'bold', padding: '4px 6px' },
+                    '& .entity-legal-date': { backgroundColor: '#9fa8da', border: '2px solid #283593', fontWeight: 'bold', padding: '4px 6px' },
+                    '& .entity-legal-jurisdiction': { backgroundColor: '#a5d6a7', border: '2px solid #2e7d32', fontWeight: 'bold', padding: '4px 6px' },
+                    '& .entity-legal-termination': { backgroundColor: '#ef9a9a', border: '2px solid #c62828', fontWeight: 'bold', padding: '4px 6px' },
+                    '& .entity-legal-non-compete': { backgroundColor: '#ffcc80', border: '2px solid #ef6c00', fontWeight: 'bold', padding: '4px 6px' },
+                    '& .entity-legal-confidentiality': { backgroundColor: '#81d4fa', border: '2px solid #0277bd', fontWeight: 'bold', padding: '4px 6px' },
+                    '& .entity-legal-ip': { backgroundColor: '#ce93d8', border: '2px solid #6a1b9a', fontWeight: 'bold', padding: '4px 6px' },
+                    '& .entity-legal-liability': { backgroundColor: '#ef9a9a', border: '2px solid #c62828', fontWeight: 'bold', padding: '4px 6px' },
+                    '& .entity-legal-payment': { backgroundColor: '#c5e1a5', border: '2px solid #558b2f', fontWeight: 'bold', padding: '4px 6px' },
+                    '& .entity-legal-force-majeure': { backgroundColor: '#ffcc80', border: '2px solid #ef6c00', fontWeight: 'bold', padding: '4px 6px' },
+                    lineHeight: 1.8,
+                    fontSize: '16px',
+                    fontFamily: '"Inter", "Roboto", sans-serif',
+                    color: '#2C3E50',
+                    whiteSpace: 'pre-wrap', // Preserve line breaks
+                    '& p': { marginBottom: '1.5rem' },
+                    '& h1, & h2, & h3, & h4, & h5, & h6': { 
+                      fontWeight: 600, 
+                      marginTop: '2rem', 
+                      marginBottom: '1rem',
+                      color: '#34495E'
+                    }
+                  }}
+                  dangerouslySetInnerHTML={{ __html: enhancedContent }}
+                />
+              ) : (
+                <Alert severity="warning" sx={{ mt: 3 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
+                    📄 Document Content Not Available
+                  </Typography>
+                  <Typography variant="body2">
+                    The full document content could not be loaded. This may happen if:
+                    <ul style={{ marginTop: '8px', marginBottom: 0 }}>
+                      <li>The document was not fully processed during ingestion</li>
+                      <li>Content extraction failed for this file type</li>
+                      <li>The document is still being processed</li>
+                    </ul>
+                  </Typography>
+                  <Typography variant="body2" sx={{ mt: 2, fontStyle: 'italic', color: 'text.secondary' }}>
+                    Check the browser console for more details.
+                  </Typography>
+                </Alert>
+              )}
             </Paper>
           </Grid>
 

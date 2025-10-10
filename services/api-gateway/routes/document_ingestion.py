@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Query, Form, UploadFile, File
 from pydantic import BaseModel, Field
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 from datetime import datetime
 import asyncio
 import uuid
@@ -411,7 +411,8 @@ async def process_single_file(file_path: str, space_id: str, job_id: str, proces
             files = {'file': (filename, file_content, 'application/pdf')}
             data = {
                 'space_id': space_id,
-                'model': model_name  # Pass the selected model
+                'model': model_name,  # Pass the selected model
+                'enable_icsr_classification': processing_options.get('enable_icsr_classification', False)
             }
             
             response = await client.post(
@@ -464,6 +465,16 @@ async def process_single_file(file_path: str, space_id: str, job_id: str, proces
                         logger.warning("Failed to sync to Neo4j (non-fatal)", 
                                       file=file_path, 
                                       error=str(neo_error))
+                
+                # If ICSR Classification is enabled, classify the document
+                if processing_options.get('enable_icsr_classification', False) and doc_id:
+                    try:
+                        await classify_document_icsr(doc_id, ai_results, space_id)
+                        logger.info("ICSR classification completed", file=file_path, doc_id=doc_id)
+                    except Exception as icsr_error:
+                        logger.warning("Failed to classify document for ICSR (non-fatal)", 
+                                      file=file_path, 
+                                      error=str(icsr_error))
                 
                 logger.info("File processed successfully", file=file_path, job_id=job_id)
                 return True
@@ -607,3 +618,88 @@ async def process_batch_ingestion(job_id: str, request: BatchIngestionRequest, s
         )
         
         logger.error("Batch ingestion failed", job_id=job_id, error=str(e))
+
+
+async def classify_document_icsr(doc_id: str, ai_results: Dict, space_id: str):
+    """Classify document using PV Classification Service"""
+    try:
+        import httpx
+        
+        # Prepare document content for classification
+        content = ""
+        if ai_results.get('summary'):
+            content += f"Summary: {ai_results['summary']}\n\n"
+        if ai_results.get('content'):
+            content += f"Content: {ai_results['content']}\n\n"
+        if ai_results.get('extracted_text'):
+            content += f"Extracted Text: {ai_results['extracted_text']}\n\n"
+        
+        # If no content available, use title
+        if not content.strip():
+            content = ai_results.get('title', 'No content available')
+        
+        # Prepare classification request in the correct format
+        classification_request = {
+            "document": {
+                "id": doc_id,
+                "title": ai_results.get('title', ''),
+                "abstract": content  # Use the prepared content as abstract
+            }
+        }
+        
+        # Call PV Classification Service using ensemble endpoint
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "http://pv-classification-service:8012/api/v1/classify/ensemble",
+                json=classification_request,
+                timeout=60.0
+            )
+            
+            if response.status_code == 200:
+                classification_result = response.json()
+                logger.info(f"ICSR classification completed for {doc_id}: {classification_result.get('classification')}")
+                
+                # Update Elasticsearch with classification results
+                await update_document_classification(doc_id, classification_result, space_id)
+                
+            else:
+                logger.warning(f"ICSR classification failed for {doc_id}: {response.status_code}")
+                
+    except Exception as e:
+        logger.error(f"Failed to classify document {doc_id} for ICSR: {e}")
+        # Don't raise - classification failure shouldn't stop ingestion
+
+
+async def update_document_classification(doc_id: str, classification_result: Dict[str, Any], space_id: str):
+    """Update document in Elasticsearch with classification results"""
+    try:
+        import httpx
+        
+        # Prepare update payload
+        update_payload = {
+            "doc": {
+                "classification": classification_result.get("classification"),
+                "classification_confidence": classification_result.get("confidence", 0.0),
+                "classification_entities": classification_result.get("entities", []),
+                "classification_reasoning": classification_result.get("reasoning", ""),
+                "classified_at": datetime.utcnow().isoformat(),
+                "classification_model": classification_result.get("model", "unknown")
+            }
+        }
+        
+        # Update document in Elasticsearch
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"http://elasticsearch:9200/documents/_update/{doc_id}",
+                json=update_payload,
+                headers={"Content-Type": "application/json"},
+                timeout=30.0
+            )
+            
+            if response.status_code in [200, 201]:
+                logger.info(f"Updated document {doc_id} with classification results")
+            else:
+                logger.warning(f"Failed to update document {doc_id} with classification: {response.status_code}")
+                
+    except Exception as e:
+        logger.error(f"Failed to update document {doc_id} with classification: {e}")

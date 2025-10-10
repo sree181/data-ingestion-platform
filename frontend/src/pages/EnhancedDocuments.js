@@ -130,11 +130,30 @@ function EnhancedDocuments() {
     }
   );
 
-  // Extract documents and total count
-  const allDocuments = (documentsData?.results || []).map(hit => ({
-    ...hit._source,
-    id: hit._id
-  }));
+  // Extract documents and total count (normalize PV classification fields)
+  const allDocuments = (documentsData?.results || []).map(hit => {
+    const src = hit._source || {};
+    const icsr = src.icsr_classification || {};
+    // Prefer already-transformed flat fields, but fallback to nested icsr_classification
+    const classification = src.classification ?? icsr.classification ?? null;
+    const classification_confidence =
+      src.classification_confidence ?? icsr.confidence ?? null;
+    const classification_entities =
+      src.classification_entities ?? icsr.key_entities ?? [];
+    const classification_reasoning =
+      src.classification_reasoning ?? icsr.reasoning ?? null;
+    const classification_cost = src.classification_cost ?? icsr.cost ?? 0;
+
+    return {
+      ...src,
+      classification,
+      classification_confidence,
+      classification_entities,
+      classification_reasoning,
+      classification_cost,
+      id: hit._id,
+    };
+  });
   const totalDocuments = documentsData?.total || 0;
   
   // Apply classification filter
@@ -498,6 +517,17 @@ function EnhancedDocuments() {
     const typeConfig = getDocumentTypeConfig(document.file_type);
     const processingColor = getProcessingBadgeColor(document.extraction_method);
     const pvConfig = getPVClassificationConfig(document.classification);
+    
+    // Debug logging for classification data
+    if (document.classification) {
+      console.log('🔍 Document Classification Debug:', {
+        title: document.title,
+        classification: document.classification,
+        confidence: document.classification_confidence,
+        entities: document.classification_entities,
+        pvConfig: pvConfig
+      });
+    }
     
     return (
       <Card

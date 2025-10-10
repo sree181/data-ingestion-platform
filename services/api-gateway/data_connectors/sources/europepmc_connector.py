@@ -204,17 +204,109 @@ class EuropePMCConnector(AbstractDataSource):
             self.logger.error(f"Failed to get full text for {source_id}: {e}")
             return None
     
-    async def _get_full_text_content(self, source_id: str) -> Optional[str]:
-        """Get full text content from Europe PMC"""
+    async def _get_full_text_xml(self, source_id: str) -> Optional[str]:
+        """
+        Get full text XML using Europe PMC's dedicated full-text endpoint
+        
+        Uses the official endpoint: /{id}/fullTextXML
+        This provides complete article content for Open Access articles
+        """
         try:
-            # Try to get full text from Europe PMC
+            # Try to get full text XML from Europe PMC's dedicated endpoint
+            url = f"{self.base_url}/{source_id}/fullTextXML"
+            
+            self.logger.info(f"Fetching full-text XML for {source_id}")
+            
+            async with aiohttp.ClientSession(timeout=self.timeout) as session:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        xml_content = await response.text()
+                        
+                        # Parse XML to extract text content
+                        try:
+                            import xml.etree.ElementTree as ET
+                            root = ET.fromstring(xml_content)
+                            
+                            # Extract text from various XML elements
+                            text_parts = []
+                            
+                            # Get title
+                            for title in root.iter('title'):
+                                if title.text:
+                                    text_parts.append(title.text.strip())
+                            
+                            # Get abstract
+                            for abstract in root.iter('abstract'):
+                                abstract_text = ''.join(abstract.itertext()).strip()
+                                if abstract_text:
+                                    text_parts.append(f"Abstract: {abstract_text}")
+                            
+                            # Get body sections
+                            for sec in root.iter('sec'):
+                                # Get section title
+                                sec_title = sec.find('title')
+                                if sec_title is not None and sec_title.text:
+                                    text_parts.append(f"\n{sec_title.text.strip()}\n")
+                                
+                                # Get section paragraphs
+                                for p in sec.iter('p'):
+                                    para_text = ''.join(p.itertext()).strip()
+                                    if para_text:
+                                        text_parts.append(para_text)
+                            
+                            # Get results/conclusions
+                            for conclusion in root.iter('conclusion'):
+                                conclusion_text = ''.join(conclusion.itertext()).strip()
+                                if conclusion_text:
+                                    text_parts.append(f"Conclusion: {conclusion_text}")
+                            
+                            full_text = "\n\n".join(text_parts)
+                            
+                            if len(full_text) > 500:  # Ensure substantial content
+                                self.logger.info(f"Successfully extracted {len(full_text)} characters from XML")
+                                return full_text
+                            else:
+                                self.logger.warning(f"Extracted text too short: {len(full_text)} chars")
+                                
+                        except ET.ParseError as e:
+                            self.logger.error(f"Failed to parse XML for {source_id}: {e}")
+                            # Return raw XML if parsing fails
+                            if len(xml_content) > 500:
+                                return xml_content
+                    
+                    elif response.status == 404:
+                        self.logger.info(f"No full-text available for {source_id} (404)")
+                    else:
+                        self.logger.warning(f"Full-text request failed with status {response.status}")
+                        
+        except Exception as e:
+            self.logger.warning(f"Failed to get full-text XML for {source_id}: {e}")
+        
+        return None
+    
+    async def _get_full_text_content(self, source_id: str) -> Optional[str]:
+        """
+        Get full text content from Europe PMC with fallback strategy
+        
+        Strategy:
+        1. Try dedicated full-text XML endpoint (best quality)
+        2. Fall back to search API with fullText parameter
+        3. Fall back to abstract + metadata
+        """
+        try:
+            # STRATEGY 1: Try dedicated full-text XML endpoint (Europe PMC official)
+            full_text_xml = await self._get_full_text_xml(source_id)
+            if full_text_xml and len(full_text_xml) > 500:
+                self.logger.info(f"Retrieved full-text XML for {source_id}: {len(full_text_xml)} chars")
+                return full_text_xml
+            
+            # STRATEGY 2: Try search API with fullText parameter
             url = f"{self.base_url}/search"
             params = {
                 "query": f"EXT_ID:{source_id}",
                 "resultType": "core",
                 "pageSize": 1,
-                "format": "json",
-                "fullText": "true"  # Request full text
+                "format": "json"
             }
             
             if self.api_key:
@@ -233,21 +325,25 @@ class EuropePMCConnector(AbstractDataSource):
             
             paper = papers[0]
             
-            # Try to get full text from different sources
-            full_text = paper.get("fullText", "")
-            if full_text and len(full_text) > 100:  # Ensure we have substantial content
-                return full_text
+            # Check if full text is available
+            has_full_text = paper.get("hasFullText", False)
+            is_open_access = paper.get("isOpenAccess", "N") == "Y"
             
-            # Try to get text from other fields
+            self.logger.info(f"Paper {source_id}: hasFullText={has_full_text}, isOpenAccess={is_open_access}")
+            
+            # STRATEGY 3: Fall back to abstract + metadata
             text_fields = [
-                paper.get("abstractText", ""),
                 paper.get("title", ""),
+                paper.get("abstractText", ""),
                 paper.get("authorString", ""),
-                paper.get("journalTitle", "")
+                paper.get("journalTitle", ""),
+                f"Keywords: {', '.join(paper.get('keywordList', {}).get('keyword', []))}"
             ]
             
-            combined_text = " ".join([field for field in text_fields if field])
+            combined_text = "\n\n".join([field for field in text_fields if field])
+            
             if len(combined_text) > 100:
+                self.logger.info(f"Using abstract + metadata for {source_id}: {len(combined_text)} chars")
                 return combined_text
             
             return None

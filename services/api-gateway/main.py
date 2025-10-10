@@ -205,6 +205,31 @@ from routes.documents import router as documents_router
 app.include_router(documents_router)
 print("✅ Documents router registered")
 
+# Import Compliance routes
+from routes.compliance import router as compliance_router
+app.include_router(compliance_router)
+print("✅ Compliance router registered")
+
+# Import Access Control routes
+from routes.access_control import router as access_control_router
+app.include_router(access_control_router)
+print("✅ Access Control router registered")
+
+# Import Audit Logging routes
+from routes.audit_logging import router as audit_logging_router
+app.include_router(audit_logging_router)
+print("✅ Audit Logging router registered")
+
+# Import Data Classification routes
+from routes.data_classification import router as data_classification_router
+app.include_router(data_classification_router)
+print("✅ Data Classification router registered")
+
+# Import Security Alerts routes
+from routes.security_alerts import router as security_alerts_router
+app.include_router(security_alerts_router)
+print("✅ Security Alerts router registered")
+
 # Import LLM document analyzer
 from services.llm_document_analyzer import llm_analyzer
 
@@ -417,11 +442,35 @@ async def search_documents(
             
             data = response.json()
             
-            # Format response
+            # Format response and transform ICSR classification data
+            hits = data.get("hits", {}).get("hits", [])
+            transformed_results = []
+            
+            for hit in hits:
+                source = hit.get("_source", {})
+                
+                # Transform ICSR classification data for frontend compatibility
+                if source.get("icsr_classification"):
+                    icsr_data = source["icsr_classification"]
+                    print(f"🔧 Transforming ICSR data: {icsr_data.get('classification')}")
+                    source["classification"] = icsr_data.get("classification")
+                    source["classification_confidence"] = icsr_data.get("confidence")
+                    source["classification_entities"] = icsr_data.get("key_entities", [])
+                    source["classification_reasoning"] = icsr_data.get("reasoning")
+                    source["classification_cost"] = icsr_data.get("cost", 0)
+                    print(f"✅ Transformed: classification={source['classification']}, confidence={source['classification_confidence']}")
+                else:
+                    print(f"❌ No ICSR classification found for document: {source.get('title', 'Unknown')}")
+                
+                transformed_results.append({
+                    "_id": hit.get("_id"),
+                    "_source": source
+                })
+            
             return {
                 "query": q,
                 "total": data.get("hits", {}).get("total", {}).get("value", 0),
-                "results": data.get("hits", {}).get("hits", [])
+                "results": transformed_results
             }
             
     except Exception as e:
@@ -2083,7 +2132,7 @@ async def get_document_structure(document_id: str):
             
             if document_structure:
                 # Return pre-analyzed structure (instant response!)
-    return {
+                return {
                     "document_id": document_id,
                     "document_title": title,
                     "document_type": document_structure.get("document_type", "unknown"),
@@ -2886,8 +2935,8 @@ async def simple_login(request: LoginRequest):
     
     # Generate token
     token = jwt.encode(payload, secret_key, algorithm=algorithm)
-        
-        return {
+    
+    return {
         "access_token": token,
         "token_type": "bearer",
         "expires_in": 28800,  # 8 hours

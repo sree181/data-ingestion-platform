@@ -305,6 +305,16 @@ class UnifiedIngestionService:
                 if ai_result:
                     # Document processor has already indexed the document with AI results
                     logger.info(f"Document {doc.id} processed and indexed with AI analysis")
+                    
+                    # If ICSR Classification is enabled, classify the document
+                    logger.info(f"🔍 DEBUG: enable_icsr_classification = {processing_options.get('enable_icsr_classification', False)}")
+                    logger.info(f"🔍 DEBUG: processing_options = {processing_options}")
+                    if processing_options.get("enable_icsr_classification", False):
+                        logger.info(f"🎯 Running ICSR classification for document {doc.id}")
+                        await self._classify_document_icsr(doc, space_id, ai_result)
+                    else:
+                        logger.warning(f"⚠️ ICSR classification SKIPPED for {doc.id} - enable_icsr_classification is False")
+                    
                     return
                 else:
                     logger.warning(f"AI processing failed for document {doc.id}, indexing without AI analysis")
@@ -577,6 +587,98 @@ class UnifiedIngestionService:
             "completed_at": job.completed_at.isoformat() if job.completed_at else None,
             "errors": job.errors
         }
+    
+    async def _classify_document_icsr(self, doc: UnifiedDocument, space_id: str, ai_results: Dict[str, Any]):
+        """Classify document using PV Classification Service"""
+        try:
+            import httpx
+            
+            # Prepare document content for classification
+            content = ""
+            if doc.abstract:
+                content += f"Abstract: {doc.abstract}\n\n"
+            if doc.content:
+                content += f"Content: {doc.content}\n\n"
+            if doc.summary:
+                content += f"Summary: {doc.summary}\n\n"
+            
+            # If no content available, use title
+            if not content.strip():
+                content = doc.title or "No content available"
+            
+            # Prepare classification request in the correct format
+            classification_request = {
+                "document": {
+                    "id": doc.id,
+                    "title": doc.title or "",
+                    "abstract": content  # Use the prepared content as abstract
+                }
+            }
+            
+            # Call PV Classification Service using ensemble endpoint
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    "http://pv-classification-service:8012/api/v1/classify/ensemble",
+                    json=classification_request,
+                    timeout=60.0
+                )
+                
+                if response.status_code == 200:
+                    response_data = response.json()
+                    # Extract the nested classification object
+                    classification_result = response_data.get("classification", {})
+                    logger.info(f"✅ ICSR classification completed for {doc.id}: {classification_result.get('classification')} ({classification_result.get('confidence', 0):.2%})")
+                    
+                    # Update Elasticsearch with classification results
+                    await self._update_document_classification(doc.id, classification_result, space_id)
+                    
+                else:
+                    logger.warning(f"ICSR classification failed for {doc.id}: {response.status_code}")
+                    
+        except Exception as e:
+            logger.error(f"Failed to classify document {doc.id} for ICSR: {e}")
+            # Don't raise - classification failure shouldn't stop ingestion
+    
+    async def _update_document_classification(self, doc_id: str, classification_result: Dict[str, Any], space_id: str):
+        """Update document in Elasticsearch with classification results"""
+        try:
+            import httpx
+            
+            # Prepare update payload - use flat field names to match existing Elasticsearch mapping
+            # Extract scalar values from the classification_result dict
+            classification_value = classification_result.get("classification", "")
+            confidence_value = classification_result.get("confidence", 0.0)
+            entities_value = classification_result.get("key_entities", [])
+            reasoning_value = classification_result.get("reasoning", "")
+            cost_value = classification_result.get("cost", 0)
+            
+            update_payload = {
+                "doc": {
+                    "classification": classification_value if isinstance(classification_value, str) else str(classification_value),
+                    "classification_confidence": float(confidence_value) if confidence_value else 0.0,
+                    "classification_entities": entities_value if isinstance(entities_value, list) else [],
+                    "classification_reasoning": reasoning_value if isinstance(reasoning_value, str) else str(reasoning_value),
+                    "classification_cost": float(cost_value) if cost_value else 0.0,
+                    "classified_at": datetime.utcnow().isoformat()
+                }
+            }
+            
+            # Update document in Elasticsearch
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"http://elasticsearch:9200/documents/_update/{doc_id}",
+                    json=update_payload,
+                    headers={"Content-Type": "application/json"},
+                    timeout=30.0
+                )
+                
+                if response.status_code in [200, 201]:
+                    logger.info(f"✅ Updated document {doc_id} with classification: {classification_result.get('classification')} ({classification_result.get('confidence', 0):.2%})")
+                else:
+                    logger.warning(f"❌ Failed to update document {doc_id} with classification: {response.status_code} - {response.text}")
+                    
+        except Exception as e:
+            logger.error(f"Failed to update document {doc_id} with classification: {e}")
 
 # Global service instance
 unified_ingestion_service = UnifiedIngestionService()
