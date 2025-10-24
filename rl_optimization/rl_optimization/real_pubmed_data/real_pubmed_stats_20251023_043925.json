@@ -1,0 +1,19 @@
+{
+  "total": 125,
+  "successful": 125,
+  "failed": 0,
+  "classifications": {
+    "Non-ICSR": 88,
+    "ICSR": 31,
+    "Safety_Information": 6
+  },
+  "domains": {
+    "general_medicine": 46,
+    "neurology": 50,
+    "hepatology": 15,
+    "cardiology": 5,
+    "oncology": 9
+  },
+  "valid_entries": 0,
+  "invalid_entries": 125
+}

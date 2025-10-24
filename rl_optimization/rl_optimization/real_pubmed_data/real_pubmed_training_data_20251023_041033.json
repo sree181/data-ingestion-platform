@@ -1,0 +1,1422 @@
+[
+  {
+    "features": {
+      "title": "Immune Checkpoint Inhibitor-Induced Cardiotoxicity: A Systematic Review and Meta-Analysis.",
+      "abstract": "Immune checkpoint inhibitors (ICIs) improve outcomes in a wide range of cancers; however, serious adverse effects, including cardiovascular adverse effects (CVAEs), can occur.",
+      "mesh_terms": [
+        "Humans",
+        "Immune Checkpoint Inhibitors",
+        "Incidence",
+        "Myocarditis",
+        "Neoplasms"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Systematic Review",
+        "Meta-Analysis"
+      ],
+      "word_count": 32,
+      "sentence_count": 3,
+      "technical_term_count": 0,
+      "medical_term_count": 3,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.06659999999999999,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.3,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.12
+      },
+      "extracted_at": "2025-10-23T04:08:59.956537"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 0,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:08:59.956543"
+    },
+    "collected_at": "2025-10-23T04:08:59.956544",
+    "data_id": "Immune Checkpoint Inhibitor-Induced Cardiotoxicity_1761210539.956545"
+  },
+  {
+    "features": {
+      "title": "Treatment for beta-blocker poisoning: a systematic review.",
+      "abstract": null,
+      "mesh_terms": [
+        "Adrenergic beta-Antagonists",
+        "Animals",
+        "Atropine",
+        "Catecholamines",
+        "Drug Overdose",
+        "Extracorporeal Membrane Oxygenation",
+        "Fat Emulsions, Intravenous",
+        "Hemodynamics",
+        "Humans",
+        "Insulin"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Systematic Review"
+      ],
+      "word_count": 8,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 1,
+      "patient_mentions": 1,
+      "drug_mentions": 1,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 1,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.0254,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.2,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 1.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.08000000000000002
+      },
+      "extracted_at": "2025-10-23T04:09:00.462895"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 0,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:09:00.462900"
+    },
+    "collected_at": "2025-10-23T04:09:00.462902",
+    "data_id": "Treatment for beta-blocker poisoning: a systematic_1761210540.462902"
+  },
+  {
+    "features": {
+      "title": "Editorial: Case reports in cardio-oncology: 2022.",
+      "abstract": "Abstract for PMID 37522080",
+      "mesh_terms": [],
+      "publication_types": [
+        "Editorial"
+      ],
+      "word_count": 10,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 0,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "oncology",
+      "complexity_score": 0.011,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.0
+      },
+      "extracted_at": "2025-10-23T04:09:04.321743"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3351,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:09:04.321749"
+    },
+    "collected_at": "2025-10-23T04:09:04.321750",
+    "data_id": "Editorial: Case reports in cardio-oncology: 2022._1761210544.321751"
+  },
+  {
+    "features": {
+      "title": "Loperamide-induced cardiotoxicity: a case overlooked?",
+      "abstract": "A young man presented to the emergency department with seizures and recurrent episodes of polymorphic ventricular tachycardia (PMVT)/torsades de pointes (TdP) requiring cardioversion and administration of intravenous magnesium. A battery of tests performed to identify a cause for his arrhythmias and seizures were all normal. A revisit of history with family revealed he had consumed over 100 tablets/day of loperamide for the past 1\u2009year. A prolonged QT interval on his ECG raised concerns for long QT syndrome (LQTS) (congenital or acquired). Our patient was suspected to have loperamide-induced cardiotoxicity. TdP is a specific PMVT that occurs with a prolonged QT interval and is usually drug-induced. Less frequently, congenital LQTS may be implicated. With supportive care, including mechanical ventilation, vasopressors and temporary transvenous overdrive pacing, our patient recovered completely. We describe the importance of a systematic and time-sensitive approach to diagnosing critical illness. Loperamide overdose may cause QT prolongation, life-threatening arrhythmias/cardiogenic shock, or cardiac arrest. Seizures/epilepsy may also be a manifestation in young patients. There is a substantial need to revisit the safety of over-the-counter medications and increasing awareness of manifestations of drug overdose.",
+      "mesh_terms": [
+        "Drug Overdose",
+        "Electric Countershock",
+        "Electrocardiography",
+        "Humans",
+        "Long QT Syndrome",
+        "Loperamide",
+        "Male",
+        "Torsades de Pointes"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 189,
+      "sentence_count": 14,
+      "technical_term_count": 0,
+      "medical_term_count": 6,
+      "patient_mentions": 4,
+      "drug_mentions": 4,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.2027,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.4
+      },
+      "extracted_at": "2025-10-23T04:09:08.792205"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3962,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:09:08.792214"
+    },
+    "collected_at": "2025-10-23T04:09:08.792216",
+    "data_id": "Loperamide-induced cardiotoxicity: a case overlook_1761210548.792216"
+  },
+  {
+    "features": {
+      "title": "Immunotherapy-Induced Cardiotoxicity: A Narrative Review of Real-World Case Reports, Recent Information and Clinical Evidence.",
+      "abstract": "Immunotherapy is revolutionizing the treatment of cancer and other conditions. However, it also precipitates a loss of self-tolerance and causes immune-related adverse events (irAEs). We provide a narrative synthesis of the scopes and methods of immunotherapy and mechanisms, clinical presentation, and diagnostic considerations of cardiovascular irAEs while providing real-world examples and perspectives. Recent real-world cases and emerging evidence suggest myocarditis is the most common and potentially fatal cardiovascular irAE, often presenting with symptoms such as shortness of breath or chest pain within weeks of therapy initiation. Other cardiotoxic effects include arrhythmias such as tachyarrhythmias or conduction blocks, heart failure, takotsubo cardiomyopathy, and pericardial disease, sometimes with pericardial effusion. These events can be severe, requiring prompt recognition and intervention to avoid deterioration. Diagnosis typically involves surveillance, a high index of suspicion, biomarker elevations, imaging modalities, cardiac magnetic resonance, and in select cases, endomyocardial biopsy. Early cessation of immunotherapy and high-dose corticosteroids frequently help stabilize acutely ill patients with additional immunomodulators such as intravenous immunoglobulin or abatacept considered in steroid-refractory cases. Clinicians are urged to adopt a multidisciplinary approach involving close cardiology collaboration for baseline risk evaluation, structured surveillance, and cautious rechallenge decisions. Despite these challenges, immunotherapy remains vital for the management of many malignancies. Ongoing research into targeted immunomodulation, refined imaging protocols, and genetic profiling may enhance clinical outcomes by enabling prevention, earlier detection and safer management of cardiovascular irAEs.",
+      "mesh_terms": [
+        "Humans",
+        "Cardiotoxicity",
+        "Immunotherapy",
+        "Risk Assessment",
+        "Heart Diseases",
+        "Risk Factors",
+        "Immune Checkpoint Inhibitors",
+        "Male",
+        "Treatment Outcome",
+        "Female"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Review"
+      ],
+      "word_count": 243,
+      "sentence_count": 13,
+      "technical_term_count": 0,
+      "medical_term_count": 9,
+      "patient_mentions": 4,
+      "drug_mentions": 4,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 3,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.2599,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.6,
+        "overall_confidence": 0.5800000000000001
+      },
+      "extracted_at": "2025-10-23T04:09:09.303591"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 2,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:09:09.303597"
+    },
+    "collected_at": "2025-10-23T04:09:09.303599",
+    "data_id": "Immunotherapy-Induced Cardiotoxicity: A Narrative _1761210549.303599"
+  },
+  {
+    "features": {
+      "title": "Managing life-threatening 5-fluorouracil cardiotoxicity.",
+      "abstract": "5-Fluorouracil (5-FU), a known cardiotoxin, is the backbone for the treatment of colorectal cancer. It is associated with arrhythmias, myocardial infarction and sudden cardiac death. Most commonly, it is associated with coronary vasospasm secondary to direct toxic effects on vascular endothelium.A woman with metastatic colon cancer, originally treated with a 5-FU infusion as part of the FOLFIRI (Folinic acid, 5-Fluorouracil, Irinotecan) regimen, was unable to tolerate the chemotherapy due to chest pain. She was transitioned from infusional 5-FU to inferior 1-hour bolus 5-FU, in an attempt to minimise cardiotoxicity, but had disease progression. A multidisciplinary decision was made to again trial 5-FU infusion and pretreat with diltiazem. She tolerated chemotherapy without adverse events. A multidisciplinary discussion is recommended for co-management of reversible 5-FU-associated cardiotoxicity. After coronary artery disease (CAD) risk stratification and treatment, empiric treatment with calcium channel blockers and/or nitrates may allow patients with suspected coronary vasospasm, from 5-FU, to continue this vital chemotherapy.",
+      "mesh_terms": [
+        "Antineoplastic Combined Chemotherapy Protocols",
+        "Calcium Channel Blockers",
+        "Camptothecin",
+        "Cardiotoxicity",
+        "Cardiotoxins",
+        "Colorectal Neoplasms",
+        "Coronary Vasospasm",
+        "Diltiazem",
+        "Female",
+        "Fluorouracil"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 159,
+      "sentence_count": 11,
+      "technical_term_count": 0,
+      "medical_term_count": 9,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 5,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.2267,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.46
+      },
+      "extracted_at": "2025-10-23T04:09:13.803885"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Safety_Information",
+      "confidence": 0.4892045454545455,
+      "reasoning": "Majority vote (2/3): Safety_Information with avg confidence 0.47",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3992,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.4892045454545455,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:09:13.803894"
+    },
+    "collected_at": "2025-10-23T04:09:13.803896",
+    "data_id": "Managing life-threatening 5-fluorouracil cardiotox_1761210553.803896"
+  },
+  {
+    "features": {
+      "title": "Cytarabine-Induced Bradycardia: A Case Report.",
+      "abstract": "Cardiotoxicity is damage to the heart muscle, which affects its function. Chemotherapy is known to cause cardiotoxicity along with many other medications and etiologies. Many chemotherapeutic cocktails are known to be associated with cardiotoxicities, such as taxane and cisplatin. Patients might have arrhythmias, severe bradycardia, cardiomyopathy, and even cardiac arrest, so precautions are taken when such medications are started. This report presents a patient who developed severe symptomatic bradycardia after receiving idarubicin and cytarabine\u00a0and was managed conservatively, along with a literature review of this entity.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 91,
+      "sentence_count": 7,
+      "technical_term_count": 0,
+      "medical_term_count": 6,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.14529999999999998,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.9,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.42000000000000004
+      },
+      "extracted_at": "2025-10-23T04:09:18.306886"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3995,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:09:18.306891"
+    },
+    "collected_at": "2025-10-23T04:09:18.306893",
+    "data_id": "Cytarabine-Induced Bradycardia: A Case Report._1761210558.306893"
+  },
+  {
+    "features": {
+      "title": "Glucocorticoid-induced cardiomyopathy: unexpected conclusion.",
+      "abstract": "Glucocorticoid excess is an under-recognised cause of cardiovascular adverse effects. The sources can be either endogenous (Cushing's syndrome) or exogenous (Anabolic steroid abuse). Cardiovascular complications due to excess glucocorticoid includes hypertension, left ventricular hypertrophy, myocardial infarction, and heart failure. Although anabolic steroid-induced cardiomyopathy is a well-recognised phenomenon, endogenous corticosteroid-induced cardiomyopathy and heart failure are rarely reported sequelae of glucocorticoid excess in the body. We report a glucocorticoid-induced dilated cardiomyopathy in a 26-year-old African-American man with cushingoid features and symptomatic heart failure.",
+      "mesh_terms": [
+        "Adult",
+        "Cardiomyopathies",
+        "Cardiotoxicity",
+        "Cushing Syndrome",
+        "Diagnosis, Differential",
+        "Echocardiography, Doppler, Color",
+        "Electrocardiography",
+        "Glucocorticoids",
+        "Humans",
+        "Male"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 85,
+      "sentence_count": 7,
+      "technical_term_count": 0,
+      "medical_term_count": 1,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.0685,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.1,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.04000000000000001
+      },
+      "extracted_at": "2025-10-23T04:09:22.855264"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4040,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:09:22.855274"
+    },
+    "collected_at": "2025-10-23T04:09:22.855275",
+    "data_id": "Glucocorticoid-induced cardiomyopathy: unexpected _1761210562.855276"
+  },
+  {
+    "features": {
+      "title": "Anthracycline-induced cardiotoxicity: A case report and review of literature.",
+      "abstract": "Doxorubicin and other anthracycline derivatives inhibit topoisomerase II and is an important class of cytotoxic chemotherapy in cancer treatment. The use of anthracycline is limited by dose-dependent cardiotoxicity, which may manifest initially as asymptomatic cardiac dysfunction with subsequent progression to congestive heart failure. Despite baseline assessment and periodic monitoring of cardiac function for patients receiving anthracycline agents, there are unmet needs in prediction and prevention of anthracycline-induced cardiotoxicity (AIC).",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 78,
+      "sentence_count": 5,
+      "technical_term_count": 0,
+      "medical_term_count": 6,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.13340000000000002,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.9,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.36000000000000004
+      },
+      "extracted_at": "2025-10-23T04:09:27.963968"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4603,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:09:27.963977"
+    },
+    "collected_at": "2025-10-23T04:09:27.963979",
+    "data_id": "Anthracycline-induced cardiotoxicity: A case repor_1761210567.96398"
+  },
+  {
+    "features": {
+      "title": "Osimertinib-Induced Cardiomyopathy.",
+      "abstract": "Osimertinib is the preferred treatment in patients with metastatic non-small cell lung cancer with epidermal growth factor receptor mutations. We report a case series of acute cardiomyopathy with heart failure exacerbation during\u00a0osimertinib treatment. We suggest that cardiotoxicity from osimertinib is reversible and occurs at a dose of\u00a080\u00a0mg/day. (",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 53,
+      "sentence_count": 5,
+      "technical_term_count": 0,
+      "medical_term_count": 5,
+      "patient_mentions": 4,
+      "drug_mentions": 4,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.1109,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.9,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.36000000000000004
+      },
+      "extracted_at": "2025-10-23T04:09:32.688455"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4217,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:09:32.688463"
+    },
+    "collected_at": "2025-10-23T04:09:32.688464",
+    "data_id": "Osimertinib-Induced Cardiomyopathy._1761210572.688465"
+  },
+  {
+    "features": {
+      "title": "Parenteral Nutrition and Cardiotoxicity.",
+      "abstract": "Parenteral nutrition (PN) is a life-saving nutritional therapy for those situations when patients are unable to receive enteral nutrition. However, despite a multitude of benefits offered by PN, it is associated with a variety of side effects, most notably parenteral nutrition-associated liver disease (PNALD). Adverse effects of PN on other organ systems, such as brain and cardiovascular system, have been poorly studied. There have been several case reports, studies, and a recent animal study highlighting cardiotoxic effects of PN; however, much remains unclear about the underlying mechanisms causing cardiac damage. In this review, we propose a series of potential mechanisms behind PN-associated heart injury, and we provide an overview of therapeutic strategies and recent scientific advances.",
+      "mesh_terms": [
+        "Animals",
+        "Antioxidants",
+        "Biopterins",
+        "Cardiotoxicity",
+        "Heart Diseases",
+        "Humans",
+        "Oxidative Stress",
+        "Parenteral Nutrition",
+        "Reactive Oxygen Species",
+        "Receptors, G-Protein-Coupled"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Research Support, N.I.H., Extramural",
+        "Research Support, Non-U.S. Gov't",
+        "Review"
+      ],
+      "word_count": 120,
+      "sentence_count": 7,
+      "technical_term_count": 0,
+      "medical_term_count": 4,
+      "patient_mentions": 1,
+      "drug_mentions": 1,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 1,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.124,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.5,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 1.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.2
+      },
+      "extracted_at": "2025-10-23T04:09:33.198188"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 0,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:09:33.198194"
+    },
+    "collected_at": "2025-10-23T04:09:33.198196",
+    "data_id": "Parenteral Nutrition and Cardiotoxicity._1761210573.198196"
+  },
+  {
+    "features": {
+      "title": "Loperamide-Induced Cardiac Events: Case Reports and Review.",
+      "abstract": "Reports of cardiac arrhythmia secondary to loperamide toxicity have become increasingly common in the literature. We present two patients in their mid-20s, each having overdosed on loperamide and subsequently manifesting life-threatening cardiac arrhythmias not otherwise explained by known pathology. An analysis of the limited research available indicates that loperamide's capacity to block ion channels may be responsible for these events. A better mechanistic understanding of loperamide's effects can help inform clinical management of patients with these life-threatening symptoms as at this time no set guidelines for management have yet been established.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 98,
+      "sentence_count": 6,
+      "technical_term_count": 0,
+      "medical_term_count": 2,
+      "patient_mentions": 1,
+      "drug_mentions": 1,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.0834,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.3,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.12
+      },
+      "extracted_at": "2025-10-23T04:09:38.561965"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4855,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:09:38.561974"
+    },
+    "collected_at": "2025-10-23T04:09:38.561976",
+    "data_id": "Loperamide-Induced Cardiac Events: Case Reports an_1761210578.561976"
+  },
+  {
+    "features": {
+      "title": "Early Manifestation of Clozapine-Induced Cardiotoxicity: Detection, Pathophysiology, and Management.",
+      "abstract": "Schizoaffective disorder, bipolar type is a chronic mental health disorder that may manifest as mania. Clozapine is effective in treating acute mania and in achieving mood stabilization. However, on rare occasions, the use of clozapine has been associated with cardiotoxicity. Here, we present a case of a 31-year-old man who at baseline is known to have schizoaffective disorder, bipolar type, and cannabis dependence and was admitted to our hospital with a psychotic relapse. He was treated with clozapine, uptitrated to a maximum daily dose of 200mg twice daily\u00a0by day 10. Thereafter he became febrile and experienced malaise, myalgias, and chest pain. He was noted on electrocardiogram to have sinus tachycardia without ischemic changes. In this context, he had a troponin leak, increased white blood cell count, serologies and cultures were negative and chest x-ray revealed no acute disease of the chest. Due to the suspicion of clozapine-induced cardiotoxicity, a transthoracic echocardiogram was done, which revealed mildly depressed left ventricular (LV) systolic function without pericardial effusion. Thereafter, clozapine was withdrawn and switched to lithium. Additionally, the cardioselective, metoprolol tartrate was initiated. Within 36-48 hours, he had resolution of symptoms and remained cardiovascularly stable. Clozapine uncommonly causes cardiotoxicity and early features may be non-specific. Awareness of this and recognizing early features aids in reducing the associated cardiovascular morbidity and mortality.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 228,
+      "sentence_count": 16,
+      "technical_term_count": 0,
+      "medical_term_count": 9,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 5,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.2674,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.46
+      },
+      "extracted_at": "2025-10-23T04:09:43.145206"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "ICSR",
+      "confidence": 0.5599999999999999,
+      "reasoning": "Three-way disagreement resolved by weighted voting: ICSR (weighted score: 0.175, models: rule=ICSR, bert=Safety_Information, llm=Non-ICSR)",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4074,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.5599999999999999,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:09:43.145215"
+    },
+    "collected_at": "2025-10-23T04:09:43.145218",
+    "data_id": "Early Manifestation of Clozapine-Induced Cardiotox_1761210583.145218"
+  },
+  {
+    "features": {
+      "title": "Mesalazine-induced myopericarditis: a case series.",
+      "abstract": "Inflammatory bowel diseases (IBD) are characterized by chronic inflammation of the gastrointestinal tract but can have multiorgan involvement. Mesalazine (5-ASA) is a key therapeutic agent in IBD. Mesalazine has rare but potentially life-threatening side effects such as cardiac injury.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 44,
+      "sentence_count": 5,
+      "technical_term_count": 0,
+      "medical_term_count": 1,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.0482,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.1,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.04000000000000001
+      },
+      "extracted_at": "2025-10-23T04:09:47.008008"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3356,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:09:47.008017"
+    },
+    "collected_at": "2025-10-23T04:09:47.008019",
+    "data_id": "Mesalazine-induced myopericarditis: a case series._1761210587.008019"
+  },
+  {
+    "features": {
+      "title": "Pegylated-liposomal Doxorubicin-induced Glomerular Thrombotic Microangiopathy.",
+      "abstract": "Pegylated liposomal doxorubicin (PLD) has emerged as a recent innovation within the realm of antineoplastic agents, distinguished by its incorporation of doxorubicin within the liposomal bilayer. Given the low risk of cardiotoxicity, the clinical use of PLD has been expanding. We encountered a patient who underwent extended PLD therapy for recurrent malignancy and subsequently developed PLD-associated thrombotic microangiopathy, which was diagnosed by a detailed pathophysiological assessment. This case underscores the importance of considering thrombotic microangiopathy as a potential differential diagnosis in patients presenting with unexplained hypertension and renal impairment during prolonged PLD monotherapy.",
+      "mesh_terms": [
+        "Humans",
+        "Antibiotics, Antineoplastic",
+        "Doxorubicin",
+        "Kidney Glomerulus",
+        "Polyethylene Glycols",
+        "Thrombotic Microangiopathies"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 98,
+      "sentence_count": 6,
+      "technical_term_count": 0,
+      "medical_term_count": 7,
+      "patient_mentions": 4,
+      "drug_mentions": 4,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 2,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.15839999999999999,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.4,
+        "overall_confidence": 0.52
+      },
+      "extracted_at": "2025-10-23T04:09:51.865767"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4351,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:09:51.865777"
+    },
+    "collected_at": "2025-10-23T04:09:51.865779",
+    "data_id": "Pegylated-liposomal Doxorubicin-induced Glomerular_1761210591.865779"
+  },
+  {
+    "features": {
+      "title": "Bevacizumab-induced arrhythmia in a patient with lung adenocarcinoma: A case report.",
+      "abstract": "Cardiotoxicity is an important side effect of vascular endothelial growth factor inhibitors therapy in the treatment of cancer. Massive studies have shown bevacizumab-related hypertension, venous, and arterial thrombosis.",
+      "mesh_terms": [
+        "Female",
+        "Humans",
+        "Middle Aged",
+        "Adenocarcinoma of Lung",
+        "Angiogenesis Inhibitors",
+        "Arrhythmias, Cardiac",
+        "Bevacizumab",
+        "Lung Neoplasms"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 39,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 6,
+      "patient_mentions": 4,
+      "drug_mentions": 4,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.1177,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.4
+      },
+      "extracted_at": "2025-10-23T04:09:55.816412"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3444,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:09:55.816420"
+    },
+    "collected_at": "2025-10-23T04:09:55.816421",
+    "data_id": "Bevacizumab-induced arrhythmia in a patient with l_1761210595.816422"
+  },
+  {
+    "features": {
+      "title": "Lithium-Induced Bradycardia and Cardiomyopathy in a Patient With Bipolar Disorder and Paranoid Schizophrenia.",
+      "abstract": "Lithium is primarily known to cause neurological and gastrointestinal side effects, however, cardiac effects have been rarely reported. We present a unique case of lithium cardiotoxicity causing bradyarrhythmia and cardiomyopathy. A 68-year-old man with a history of paranoid schizophrenia and bipolar disorder presented with altered mental status. On examination, the patient was lethargic, afebrile, with dry oral mucosa, and a regular pulse of 42 bpm. Labs revealed acute kidney injury and elevated lithium levels. Electrocardiogram (ECG) revealed a junctional escape rhythm with a right bundle morphology. Lithium toxicity was strongly suspected in the setting of raised serum lithium levels, decreased oral intake and acute kidney injury. The patient was found to have lithium-induced junctional bradycardia. Transvenous pacing was not indicated as the patient responded to fluids and atropine and had no severe hemodynamic compromise. As his serum lithium levels decreased, the bradycardia gradually improved. His echocardiogram revealed moderate left ventricular systolic dysfunction. Workup of cardiomyopathies was negative: no obstructive coronary artery disease; viral panel, and autoimmune markers were unremarkable. Thus, his cardiomyopathy was attributed to lithium toxicity. Lithium cardiotoxicity may manifest as arrhythmias and/or cardiomyopathy. Clinicians should have a high index of suspicion for lithium cardiotoxicity due to the narrow therapeutic range of lithium.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 217,
+      "sentence_count": 17,
+      "technical_term_count": 0,
+      "medical_term_count": 12,
+      "patient_mentions": 5,
+      "drug_mentions": 5,
+      "adverse_event_mentions": 7,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.3131,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.4
+      },
+      "extracted_at": "2025-10-23T04:10:00.356322"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4032,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:00.356327"
+    },
+    "collected_at": "2025-10-23T04:10:00.356330",
+    "data_id": "Lithium-Induced Bradycardia and Cardiomyopathy in _1761210600.35633"
+  },
+  {
+    "features": {
+      "title": "Loperamide-Induced Torsades de Pointes.",
+      "abstract": "Loperamide, an over-the-counter antidiarrheal, works on the\u00a0\u00b5 opioid receptor with minimal opioid activity if taken as directed. Recently, it has gained popularity as the \"poor\u00a0man's\u00a0methadone\" at supratherapeutic dosing. Opioid antagonism with naloxone is beneficial in reversing respiratory depression but has no effect on cardiotoxicity due to the human ether-a-go-go-related gene (hERG). We present the case of a 34-year-old female who presented for syncope after taking 48 tablets of 2 mg loperamide.\u202fOn arrival, she was obtunded with variable heart block and a QTc of 560 ms.\u202fSubsequently, due to further QT prolongation from loperamide to 656 ms, she developed\u00a0Torsades\u00a0de Pointes requiring defibrillation at 120 J twice. Ultimately, she was discharged home with psychiatric and substance abuse outpatient follow-up. Patients and healthcare providers face new challenges with the increase in loperamide misuse due to easy access and delayed identification. It is important for clinicians to recognize and be familiar with loperamide overdose given the potential for multiorgan failure and increased mortality.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 169,
+      "sentence_count": 11,
+      "technical_term_count": 0,
+      "medical_term_count": 5,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.16970000000000002,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.8,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.38000000000000006
+      },
+      "extracted_at": "2025-10-23T04:10:05.272156"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4407,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:05.272167"
+    },
+    "collected_at": "2025-10-23T04:10:05.272169",
+    "data_id": "Loperamide-Induced Torsades de Pointes._1761210605.272169"
+  },
+  {
+    "features": {
+      "title": "Remdesivir-Induced Extreme Sinus Bradycardia in COVID-19.",
+      "abstract": "During the COVID-19 pandemic, there was an urgent need for any medication to help reduce the high death rate experienced during this deadly surge. Remdesivir is an FDA-approved drug for COVID-19 treatment, given its anti-inflammatory properties. Upon extensive literature search, we found two studies and four cases of COVID-19-induced pneumonia treated with remdesivir who were developing bradycardia. In most of these cases, the bradycardia resolved within one-to-two days of holding remdesivir, which correlated with the half-life of remdesivir. Remdesivir was shown to have benefits in COVID-19-induced pneumonia during the COVID-19 surge; however, its use has been controversial. According to the studies, the sinus bradycardia following remdesivir administration does not impact patients' prognosis in terms of ICU admission and in-hospital mortality. There are multiple case reports noted to report several remdesivir-induced cardiac side effects. In our case, prolonged use and high dosages may induce cardiotoxicity, manifesting as severe bradycardia. Several possible mechanisms for cardiac adverse effects with remdesivir need further investigation and research as COVID-19 remains an active global issue. We present a 53-year-old man hospitalized with COVID-19-induced pneumonia who experienced extreme sinus bradycardia that is likely attributable to remdesivir.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 195,
+      "sentence_count": 12,
+      "technical_term_count": 0,
+      "medical_term_count": 11,
+      "patient_mentions": 5,
+      "drug_mentions": 5,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 3,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.2715,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.6,
+        "overall_confidence": 0.5800000000000001
+      },
+      "extracted_at": "2025-10-23T04:10:09.987519"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "ICSR",
+      "confidence": 0.5175,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.49",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4209,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.5175,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:09.987526"
+    },
+    "collected_at": "2025-10-23T04:10:09.987528",
+    "data_id": "Remdesivir-Induced Extreme Sinus Bradycardia in CO_1761210609.987529"
+  },
+  {
+    "features": {
+      "title": "Mesalazine-induced myopericarditis: a case report.",
+      "abstract": "Mesalazine is a well-established 1st line treatment for inflammatory bowel disease (IBD). Cardiotoxicity following 5-aminosalicyclic-acid therapy remains a rare yet serious complication and can often be challenging to distinguish from myocarditis presenting as an extra-intestinal manifestation of IBD.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 43,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 6,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.11889999999999999,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.9,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.42000000000000004
+      },
+      "extracted_at": "2025-10-23T04:10:13.813424"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3319,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:13.813431"
+    },
+    "collected_at": "2025-10-23T04:10:13.813433",
+    "data_id": "Mesalazine-induced myopericarditis: a case report._1761210613.813434"
+  },
+  {
+    "features": {
+      "title": "Cardiac toxicity associated with pharmacokinetic drug-drug interaction between crizotinib and sofosbuvir/velpatasvir: A case report.",
+      "abstract": "This case report describes a pharmacokinetic drug-drug interaction between crizotinib, a tyrosine kinase inhibitor, and sofosbuvir/velpatasvir, a direct-acting antiviral drug, leading to cardiac toxicity. A 75-year-old man, with no cardiovascular history but a diagnosis of metastatic nonsmall cell lung cancer with mesenchymal-epithelial transition exon-14 deletion and hepatitis C virus infection genotype 1A, received both crizotinib and sofosbuvir/velpatasvir. Crizotinib was well tolerated, but 1\u2009week after sofosbuvir/velpatasvir initiation, the patient experienced bilateral lower-limb oedema and class III New York Heart Association dyspnoea. We assumed that increased exposure to crizotinib could account for this cardiac toxicity. Drug causality was probable according to the Naranjo scale. We hypothesized a reciprocal interaction between crizotinib and velpatasvir, mediated by both cytochrome 3A4 (CYP3A4) and P-glycoprotein (P-gp). Clinicians should be aware of the risk of drug-drug interactions between direct-acting antiviral agents that inhibit CYP3A4 (glecaprevir) and/or P-gp (voxilaprevir, velpatasvir) and anticancer tyrosine kinase inhibitors that are mostly CYP3A4 and/or P-gp substrates (gefitinib, afatinib, erlotinib, crizotinib, ceritinib, lorlatinib, brigatinib, capmatinib etc.).",
+      "mesh_terms": [
+        "Male",
+        "Humans",
+        "Aged",
+        "Sofosbuvir",
+        "Antiviral Agents",
+        "Crizotinib",
+        "Carcinoma, Non-Small-Cell Lung",
+        "Cardiotoxicity",
+        "Cytochrome P-450 CYP3A",
+        "Hepatitis C, Chronic"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 178,
+      "sentence_count": 10,
+      "technical_term_count": 0,
+      "medical_term_count": 8,
+      "patient_mentions": 4,
+      "drug_mentions": 4,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.2134,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.46
+      },
+      "extracted_at": "2025-10-23T04:10:18.610195"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "ICSR",
+      "confidence": 0.5175,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.49",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4287,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.5175,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:18.610202"
+    },
+    "collected_at": "2025-10-23T04:10:18.610204",
+    "data_id": "Cardiac toxicity associated with pharmacokinetic d_1761210618.610204"
+  },
+  {
+    "features": {
+      "title": "Methotrexate-induced acute cardiotoxicity requiring veno-arterial extracorporeal membrane oxygenation support: a case report.",
+      "abstract": "Methotrexate is an antifolate antimetabolite that inhibits the activity of dihydrofolate reductase by acting as a false substrate, which leads to defects of DNA synthesis, specifically the inhibition of purine and pyrimidine synthesis. Thus, methotrexate is a powerful agent for treating autoimmune diseases and cancer. In general, methotrexate is thought to be cardioprotective and reports of methotrexate-induced cardiomyopathy are rare. We present a case of methotrexate-induced severe cardiotoxicity diagnosed by exclusion of all other potential causes.",
+      "mesh_terms": [
+        "Male",
+        "Humans",
+        "Middle Aged",
+        "Cardiotoxicity",
+        "Methotrexate",
+        "Extracorporeal Membrane Oxygenation",
+        "Stroke Volume",
+        "Leucovorin",
+        "Ventricular Function, Left",
+        "Heart Failure"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 88,
+      "sentence_count": 6,
+      "technical_term_count": 0,
+      "medical_term_count": 4,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "oncology",
+      "complexity_score": 0.1104,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.6,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.24
+      },
+      "extracted_at": "2025-10-23T04:10:23.340115"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4223,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:23.340120"
+    },
+    "collected_at": "2025-10-23T04:10:23.340122",
+    "data_id": "Methotrexate-induced acute cardiotoxicity requirin_1761210623.340123"
+  },
+  {
+    "features": {
+      "title": "Adverse drug event of hypokalaemia-induced cardiotoxicity secondary to the use of laxatives: A systematic review of case reports.",
+      "abstract": "The imbalance in serum potassium caused by laxatives can negatively affect the cardiovascular system, leading to life-threatening consequences. Our objective was to evaluate the reported evidence of adverse events related to the cardiac system due to laxative-induced hypokalaemia from case reports.",
+      "mesh_terms": [
+        "Cardiotoxicity",
+        "Dose-Response Relationship, Drug",
+        "Drug Interactions",
+        "Humans",
+        "Hypokalemia",
+        "Laxatives",
+        "Medication Adherence",
+        "Potassium",
+        "Severity of Illness Index"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Systematic Review"
+      ],
+      "word_count": 59,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 3,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.07869999999999999,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.3,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.12
+      },
+      "extracted_at": "2025-10-23T04:10:23.847962"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 0,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:10:23.847968"
+    },
+    "collected_at": "2025-10-23T04:10:23.847970",
+    "data_id": "Adverse drug event of hypokalaemia-induced cardiot_1761210623.84797"
+  },
+  {
+    "features": {
+      "title": "The molecular mechanisms of lithium-induced cardiotoxicity in male rats and its amelioration by ",
+      "abstract": "Lithium is one of the most powerful and commonly used medications for the treatment of various psychiatric diseases, especially bipolar disorder. However, it has a narrow therapeutic index with toxic effects on various organs. There are several case reports of lithium-induced arrhythmia and ischemia. The current work aimed to study the toxic effects of lithium on the heart of adult albino rats and its molecular mechanisms and the ameliorating effect of ",
+      "mesh_terms": [
+        "Acetylcysteine",
+        "Animals",
+        "Antimanic Agents",
+        "Antioxidants",
+        "Cardiotonic Agents",
+        "Cardiotoxicity",
+        "Creatine Kinase, MB Form",
+        "Lithium Carbonate",
+        "Male",
+        "MicroRNAs"
+      ],
+      "publication_types": [
+        "Journal Article"
+      ],
+      "word_count": 84,
+      "sentence_count": 4,
+      "technical_term_count": 2,
+      "medical_term_count": 2,
+      "patient_mentions": 1,
+      "drug_mentions": 1,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 1,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.11120000000000001,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.3,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 1.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.12
+      },
+      "extracted_at": "2025-10-23T04:10:28.636175"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4282,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:28.636182"
+    },
+    "collected_at": "2025-10-23T04:10:28.636184",
+    "data_id": "The molecular mechanisms of lithium-induced cardio_1761210628.636184"
+  },
+  {
+    "features": {
+      "title": "Cisplatin-induced Atrioventricular Block Requiring a Pacemaker: Two Case Reports and a Literature Review.",
+      "abstract": "Chemotherapeutic drugs can cause cardiac toxicities such as cardiomyopathy, arrhythmia, and cardiovascular disease. The well-known side effects of cisplatin are nephrotoxicity, nausea, vomiting, and electrolyte imbalance. Cardiotoxicity induced by cisplatin is rare, and its pathophysiology is unknown. Here, we present two cases of complete and high-degree atrioventricular (AV) block that occurred during cisplatin-based chemotherapy and required pacemaker placement. A 64-year-old woman and a 75-year-old man, who had no underlying heart disease, developed dyspnea without chest pain and bradycardia during cisplatin-based chemotherapy. However, there were no significant differences in their serum electrolyte levels, cardiac enzyme levels, and echocardiography results before and after drug administration. The ECGs were confirmed with complete AV block and high-degree AV block, which requiring pacemaker placement. We assume that cisplatin directly caused the complete, high-degree AV block, which required a pacemaker placement in our cases. In such cases, a cumulative dose of cisplatin over 240 mg/m2 is a risk factor for early symptoms of AV block. If patients complain of dyspnea without chest pain during cisplatin-based chemotherapy, arrhythmic complications should be considered. This information may be helpful for clinicians treating patients with cisplatin chemotherapy.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 200,
+      "sentence_count": 13,
+      "technical_term_count": 0,
+      "medical_term_count": 8,
+      "patient_mentions": 5,
+      "drug_mentions": 5,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.23199999999999998,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.46
+      },
+      "extracted_at": "2025-10-23T04:10:33.385774"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4241,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:33.385787"
+    },
+    "collected_at": "2025-10-23T04:10:33.385789",
+    "data_id": "Cisplatin-induced Atrioventricular Block Requiring_1761210633.385789"
+  }
+]

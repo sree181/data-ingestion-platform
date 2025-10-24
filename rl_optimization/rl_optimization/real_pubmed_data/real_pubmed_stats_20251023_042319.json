@@ -1,0 +1,15 @@
+{
+  "total": 120,
+  "successful": 119,
+  "failed": 1,
+  "classifications": {
+    "Non-ICSR": 78,
+    "ICSR": 26,
+    "Safety_Information": 15
+  },
+  "domains": {
+    "hepatology": 119
+  },
+  "valid_entries": 0,
+  "invalid_entries": 119
+}

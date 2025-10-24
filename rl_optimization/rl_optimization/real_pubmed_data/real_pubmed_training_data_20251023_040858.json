@@ -1,0 +1,1281 @@
+[
+  {
+    "features": {
+      "title": "Antidepressants- and antipsychotics-induced hepatotoxicity.",
+      "abstract": "Drug-induced liver injury (DILI) is a serious health burden. It has diverse clinical presentations that can escalate to acute liver failure. The worldwide increase in the use of psychotropic drugs, their long-term use on a daily basis, common comorbidities of psychiatric and metabolic disorders, and polypharmacy in psychiatric patients increase the incidence of psychotropics-induced DILI. During the last 2 decades, hepatotoxicity of various antidepressants (ADs) and antipsychotics (APs) received much attention. Comprehensive review and discussion of accumulated literature data concerning this issue are performed in this study, as hepatotoxic effects of most commonly prescribed ADs and APs are classified, described, and discussed. The review focuses on ADs and APs characterized by the risk of causing liver damage and highlights the ones found to cause life-threatening or severe DILI cases. In parallel, an overview of hepatic oxidative stress, inflammation, and steatosis underlying DILI is provided, followed by extensive review and discussion of the pathophysiology of AD- and AP-induced DILI revealed in case reports, and animal and in vitro studies. The consequences of some ADs and APs ability to affect drug-metabolizing enzymes and therefore provoke drug-drug interactions are also addressed. Continuous collecting of data on drugs, mechanisms, and risk factors for DILI, as well as critical data reviewing, is crucial for easier DILI diagnosis and more efficient risk assessment of AD- and AP-induced DILI. Higher awareness of ADs and APs hepatotoxicity is the prerequisite for their safe use and optimal dosing.",
+      "mesh_terms": [
+        "Animals",
+        "Antidepressive Agents",
+        "Antipsychotic Agents",
+        "Chemical and Drug Induced Liver Injury",
+        "Drug Interactions",
+        "Humans",
+        "Oxidative Stress",
+        "Risk Assessment",
+        "Risk Factors",
+        "Severity of Illness Index"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Research Support, Non-U.S. Gov't",
+        "Review"
+      ],
+      "word_count": 243,
+      "sentence_count": 12,
+      "technical_term_count": 1,
+      "medical_term_count": 4,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 1,
+      "rejected_signals": 1,
+      "domain": "hepatology",
+      "complexity_score": 0.20090000000000002,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.4,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 1.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.16000000000000003
+      },
+      "extracted_at": "2025-10-23T04:07:41.781321"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 1,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:07:41.781327"
+    },
+    "collected_at": "2025-10-23T04:07:41.781332",
+    "data_id": "Antidepressants- and antipsychotics-induced hepato_1761210461.781333"
+  },
+  {
+    "features": {
+      "title": "Clinical management of patients with drug-induced liver injury (DILI).",
+      "abstract": "Drug-induced liver injury (DILI) should be considered in all patients with recent elevation of liver tests without obvious etiology and normal hepatobiliary imaging. There is currently no biomarker that is helpful in diagnosis which relies on clinical and laboratory findings. Diagnosis is dependent on temporal relationship with a recently started drug or herbal and dietary supplement and elevated liver tests with exclusion of competing etiologies. The implicated agent should be discontinued and the patient should be observed closely. This is particularly important in patients with jaundice who have approximately 10% risk of liver related mortality and/or need for liver transplantation. There is no specific therapy for DILI which is only symptomatic such as for itching. Patients with jaundice and coagulopathy usually require hospitalization.",
+      "mesh_terms": [
+        "Acetylcysteine",
+        "Aged",
+        "Anti-Bacterial Agents",
+        "Anticholesteremic Agents",
+        "Atorvastatin",
+        "Azithromycin",
+        "Checklist",
+        "Chemical and Drug Induced Liver Injury",
+        "Female",
+        "Humans"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article",
+        "Review"
+      ],
+      "word_count": 132,
+      "sentence_count": 9,
+      "technical_term_count": 0,
+      "medical_term_count": 6,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.1656,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.8,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.32000000000000006
+      },
+      "extracted_at": "2025-10-23T04:07:42.290535"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 1,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:07:42.290540"
+    },
+    "collected_at": "2025-10-23T04:07:42.290542",
+    "data_id": "Clinical management of patients with drug-induced _1761210462.290542"
+  },
+  {
+    "features": {
+      "title": "Hepatotoxicity following administration of onasemnogene abeparvovec (AVXS-101) for the treatment of spinal muscular\u00a0atrophy.",
+      "abstract": "Spinal muscular atrophy (SMA) is an autosomal recessive, childhood-onset motor neuron disease. Onasemnogene abeparvovec (OA) is a gene therapy designed to address SMA's root cause. In pivotal mouse toxicology studies, the liver was identified as a major site of OA toxicity. Clinical data reflect elevations in serum aminotransferase concentrations, with some reports of serious acute liver injury. Prophylactic prednisolone mitigates these effects. Herein, we aim to provide pragmatic, supportive guidance for identification, management, and risk mitigation of potential drug-induced liver injury.",
+      "mesh_terms": [
+        "Alanine Transaminase",
+        "Aspartate Aminotransferases",
+        "Bilirubin",
+        "Biological Products",
+        "Chemical and Drug Induced Liver Injury",
+        "Cohort Studies",
+        "Female",
+        "Genetic Therapy",
+        "Glucocorticoids",
+        "Humans"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Clinical Trial",
+        "Journal Article",
+        "Research Support, Non-U.S. Gov't"
+      ],
+      "word_count": 95,
+      "sentence_count": 8,
+      "technical_term_count": 0,
+      "medical_term_count": 9,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 2,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.1955,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.4,
+        "overall_confidence": 0.52
+      },
+      "extracted_at": "2025-10-23T04:07:42.799538"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 1,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:07:42.799543"
+    },
+    "collected_at": "2025-10-23T04:07:42.799545",
+    "data_id": "Hepatotoxicity following administration of onasemn_1761210462.799545"
+  },
+  {
+    "features": {
+      "title": "Severe Acute Liver Injury After Hepatotoxic Medication Initiation in Real-World Data.",
+      "abstract": "Current approaches to classify the hepatotoxic potential of medications are based on cumulative case reports of acute liver injury (ALI), which do not consider the size of the exposed population. There is little evidence from real-world data (data relating to patient health status and/or the delivery of health care routinely collected from sources outside of a research setting) on incidence rates of severe ALI after initiation of medications, accounting for duration of exposure.",
+      "mesh_terms": [
+        "Humans",
+        "Chemical and Drug Induced Liver Injury",
+        "Male",
+        "Female",
+        "Middle Aged",
+        "Incidence",
+        "United States",
+        "Aged",
+        "Hospitalization",
+        "Cohort Studies"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Comment"
+      ],
+      "word_count": 84,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 7,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 3,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.1462,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.9,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.6,
+        "overall_confidence": 0.54
+      },
+      "extracted_at": "2025-10-23T04:07:47.299661"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "ICSR",
+      "confidence": 0.5925,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.56",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3992,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.5925,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:07:47.299670"
+    },
+    "collected_at": "2025-10-23T04:07:47.299672",
+    "data_id": "Severe Acute Liver Injury After Hepatotoxic Medica_1761210467.299672"
+  },
+  {
+    "features": {
+      "title": "Turmeric-Induced Liver Injury.",
+      "abstract": "Turmeric and its active compound, curcumin, has gained popularity as an herbal supplement due to its anti-inflammatory properties. However, the lack of standardized regulation for herbal supplements raises concerns about potential side effects and toxicity. This case report presents a 53-year-old woman with Beh\u00e7et disease who developed biopsy-proven drug-induced liver injury (DILI) after initiating a turmeric supplement, with resolution of laboratory abnormalities after a positive supplement de-challenge. This case highlights the importance of noting herbal supplementation during medication reconciliation and underscores the need for rigorous regulatory oversight to ensure the safety of such products.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 97,
+      "sentence_count": 6,
+      "technical_term_count": 0,
+      "medical_term_count": 8,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 2,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.1731,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.4,
+        "overall_confidence": 0.52
+      },
+      "extracted_at": "2025-10-23T04:07:51.927347"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "ICSR",
+      "confidence": 0.5925,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.56",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4120,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.5925,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:07:51.927354"
+    },
+    "collected_at": "2025-10-23T04:07:51.927356",
+    "data_id": "Turmeric-Induced Liver Injury._1761210471.927357"
+  },
+  {
+    "features": {
+      "title": "RAD-140 Drug-Induced Liver Injury.",
+      "abstract": null,
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 5,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 1,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.0245,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.1,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.04000000000000001
+      },
+      "extracted_at": "2025-10-23T04:07:55.183733"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 2749,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:07:55.183742"
+    },
+    "collected_at": "2025-10-23T04:07:55.183744",
+    "data_id": "RAD-140 Drug-Induced Liver Injury._1761210475.183744"
+  },
+  {
+    "features": {
+      "title": "Drug-Induced Fatty Liver Disease (DIFLD): A Comprehensive Analysis of Clinical, Biochemical, and Histopathological Data for Mechanisms Identification and Consistency with Current Adverse Outcome Pathways.",
+      "abstract": "Drug induced fatty liver disease (DIFLD) is a form of drug-induced liver injury (DILI), which can also be included in the more general metabolic dysfunction-associated steatotic liver disease (MASLD), which specifically refers to the accumulation of fat in the liver unrelated to alcohol intake. A bi-directional relationship between DILI and MASLD is likely to exist: while certain drugs can cause MASLD by acting as pro-steatogenic factors, MASLD may make hepatocytes more vulnerable to drugs. Having a pre-existing MASLD significantly heightens the likelihood of experiencing DILI from certain medications. Thus, the prevalence of steatosis within DILI may be biased by pre-existing MASLD, and it can be concluded that the genuine true incidence of DIFLD in the general population remains unknown. In certain individuals, drug-induced steatosis is often accompanied by concomitant injury mechanisms such as oxidative stress, cell death, and inflammation, which leads to the development of drug-induced steatohepatitis (DISH). DISH is much more severe from the clinical point of view, has worse prognosis and outcome, and resembles MASH (metabolic-associated steatohepatitis), as it is associated with inflammation and sometimes with fibrosis. A literature review of clinical case reports allowed us to examine and evaluate the clinical features of DIFLD and their association with specific drugs, enabling us to propose a classification of DIFLD drugs based on clinical outcomes and pathological severity: Group 1, drugs with low intrinsic toxicity (e.g., ibuprofen, naproxen, acetaminophen, irinotecan, methotrexate, and tamoxifen), but expected to promote/aggravate steatosis in patients with pre-existing MASLD; Group 2, drugs associated with steatosis and only occasionally with steatohepatitis (e.g., amiodarone, valproic acid, and tetracycline); and Group 3, drugs with a great tendency to transit to steatohepatitis and further to fibrosis. Different mechanisms may be in play when identifying drug mode of action: (1) inhibition of mitochondrial fatty acid \u03b2-oxidation; (2) inhibition of fatty acid transport across mitochondrial membranes; (3) increased de novo lipid synthesis; (4) reduction in lipid export by the inhibition of microsomal triglyceride transfer protein; (5) induction of mitochondrial permeability transition pore opening; (6) dissipation of the mitochondrial transmembrane potential; (7) impairment of the mitochondrial respiratory chain/oxidative phosphorylation; (8) mitochondrial DNA damage, degradation and depletion; and (9) nuclear receptors (NRs)/transcriptomic alterations. Currently, the majority of, if not all, adverse outcome pathways (AOPs) for steatosis in AOP-Wiki highlight the interaction with NRs or transcription factors as the key molecular initiating event (MIE). This perspective suggests that chemical-induced steatosis typically results from the interplay between a chemical and a NR or transcription factors, implying that this interaction represents the primary and pivotal MIE. However, upon conducting this exhaustive literature review, it became evident that the current AOPs tend to overly emphasize this interaction as the sole MIE. Some studies indeed support the involvement of NRs in steatosis, but others demonstrate that such NR interactions alone do not necessarily lead to steatosis. This view, ignoring other mitochondrial-related injury mechanisms, falls short in encapsulating the intricate biological mechanisms involved in chemically induced liver steatosis, necessitating their consideration as part of the AOP's map road as well.",
+      "mesh_terms": [
+        "Humans",
+        "Fatty Liver",
+        "Chemical and Drug Induced Liver Injury",
+        "Adverse Outcome Pathways",
+        "Liver",
+        "Oxidative Stress"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Review"
+      ],
+      "word_count": 525,
+      "sentence_count": 19,
+      "technical_term_count": 2,
+      "medical_term_count": 8,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 7,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.39350000000000007,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.8,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.38000000000000006
+      },
+      "extracted_at": "2025-10-23T04:07:55.700017"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 4,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:07:55.700022"
+    },
+    "collected_at": "2025-10-23T04:07:55.700023",
+    "data_id": "Drug-Induced Fatty Liver Disease (DIFLD): A Compre_1761210475.700024"
+  },
+  {
+    "features": {
+      "title": "Albendazole-Induced Liver Injury.",
+      "abstract": "Albendazole is an anthelmintic drug used worldwide for prophylactic or curative treatment. Side effects include diarrhea, abdominal pain, elevated levels of hepatic transaminases, dizziness, neutropenia, and alopecia.",
+      "mesh_terms": [
+        "Albendazole",
+        "Anthelmintics",
+        "Chemical and Drug Induced Liver Injury, Chronic",
+        "Echinococcosis, Hepatic",
+        "Humans"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Systematic Review"
+      ],
+      "word_count": 30,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 2,
+      "patient_mentions": 1,
+      "drug_mentions": 1,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.055,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.3,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.12
+      },
+      "extracted_at": "2025-10-23T04:07:56.208733"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 0,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:07:56.208738"
+    },
+    "collected_at": "2025-10-23T04:07:56.208740",
+    "data_id": "Albendazole-Induced Liver Injury._1761210476.20874"
+  },
+  {
+    "features": {
+      "title": "Atorvastatin-induced Myositis and Drug-induced Liver Injury.",
+      "abstract": "Statins are drugs for preventing cardiac events in the elderly population. Statins are well tolerated with a lower reported incidence of serious side effects (<0.15%) like myopathy and elevated transaminases [>3\u00d7 upper limit of normal (ULN)]. Serious adverse effects of statins like statin-associated myopathy range from mild muscle pain to rhabdomyolysis. Drug-induced liver injury (DILI) is another adverse effect of statin use, typically presenting with an acute hepatocellular liver injury pattern as mixed or cholestatic injury. Symptoms usually disappear after 3 months of discontinuation of statins. Some patients require immunosuppression with steroids, intravenous immunoglobulin, or rituximab for management of rhabdomyolysis. DILI can be rapidly reversed by the stoppage of the statins if the enzyme elevation is more than twice the normal. Elderly patients are particularly at increased risk of such adverse effects, emphasizing a need for rational prescription of statins in older adults and close monitoring. We report a case of an elderly presenting with paraparesis and later diagnosed to be a case of statin-induced myositis that significantly improved with prompt management. ",
+      "mesh_terms": [
+        "Humans",
+        "Atorvastatin",
+        "Chemical and Drug Induced Liver Injury",
+        "Hydroxymethylglutaryl-CoA Reductase Inhibitors",
+        "Myositis",
+        "Aged",
+        "Male",
+        "Female"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 178,
+      "sentence_count": 12,
+      "technical_term_count": 0,
+      "medical_term_count": 11,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 7,
+      "temporal_mentions": 2,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.26639999999999997,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.4,
+        "overall_confidence": 0.52
+      },
+      "extracted_at": "2025-10-23T04:08:00.903906"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Safety_Information",
+      "confidence": 0.584659090909091,
+      "reasoning": "Majority vote (2/3): Safety_Information with avg confidence 0.56",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4188,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.584659090909091,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:00.903913"
+    },
+    "collected_at": "2025-10-23T04:08:00.903914",
+    "data_id": "Atorvastatin-induced Myositis and Drug-induced Liv_1761210480.903915"
+  },
+  {
+    "features": {
+      "title": "History!",
+      "abstract": "Abstract for PMID 33039473",
+      "mesh_terms": [
+        "Abdominal Pain",
+        "Adult",
+        "Analgesics",
+        "Bile Ducts",
+        "Chemical and Drug Induced Liver Injury",
+        "Humans",
+        "Male",
+        "Mitragyna"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 5,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 0,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.0095,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.0
+      },
+      "extracted_at": "2025-10-23T04:08:03.647811"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 2239,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:03.647820"
+    },
+    "collected_at": "2025-10-23T04:08:03.647822",
+    "data_id": "History!_1761210483.647822"
+  },
+  {
+    "features": {
+      "title": "Enoxaparin-Induced Liver Injury.",
+      "abstract": "Enoxaparin, a form of low-molecular-weight heparin, can cause a rare, underreported, and often reversible form of hepatocellular injury. This report describes a case of enoxaparin-induced hepatotoxicity in a 61-year-old male diagnosed with pulmonary embolism. Elevations of liver enzymes were noted within 1 week of starting the drug, followed by a dramatic improvement upon its discontinuation, with subsequent normalization in the following days.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 65,
+      "sentence_count": 5,
+      "technical_term_count": 1,
+      "medical_term_count": 7,
+      "patient_mentions": 1,
+      "drug_mentions": 1,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 3,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.16450000000000004,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.8,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.6,
+        "overall_confidence": 0.5
+      },
+      "extracted_at": "2025-10-23T04:08:08.275247"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4120,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:08.275257"
+    },
+    "collected_at": "2025-10-23T04:08:08.275259",
+    "data_id": "Enoxaparin-Induced Liver Injury._1761210488.275259"
+  },
+  {
+    "features": {
+      "title": "An overweight female with a history of allergies and drug-induced liver injury.",
+      "abstract": "Abstract for PMID 39181618",
+      "mesh_terms": [
+        "Humans",
+        "Female",
+        "Chemical and Drug Induced Liver Injury",
+        "Overweight",
+        "Hypersensitivity",
+        "Middle Aged",
+        "Adult"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 16,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 1,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.0278,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.1,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.04000000000000001
+      },
+      "extracted_at": "2025-10-23T04:08:11.948593"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3167,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:11.948602"
+    },
+    "collected_at": "2025-10-23T04:08:11.948604",
+    "data_id": "An overweight female with a history of allergies a_1761210491.948605"
+  },
+  {
+    "features": {
+      "title": "Vedolizumab-induced cholestatic liver injury.",
+      "abstract": "Abstract for PMID 33248173",
+      "mesh_terms": [
+        "Aged, 80 and over",
+        "Anti-Inflammatory Agents",
+        "Antibodies, Monoclonal, Humanized",
+        "Chemical and Drug Induced Liver Injury",
+        "Cholestasis, Intrahepatic",
+        "Colitis, Ulcerative",
+        "Gastrointestinal Agents",
+        "Humans",
+        "Maintenance Chemotherapy",
+        "Male"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Letter"
+      ],
+      "word_count": 8,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 1,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.0254,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.1,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.04000000000000001
+      },
+      "extracted_at": "2025-10-23T04:08:16.111589"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3654,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:16.111597"
+    },
+    "collected_at": "2025-10-23T04:08:16.111598",
+    "data_id": "Vedolizumab-induced cholestatic liver injury._1761210496.111599"
+  },
+  {
+    "features": {
+      "title": "Drug-induced liver injury from elexacaftor/ivacaftor/tezacaftor.",
+      "abstract": "Abstract for PMID 34275759",
+      "mesh_terms": [
+        "Aminophenols",
+        "Benzodioxoles",
+        "Chemical and Drug Induced Liver Injury",
+        "Chloride Channel Agonists",
+        "Cystic Fibrosis",
+        "Cystic Fibrosis Transmembrane Conductance Regulator",
+        "Drug Combinations",
+        "Humans",
+        "Indoles",
+        "Pyrazoles"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 9,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 1,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.0257,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.1,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.04000000000000001
+      },
+      "extracted_at": "2025-10-23T04:08:19.780861"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3165,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:19.780871"
+    },
+    "collected_at": "2025-10-23T04:08:19.780873",
+    "data_id": "Drug-induced liver injury from elexacaftor/ivacaft_1761210499.780874"
+  },
+  {
+    "features": {
+      "title": "A case of rapid avacopan-induced liver injury in pediatric granulomatosis with polyangiitis.",
+      "abstract": "Children with anti-neutrophil cytoplasmic antibody-associated vasculitis benefit immensely from avacopan as it reduces the requirement for steroids. However, descriptions of adverse drug reactions in children are lacking, and the dosage and follow-up intervals are unclear. A 10-year-old boy with initial granulomatosis and polyangiitis presented with diffuse pulmonary hemorrhage. Rituximab and 30\u00a0mg avacopan were administered twice daily as induction therapy following methylprednisolone pulse therapy. However, sudden liver function test abnormalities were observed on day 31 of avacopan treatment, despite liver enzyme levels being within the normal range 5\u00a0days earlier. A drug-induced lymphocyte stimulation and various infectious disease tests yielded negative results. Discontinuation of rituximab and avacopan resulted in improved liver function; no change in the Birmingham Vasculitis Activity Score during liver function test abnormalities was observed. Avacopan-associated abnormalities in liver function tests suggest that drug-induced liver injury may occur rapidly in children, and appropriate dosing strategies should be reconsidered.",
+      "mesh_terms": [
+        "Humans",
+        "Male",
+        "Child",
+        "Chemical and Drug Induced Liver Injury",
+        "Granulomatosis with Polyangiitis",
+        "Rituximab",
+        "Liver Function Tests",
+        "Methylprednisolone"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 162,
+      "sentence_count": 10,
+      "technical_term_count": 0,
+      "medical_term_count": 12,
+      "patient_mentions": 6,
+      "drug_mentions": 6,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 3,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.2686,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.6,
+        "overall_confidence": 0.5800000000000001
+      },
+      "extracted_at": "2025-10-23T04:08:24.881030"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "ICSR",
+      "confidence": 0.5925,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.56",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4593,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.5925,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:24.881038"
+    },
+    "collected_at": "2025-10-23T04:08:24.881040",
+    "data_id": "A case of rapid avacopan-induced liver injury in p_1761210504.881041"
+  },
+  {
+    "features": {
+      "title": "Linezolid use and drug-induced liver injury.",
+      "abstract": "Linezolid is a frequently prescribed antibiotic for chronic infection suppression, such as in prosthetic joint infections. While well tolerated, its prolonged use can increase the risk of rare and serious side effects. We present a case of linezolid toxicity presenting with a constellation of adverse effects including bone marrow suppression, lactic acidosis, and drug-induced liver injury. Our case highlights the increased risk of acute multiorgan failure in patients using the antibiotic for extended durations, notably those with preexisting comorbidities.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 85,
+      "sentence_count": 6,
+      "technical_term_count": 0,
+      "medical_term_count": 4,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.1095,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.4,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.16000000000000003
+      },
+      "extracted_at": "2025-10-23T04:08:29.757465"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Safety_Information",
+      "confidence": 0.7755681818181819,
+      "reasoning": "Majority vote (2/3): Safety_Information with avg confidence 0.74",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4369,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.7755681818181819,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:29.757473"
+    },
+    "collected_at": "2025-10-23T04:08:29.757475",
+    "data_id": "Linezolid use and drug-induced liver injury._1761210509.757476"
+  },
+  {
+    "features": {
+      "title": "Corydalis and Drug-Induced Liver Injury: A Series of 2 Cases.",
+      "abstract": "Corydalis is an herbal plant found in Asian countries. Research has demonstrated multiple health benefits. It has also been implicated in drug-induced liver injury. Cannabis dispensaries market a sleep aid which has corydalis as an active ingredient. We present 2 cases of corydalis-induced hepatotoxicity. An asymptomatic female patient exhibited a rise and fall of her transaminases coinciding with the consumption and rechallenge of this sleep aid. A man with symptoms consistent with liver dysfunction began taking the same sleep aid. With discontinuance, his liver function returned to normal. These 2 clinical cases provide evidence for corydalis-induced liver injury.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 108,
+      "sentence_count": 11,
+      "technical_term_count": 0,
+      "medical_term_count": 7,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.1814,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.9,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.42000000000000004
+      },
+      "extracted_at": "2025-10-23T04:08:35.576039"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 5312,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:35.576052"
+    },
+    "collected_at": "2025-10-23T04:08:35.576055",
+    "data_id": "Corydalis and Drug-Induced Liver Injury: A Series _1761210515.576055"
+  },
+  {
+    "features": {
+      "title": "Long-term sequelae of drug-induced liver injury.",
+      "abstract": "Drug-induced liver injury (DILI) has a very variable clinical and biochemical phenotype and differs widely in severity, from mild injury to life-threatening liver failure. Chronic injury has also been reported to occur at a variable frequency, ranging from 3.4% to 39%, 6-12 months after discontinuing the implicated agent. This wide range is probably related to various definitions of chronic liver injury and variable selection of patients. The long-term sequalae of this chronic injury in terms of morbidity and mortality are unclear, although rare vanishing bile duct syndrome is associated with an unfavourable prognosis, with increased risk of chronic liver failure and need for liver transplantation. Other forms of long-term sequalae associated with DILI are progressive fibrosis, autoimmune-like hepatitis, secondary sclerosing cholangitis, sinusoidal obstruction syndrome and, as a common final stage, the development of cirrhosis, portal hypertension and its complications. Immune checkpoint inhibitors, which can cause an autoimmune-like phenotype have also recently been shown to cause sclerosing cholangitis with cytotoxic T CD8+ cell infiltration in biliary tracts. DILI has been shown to have a significant impact on health-related quality of life but very little is known about its psychological consequences in the long-term. Further investigations with structured long-term follow-up and periodic quality of life surveys are needed to assess the impact of DILI on psychological outcomes, particularly in those with chronic sequelae.",
+      "mesh_terms": [
+        "Adult",
+        "Chemical and Drug Induced Liver Injury",
+        "Female",
+        "Humans",
+        "Liver Function Tests",
+        "Long Term Adverse Effects",
+        "Prognosis",
+        "Risk Factors"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 227,
+      "sentence_count": 11,
+      "technical_term_count": 0,
+      "medical_term_count": 8,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 6,
+      "temporal_mentions": 2,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.2321,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.8,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.4,
+        "overall_confidence": 0.44000000000000006
+      },
+      "extracted_at": "2025-10-23T04:08:40.366947"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Safety_Information",
+      "confidence": 0.6000000000000001,
+      "reasoning": "Three-way disagreement resolved by weighted voting: Safety_Information (weighted score: 0.188, models: rule=Safety_Information, bert=ICSR, llm=Non-ICSR)",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4282,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.6000000000000001,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:40.366959"
+    },
+    "collected_at": "2025-10-23T04:08:40.366962",
+    "data_id": "Long-term sequelae of drug-induced liver injury._1761210520.366963"
+  },
+  {
+    "features": {
+      "title": "A case of meropenem-induced liver injury and jaundice.",
+      "abstract": "This report describes what we believe is the first reported case of clinically significant cholestasis and acute liver injury within three days of meropenem therapy. An 83-year-old Hispanic female was admitted for sepsis of unknown origin and was started on intravenous meropenem. Three days following initiation of the antibiotic, the patient developed mixed hepatocellular and cholestatic liver injury with jaundice and pruritus. Possible causes of cholestasis were excluded after extensive investigations. A drug-induced liver injury was suspected and meropenem was discontinued. Following discontinuation of meropenem, the patient demonstrated symptomatic and laboratory improvements, and her liver enzymes and bilirubin levels were normalized.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 109,
+      "sentence_count": 8,
+      "technical_term_count": 0,
+      "medical_term_count": 15,
+      "patient_mentions": 4,
+      "drug_mentions": 4,
+      "adverse_event_mentions": 5,
+      "temporal_mentions": 6,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.28969999999999996,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 1.0,
+        "overall_confidence": 0.7
+      },
+      "extracted_at": "2025-10-23T04:08:45.227859"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4352,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:45.227866"
+    },
+    "collected_at": "2025-10-23T04:08:45.227868",
+    "data_id": "A case of meropenem-induced liver injury and jaund_1761210525.227868"
+  },
+  {
+    "features": {
+      "title": "Pyrazinamide related prolonged drug-induced liver injury: A case report.",
+      "abstract": "Drug induced liver injury (DILI) is a common side effect causing treatment discontinuation during tuberculosis (TB) treatment, and pyrazinamide (PZA) usually leads to a delayed and prolonged abnormal liver function of the 4 standard anti-tuberculosis regimens. However, a prolonged hepatitis lasting more than 4 months is rarely reported.",
+      "mesh_terms": [
+        "Antitubercular Agents",
+        "Arylamine N-Acetyltransferase",
+        "Chemical and Drug Induced Liver Injury",
+        "Ethambutol",
+        "Humans",
+        "Levofloxacin",
+        "Pyrazinamide",
+        "Transaminases",
+        "Tuberculosis, Lymph Node"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 57,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 7,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.1381,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.46
+      },
+      "extracted_at": "2025-10-23T04:08:49.012318"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3277,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:49.012324"
+    },
+    "collected_at": "2025-10-23T04:08:49.012326",
+    "data_id": "Pyrazinamide related prolonged drug-induced liver _1761210529.012326"
+  },
+  {
+    "features": {
+      "title": "Turmeric-Associated Drug-Induced Liver Injury.",
+      "abstract": "Turmeric is a common herbal supplement used for its possible anti-inflammatory and other properties. It is marketed as safe with few reports of major adverse effects directly related to oral supplementation. We report a case of turmeric supplement-induced liver injury in a 49-year-old woman admitted with elevated aspartate aminotransferase and alanine aminotransferase with no history of liver disease or alcohol use disorder. Thus, this case re-emphasizes the importance of evaluating herbal and dietary supplements as potential drug-induced liver injury causes.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 84,
+      "sentence_count": 6,
+      "technical_term_count": 0,
+      "medical_term_count": 4,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.10919999999999999,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.4,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.16000000000000003
+      },
+      "extracted_at": "2025-10-23T04:08:53.763435"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4244,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:53.763442"
+    },
+    "collected_at": "2025-10-23T04:08:53.763444",
+    "data_id": "Turmeric-Associated Drug-Induced Liver Injury._1761210533.763444"
+  },
+  {
+    "features": {
+      "title": "A Case-Report of Drug-Induced Mixed Liver Injury Resulting From Cefepime Exposure.",
+      "abstract": "A 99-year-old African-American male presented to the hospital with severe sepsis secondary to a urinary tract infection. Upon initial presentation he was tachycardic, hypotensive and had leukocytosis. While he had signs of acute kidney injury, no signs of acute liver injury were present with his alanine transferase (ALT) and amino transferase (AST) levels measuring at 22 and 44 U/L, respectively. During the treatment course the patient began to show signs of clinical improvement. Despite this, his ALT and AST began to increase on day 2 of treatment and reached their peak of 210 and 239 U/L on day 4. Cefepime-induced liver injury was suspected and cefepime was discontinued. Upon cefepime discontinuation, liver enzymes downtrended and gradually returned to normal. No other likely medication causes of liver injury could be identified and alternative medical causes were ruled out. The lack of an alternative cause and the temporal relationship of cefepime use to hepatic dysfunction support the diagnosis of cefepime-induced liver injury. The patient's Roussel Uclaf Causality Assessment Methods score was 7, indicating this was a possible case of cefepime-induced liver injury, and the Naranjo Nomogram score was 5 indicating this was a probable case of cefepime-induced liver injury. While cefepime-induced liver injury is rare, clinicians should be cognizant of the potential for this adverse effect if liver enzyme elevation is detected during cefepime therapy and other common causes have been ruled out.",
+      "mesh_terms": [
+        "Humans",
+        "Male",
+        "Aged, 80 and over",
+        "Cefepime",
+        "Chemical and Drug Induced Liver Injury, Chronic",
+        "Chemical and Drug Induced Liver Injury",
+        "Liver Diseases"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 242,
+      "sentence_count": 13,
+      "technical_term_count": 0,
+      "medical_term_count": 18,
+      "patient_mentions": 7,
+      "drug_mentions": 7,
+      "adverse_event_mentions": 11,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.3946,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.4
+      },
+      "extracted_at": "2025-10-23T04:08:58.300360"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "ICSR",
+      "confidence": 0.5175,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.49",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4029,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.5175,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:08:58.300370"
+    },
+    "collected_at": "2025-10-23T04:08:58.300372",
+    "data_id": "A Case-Report of Drug-Induced Mixed Liver Injury R_1761210538.300372"
+  }
+]

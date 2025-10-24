@@ -1,0 +1,1437 @@
+[
+  {
+    "features": {
+      "title": "Tacrolimus-Induced Neurotoxicity After Transplant: A Literature Review.",
+      "abstract": "Tacrolimus, a calcineurin inhibitor, is an immunosuppressant used globally to prevent rejection after organ transplantation. Although it significantly improves outcomes for solid organ transplant patients, it is associated with various side effects such as nephrotoxicity and neurotoxicity. Tacrolimus-induced neurotoxicity is frequently encountered in clinical practice and can present with a variety of symptoms that may occur even at therapeutic levels. Although tacrolimus-induced neurotoxicity is well documented, there is limited literature available on pharmacologic management. Twenty-eight case reports of tacrolimus-induced neurotoxicity were identified and analyzed in addition to other literature including reviews, retrospective studies, and animal model studies. The severity of cases of tacrolimus-induced neurotoxicity reported ranged from mild symptoms that could be managed with symptomatic treatment to conditions such as posterior reversible encephalopathy syndrome and chronic inflammatory demyelinating polyradiculoneuropathy that may require more immediate intervention. This information was utilized in addition to clinical experience to compile potential management options for prevention and treatment of neurotoxic adverse events. This review is limited by the utilization of primarily retrospective studies and case reports. The available literature on the subject is largely narrative and there are no guidelines on treatment of tacrolimus-induced neurotoxicity at the time of this research. This comprehensive review may guide further studies to investigate the pathophysiology of tacrolimus-induced neurotoxicity and to define patient-specific strategies for mitigation or minimization of neurotoxicity. This is especially important given that management of tacrolimus-induced neurotoxicity can include changes to immunosuppression that can result in an increased risk of rejection.",
+      "mesh_terms": [
+        "Animals",
+        "Humans",
+        "Tacrolimus",
+        "Retrospective Studies",
+        "Posterior Leukoencephalopathy Syndrome",
+        "Immunosuppressive Agents",
+        "Calcineurin Inhibitors",
+        "Neurotoxicity Syndromes"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Review"
+      ],
+      "word_count": 252,
+      "sentence_count": 13,
+      "technical_term_count": 1,
+      "medical_term_count": 20,
+      "patient_mentions": 6,
+      "drug_mentions": 6,
+      "adverse_event_mentions": 12,
+      "temporal_mentions": 2,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 1,
+      "rejected_signals": 1,
+      "domain": "general_medicine",
+      "complexity_score": 0.4476,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 1.0,
+        "temporal_evidence": 0.4,
+        "overall_confidence": 0.52
+      },
+      "extracted_at": "2025-10-23T04:10:35.057537"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 2,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:10:35.057547"
+    },
+    "collected_at": "2025-10-23T04:10:35.057550",
+    "data_id": "Tacrolimus-Induced Neurotoxicity After Transplant:_1761210635.05755"
+  },
+  {
+    "features": {
+      "title": "Cefepime-induced neurotoxicity: systematic review.",
+      "abstract": "Cefepime-induced neurotoxicity (CIN) has been well acknowledged among clinicians, although there are no clear diagnostic criteria or specific laboratory testing to help with its diagnosis. We aimed to summarize the existing evidence regarding CIN and provide future agendas for research.",
+      "mesh_terms": [
+        "Humans",
+        "Cefepime",
+        "Cephalosporins",
+        "Anti-Bacterial Agents",
+        "Neurotoxicity Syndromes",
+        "Brain Diseases"
+      ],
+      "publication_types": [
+        "Systematic Review",
+        "Journal Article"
+      ],
+      "word_count": 44,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 2,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.059199999999999996,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.2,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.08000000000000002
+      },
+      "extracted_at": "2025-10-23T04:10:35.562750"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 0,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:10:35.562760"
+    },
+    "collected_at": "2025-10-23T04:10:35.562763",
+    "data_id": "Cefepime-induced neurotoxicity: systematic review._1761210635.562764"
+  },
+  {
+    "features": {
+      "title": "Metronidazole-induced encephalopathy.",
+      "abstract": "Metronidazole is a widely used antibacterial and antiprotozoal agent for a number of conditions. Whilst its more common gastrointestinal side effects are well known, neurotoxicity remains under-recognised. Both central and peripheral neurological side effects have been described. This report describes a case of radiologically confirmed metronidazole-induced cerebellar ataxia in a cirrhotic patient with a review of the literature. Awareness of this side effect is essential for prompt recognition as early drug withdrawal leads to resolution in the majority of cases.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 82,
+      "sentence_count": 7,
+      "technical_term_count": 0,
+      "medical_term_count": 3,
+      "patient_mentions": 1,
+      "drug_mentions": 1,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "neurology",
+      "complexity_score": 0.0976,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.4,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.16000000000000003
+      },
+      "extracted_at": "2025-10-23T04:10:40.213391"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4145,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:40.213402"
+    },
+    "collected_at": "2025-10-23T04:10:40.213404",
+    "data_id": "Metronidazole-induced encephalopathy._1761210640.213404"
+  },
+  {
+    "features": {
+      "title": "Ertapenem-induced encephalopathy.",
+      "abstract": "Neurotoxicity is an unusual side effect of carbapenems, and it has been reported most commonly presenting as seizures, encephalopathy and hallucinations. Ertapenem neurotoxicity most classically presents as seizures in patients with end-stage renal disease (estimated glomerular filtration rate (eGFR) <30 mL/min/1.73 m",
+      "mesh_terms": [
+        "Akathisia, Drug-Induced",
+        "Anti-Bacterial Agents",
+        "Delirium",
+        "Empyema",
+        "Ertapenem",
+        "Hallucinations",
+        "Humans",
+        "Male",
+        "Middle Aged",
+        "Neurotoxicity Syndromes"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 44,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 3,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "neurology",
+      "complexity_score": 0.07419999999999999,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.3,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.12
+      },
+      "extracted_at": "2025-10-23T04:10:44.141871"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3421,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:44.141880"
+    },
+    "collected_at": "2025-10-23T04:10:44.141883",
+    "data_id": "Ertapenem-induced encephalopathy._1761210644.141883"
+  },
+  {
+    "features": {
+      "title": "Cefepime-Induced Neurotoxicity.",
+      "abstract": "Cefepime is a common antibiotic used to treat various infections such as pneumonia, skin infections, and intra-abdominal infections due to its broad gram-positive and gram-negative spectrum. However, patients with acute kidney injury, end-stage renal disease, and renal transplantation are disproportionately at higher risk of developing complications from administration of cefepime,\u00a0secondary to its predominant renal excretion. Current guidelines prescribe cefepime renal-dosing, dependent on the glomerular filtration rate, to prevent toxicity. This study presents a rare case where an acutely hospitalized patient undergoing chronic renal transplant rejection was administered renal-dose cefepime. Despite renal dosing, the patient developed neurotoxicity that manifested as delirium, inability to tolerate oral intake, and non-convulsive status epilepticus. Solely adjusting for renal dysfunction may be inadequate to prevent the accumulation of cefepime metabolites, which may present in an atypical manner in the patient. Such possibilities emphasize the need for continued evaluation of a patient's mentation in case of cefepime administration. Cefepime-induced neurotoxicity incidences need to be evaluated and researched thoroughly.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 164,
+      "sentence_count": 10,
+      "technical_term_count": 0,
+      "medical_term_count": 13,
+      "patient_mentions": 8,
+      "drug_mentions": 8,
+      "adverse_event_mentions": 5,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.2842,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.4
+      },
+      "extracted_at": "2025-10-23T04:10:48.806424"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "ICSR",
+      "confidence": 0.5599999999999999,
+      "reasoning": "Three-way disagreement resolved by weighted voting: ICSR (weighted score: 0.175, models: rule=ICSR, bert=Safety_Information, llm=Non-ICSR)",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4157,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.5599999999999999,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:48.806431"
+    },
+    "collected_at": "2025-10-23T04:10:48.806433",
+    "data_id": "Cefepime-Induced Neurotoxicity._1761210648.806434"
+  },
+  {
+    "features": {
+      "title": "Cefepime-Induced Encephalopathy.",
+      "abstract": "Cefepime, a fourth-generation cephalosporin, remains an essential antibiotic targeting a broad spectrum of Gram-positive and Gram-negative organisms. However, it also remains an important, yet often unrecognized, cause of encephalopathy. We are here to discuss a case of a 74-year-old male with a common bile duct low-grade adenoma who presented to the hospital for lethargy. He was placed on intravenous cefepime for a\u00a0",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 64,
+      "sentence_count": 5,
+      "technical_term_count": 0,
+      "medical_term_count": 1,
+      "patient_mentions": 1,
+      "drug_mentions": 1,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.0542,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.2,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.08000000000000002
+      },
+      "extracted_at": "2025-10-23T04:10:53.754342"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4440,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:53.754352"
+    },
+    "collected_at": "2025-10-23T04:10:53.754355",
+    "data_id": "Cefepime-Induced Encephalopathy._1761210653.754356"
+  },
+  {
+    "features": {
+      "title": "Cefepime-induced neurotoxicity.",
+      "abstract": "We present a case of severe cefepime-induced neurotoxicity following acute kidney injury in a patient with a fracture-related infection. Despite stopping cefepime, the patient required intubation, ventilation, multiple antiepileptic drugs for seizure control, and haemodialysis.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 37,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 6,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "neurology",
+      "complexity_score": 0.1171,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.8,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.38000000000000006
+      },
+      "extracted_at": "2025-10-23T04:10:58.059341"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3795,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:10:58.059352"
+    },
+    "collected_at": "2025-10-23T04:10:58.059355",
+    "data_id": "Cefepime-induced neurotoxicity._1761210658.059355"
+  },
+  {
+    "features": {
+      "title": "Cefepime-Induced Delirium.",
+      "abstract": "Cefepime is a fourth-generation cephalosporin usually reserved to treat severe infections or those caused by multi-resistant microorganisms. Neurotoxicity is attributed to its ability to cross the blood-brain barrier and produce gamma-aminobutyric acid antagonism. Neurological symptoms may range from mild somnolence to seizures and coma. Our patient is an 88-year-old man who presented from a nursing home due to worsening pressure ulcers. After cefepime was started, he started developing worsening altered mental status and hallucinations. Cefepime was discontinued and his neurological symptoms improved shortly afterward. He was discharged to a long-term acute facility for antibiotic therapy where he recovered. Our case illustrates a commonly missed side effect of cefepime. Prompt recognition of this adverse effect is paramount to prevent disease progression and avoid permanent neurological damage.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 127,
+      "sentence_count": 11,
+      "technical_term_count": 0,
+      "medical_term_count": 10,
+      "patient_mentions": 5,
+      "drug_mentions": 5,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "neurology",
+      "complexity_score": 0.2321,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.46
+      },
+      "extracted_at": "2025-10-23T04:11:03.046694"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4478,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:11:03.046706"
+    },
+    "collected_at": "2025-10-23T04:11:03.046709",
+    "data_id": "Cefepime-Induced Delirium._1761210663.046709"
+  },
+  {
+    "features": {
+      "title": "Valproate Induced Hyperammonemic Encephalopathy.",
+      "abstract": "Valproate is a commonly prescribed anticonvulsant drug. It has a potential to cause hyperammonemia even in the presence of normal liver function tests. This hyperammonemic state can lead to encephalopathy referred as Valproate induced hyperammonemic encephalopathy (VHE). Here we present a case of valproate induced hyperammonemic encephalopathy in a young male caused by initiation of valproate therapy.",
+      "mesh_terms": [
+        "Male",
+        "Humans",
+        "Valproic Acid",
+        "Anticonvulsants",
+        "Brain Diseases",
+        "Neurotoxicity Syndromes",
+        "Hyperammonemia"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 61,
+      "sentence_count": 6,
+      "technical_term_count": 0,
+      "medical_term_count": 1,
+      "patient_mentions": 1,
+      "drug_mentions": 1,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.057300000000000004,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.2,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.08000000000000002
+      },
+      "extracted_at": "2025-10-23T04:11:08.927738"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 5373,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:11:08.927745"
+    },
+    "collected_at": "2025-10-23T04:11:08.927747",
+    "data_id": "Valproate Induced Hyperammonemic Encephalopathy._1761210668.927747"
+  },
+  {
+    "features": {
+      "title": "Proton Radiation Therapy: A Systematic Review of Treatment-Related Side Effects and Toxicities.",
+      "abstract": "Cancer is the second leading cause of death worldwide. Around half of all cancer patients undergo some type of radiation therapy throughout the course of their treatment. Photon radiation remains (RT) the most widely utilized modality of radiotherapy despite recent advancements in proton radiation therapy (PBT). PBT makes use of the particle's biological property known as the Bragg peak to better spare healthy tissue from radiation damage, with data to support that this treatment modality is less toxic than photon RT. Hence, proton radiation dosimetry looks better compared to photon dosimetry; however, due to proton-specific uncertainties, unexpected acute, subacute, and long-term toxicities can be encountered. Reported neurotoxicity resulting from proton radiation treatments include radiation necrosis, moyamoya syndrome, neurosensory toxicities, brain edema, neuromuscular toxicities, and neurocognitive toxicities. Pulmonary toxicities include pneumonitis and fibrosis, pleural effusions, and bronchial toxicities. Pericarditis, pericardial effusions, and atrial fibrillations are among the cardiac toxicities related to proton therapy. Gastrointestinal and hematological toxicities are also found in the literature. Genitourinary toxicities include urinary and reproductive-related toxicities. Osteological, oral, endocrine, and skin toxicities have also been reported. The side effects will be comparable to the ones following photon RT, nonetheless at an expected lower incidence. The toxicities collected mainly from case reports and clinical trials are described based on the organs affected and functions altered.",
+      "mesh_terms": [
+        "Humans",
+        "Neoplasms",
+        "Proton Therapy",
+        "Radiation Injuries"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Systematic Review"
+      ],
+      "word_count": 229,
+      "sentence_count": 15,
+      "technical_term_count": 0,
+      "medical_term_count": 10,
+      "patient_mentions": 7,
+      "drug_mentions": 7,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.27869999999999995,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.46
+      },
+      "extracted_at": "2025-10-23T04:11:09.437750"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.95,
+      "reasoning": "High-confidence rule-based classification: High confidence: Publication type indicates systematic review or clinical trial, not individual case report",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 1,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.95,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-23T04:11:09.437757"
+    },
+    "collected_at": "2025-10-23T04:11:09.437759",
+    "data_id": "Proton Radiation Therapy: A Systematic Review of T_1761210669.437759"
+  },
+  {
+    "features": {
+      "title": "Metronidazole-induced reversible cerebellar dysfunction.",
+      "abstract": "A 73-year-old man who presented with fever and abdominal discomfort was diagnosed to have a liver abscess. He was treated with antimicrobials which included metronidazole. One month into treatment, he developed neurological symptoms and signs that were suggestive of cerebellar pathology. MRI of the brain showed T2/fluid attenuated inversion recovery hyperintensities involving bilateral dentate, fastigial and interpositus nuclei. After excluding common aetiologies, the possibility of metronidazole-induced neurotoxicity was considered. After stopping metronidazole, his symptoms and signs resolved. A subsequent MRI scan of the brain showed reversal of changes. Neurotoxicity caused by metronidazole is an uncommon adverse effect of a commonly used antimicrobial drug and should be considered in the appropriate clinical scenario.",
+      "mesh_terms": [
+        "Aged",
+        "Anti-Bacterial Agents",
+        "Ataxia",
+        "Cerebellar Diseases",
+        "Cerebellar Nuclei",
+        "Duration of Therapy",
+        "Dysarthria",
+        "Humans",
+        "Liver Abscess",
+        "Magnetic Resonance Imaging"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 116,
+      "sentence_count": 10,
+      "technical_term_count": 0,
+      "medical_term_count": 13,
+      "patient_mentions": 6,
+      "drug_mentions": 6,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 3,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.26980000000000004,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.6,
+        "overall_confidence": 0.5800000000000001
+      },
+      "extracted_at": "2025-10-23T04:11:14.191669"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4244,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:11:14.191675"
+    },
+    "collected_at": "2025-10-23T04:11:14.191676",
+    "data_id": "Metronidazole-induced reversible cerebellar dysfun_1761210674.191677"
+  },
+  {
+    "features": {
+      "title": "[Metronidazole-induced neurotoxicity].",
+      "abstract": "Metronidazole, an antiparasitic treatment with bactericidal activity, may be neurotoxic. The exact pathophysiology of this complication is unknown. While it is related to the cumulative dose, it does vary from patient to patient. We are describing the case of a 43-year-old woman, who was admitted into the hospital for treatment of a liver abscess and an ascitic fluid infection. This patient presented with cerebellar syndrome and motor slowing 29 days after starting metronidazole. Cerebral MRI showed a FLAIR hypersignal of the dentate nuclei without associated enhancement or diffusion restriction. This is typical of metronidazole toxic encephalopathy. Treatment had to be stopped. The patient's clinical course rapidly improved. A follow-up MRI scan after 10 days showed the complete resolution of dentate nuclei lesions.",
+      "mesh_terms": [
+        "Humans",
+        "Female",
+        "Adult",
+        "Metronidazole",
+        "Neurotoxicity Syndromes",
+        "Magnetic Resonance Imaging",
+        "Liver Abscess",
+        "Anti-Infective Agents"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "English Abstract",
+        "Journal Article"
+      ],
+      "word_count": 124,
+      "sentence_count": 12,
+      "technical_term_count": 0,
+      "medical_term_count": 15,
+      "patient_mentions": 9,
+      "drug_mentions": 9,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 4,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.3102,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.8,
+        "overall_confidence": 0.64
+      },
+      "extracted_at": "2025-10-23T04:11:19.445042"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "ICSR",
+      "confidence": 0.7424999999999999,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.71",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4747,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.7424999999999999,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:11:19.445053"
+    },
+    "collected_at": "2025-10-23T04:11:19.445056",
+    "data_id": "[Metronidazole-induced neurotoxicity]._1761210679.445056"
+  },
+  {
+    "features": {
+      "title": "Cytarabine-Induced Encephalitis.",
+      "abstract": null,
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 3,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 0,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.0089,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.0
+      },
+      "extracted_at": "2025-10-23T04:11:22.569685"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 2618,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:11:22.569698"
+    },
+    "collected_at": "2025-10-23T04:11:22.569701",
+    "data_id": "Cytarabine-Induced Encephalitis._1761210682.569702"
+  },
+  {
+    "features": {
+      "title": "Irinotecan-induced dysarthria and management.",
+      "abstract": "BackgroundIrinotecan is chemotherapeutic agent often used in abdominal cancers such as colorectal and pancreatic cancers. While often associated with non-central nervous system (CNS) adverse effects, in rare cases it may present with paresthesias and dysarthrias. In one case, a patient received an irinotecan-containing regimen (fluorouracil, irinotecan, oxaliplatin) and experienced several neurotoxic effects, which was successfully managed.Case ReportA female patient with newly-diagnosed pancreatic cancer was started on fluorouracil, irinotecan, and oxaliplatin (modified FOLFIRINOX). She developed dysarthrias early on in the course. Causality assessment was conducted via the Naranjo criteria, yielding a score of 6, indicating a probable adverse reaction.Management & OutcomeInitially managed with steroids and lorazepam, she was eventually given a prophylactic strategy of atropine 0.4\u2005mg and a longer infusion time of 3\u2005h instead of 90\u2005min with as needed lorazepam. This strategy alleviated the dysarthrias and the patient was able to complete 12 cycles of therapy, resulting in a partial response at the end of treatment.DiscussionProlonging the infusion and giving prophylactic atropine may help to prevent these rare adverse effects of irinotecan.",
+      "mesh_terms": [
+        "Humans",
+        "Irinotecan",
+        "Female",
+        "Dysarthria",
+        "Pancreatic Neoplasms",
+        "Antineoplastic Combined Chemotherapy Protocols",
+        "Camptothecin",
+        "Lorazepam",
+        "Fluorouracil",
+        "Middle Aged"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Case Reports"
+      ],
+      "word_count": 178,
+      "sentence_count": 12,
+      "technical_term_count": 0,
+      "medical_term_count": 13,
+      "patient_mentions": 9,
+      "drug_mentions": 9,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "oncology",
+      "complexity_score": 0.2964,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.4
+      },
+      "extracted_at": "2025-10-23T04:11:28.464699"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "ICSR",
+      "confidence": 0.5175,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.49",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 5384,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.5175,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:11:28.464708"
+    },
+    "collected_at": "2025-10-23T04:11:28.464710",
+    "data_id": "Irinotecan-induced dysarthria and management._1761210688.464711"
+  },
+  {
+    "features": {
+      "title": "[Not Available].",
+      "abstract": "In this case report, a four-week-old boy, who since birth had suffered from constipation and infantile colic, presented with seizures, myoclonic jerks and irritability after being fed with a herbal mixture of star anise the day prior to admission. Chinese star anise is a globally used spice and a herbal remedy for infantile colic. The quick recovery of the boy and normal paraclinical findings supported the assumption of star anise intoxication. The frequent use of complementary medicine in children warrants awareness to inform families of the potential dangers of this home remedy.",
+      "mesh_terms": [
+        "Male",
+        "Humans",
+        "Child",
+        "Illicium",
+        "Colic",
+        "Neurotoxicity Syndromes",
+        "Seizures",
+        "Eating"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "English Abstract",
+        "Journal Article"
+      ],
+      "word_count": 94,
+      "sentence_count": 6,
+      "technical_term_count": 0,
+      "medical_term_count": 4,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 2,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "neurology",
+      "complexity_score": 0.1122,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.6,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.4,
+        "overall_confidence": 0.36
+      },
+      "extracted_at": "2025-10-23T04:11:33.719375"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4749,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:11:33.719383"
+    },
+    "collected_at": "2025-10-23T04:11:33.719385",
+    "data_id": "[Not Available]._1761210693.719385"
+  },
+  {
+    "features": {
+      "title": "[Not Available].",
+      "abstract": "To describe the presentation, management, and postmortem examination findings in a dog with confirmed lisdexamfetamine dimesylate (LDX) toxicosis.",
+      "mesh_terms": [
+        "Humans",
+        "Female",
+        "Dogs",
+        "Animals",
+        "Lisdexamfetamine Dimesylate",
+        "Central Nervous System Stimulants",
+        "Dextroamphetamine",
+        "Attention Deficit Disorder with Hyperactivity",
+        "Treatment Outcome"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "English Abstract",
+        "Journal Article"
+      ],
+      "word_count": 20,
+      "sentence_count": 3,
+      "technical_term_count": 0,
+      "medical_term_count": 0,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 1,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.018000000000000002,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 1.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.0
+      },
+      "extracted_at": "2025-10-23T04:11:37.759264"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3534,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:11:37.759294"
+    },
+    "collected_at": "2025-10-23T04:11:37.759297",
+    "data_id": "[Not Available]._1761210697.759298"
+  },
+  {
+    "features": {
+      "title": "Contrast-induced encephalopathy in an infant.",
+      "abstract": "Contrast-induced encephalopathy (CIE) is a well-known but rare complication following contrast media administration. Its nonspecific clinical manifestations hinder diagnosis, particularly in the pediatric population. The majority of cases are reversible, with clinical improvement and resolution of signs noted on diagnostic imaging. Here, we report the case of a 2-month-old patient with a history of complex cardiovascular disease who presented with a single episode of seizure after undergoing cardiac catheterization with nonionic iodinated contrast media. CIE is diagnosed based on the signs and symptoms exhibited by the patient and the findings on plain head computed tomography (CT) scan. Subsequently, the absence of neurological symptoms and disappearance of the imaging alterations on a control CT are documented.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 120,
+      "sentence_count": 8,
+      "technical_term_count": 0,
+      "medical_term_count": 10,
+      "patient_mentions": 7,
+      "drug_mentions": 7,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 2,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.218,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.4,
+        "overall_confidence": 0.52
+      },
+      "extracted_at": "2025-10-23T04:11:42.796284"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4530,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:11:42.796293"
+    },
+    "collected_at": "2025-10-23T04:11:42.796295",
+    "data_id": "Contrast-induced encephalopathy in an infant._1761210702.796296"
+  },
+  {
+    "features": {
+      "title": "Tranexamic Acid Neurotoxicity After Nebulization and BAL.",
+      "abstract": "Tranexamic acid is a commonly used hemostatic agent with broad clinical uses across multiple specialties. Systemic toxicity is due to gamma-aminobutyric acid type A and glycine receptor competitive antagonism and has been reported by multiple routes, but toxicity after pulmonary administration via nebulization and BAL has not yet been described. A 44-year-old man with a history of congenital pulmonary arteriovenous malformations underwent routine bronchoscopy for hemoptysis. He received preprocedure nebulized tranexamic acid 500\u00a0mg three times daily for 48 h. An additional 1,000\u00a0mg was given via BAL for intraprocedural hemostasis. One hour after the procedure, he developed altered mental status, myoclonus, and hyperthermia, which was ultimately controlled with propofol and vecuronium. As the use of pulmonary tranexamic acid increases, toxicity from this agent should be considered. Dose reductions and alternate treatment modalities should be considered in patients with advanced age, arteriovenous malformations, and renal insufficiency.",
+      "mesh_terms": [
+        "Humans",
+        "Male",
+        "Adult",
+        "Tranexamic Acid",
+        "Bronchoscopy",
+        "Antifibrinolytic Agents",
+        "Nebulizers and Vaporizers",
+        "Neurotoxicity Syndromes",
+        "Hemoptysis",
+        "Administration, Inhalation"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 153,
+      "sentence_count": 10,
+      "technical_term_count": 0,
+      "medical_term_count": 13,
+      "patient_mentions": 6,
+      "drug_mentions": 6,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 3,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.28090000000000004,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.6,
+        "overall_confidence": 0.5800000000000001
+      },
+      "extracted_at": "2025-10-23T04:11:48.216891"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "ICSR",
+      "confidence": 0.5599999999999999,
+      "reasoning": "Three-way disagreement resolved by weighted voting: ICSR (weighted score: 0.175, models: rule=ICSR, bert=Safety_Information, llm=Non-ICSR)",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4912,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.5599999999999999,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:11:48.216901"
+    },
+    "collected_at": "2025-10-23T04:11:48.216903",
+    "data_id": "Tranexamic Acid Neurotoxicity After Nebulization a_1761210708.216904"
+  },
+  {
+    "features": {
+      "title": "Intranasal disulfiram-induced encephalopathy: clinical and neuroimage findings.",
+      "abstract": "Disulfiram-induced-encephalopathy is a rare complication that has been well described in adults. Although it usually occurs in acute intoxication with high doses of disulfiram, late onset encephalopathy has also been reported. Some authors propose the inhibition of dopamine beta-hydroxylase mediated by toxic metabolites of disulfiram as the main responsible, but the exact mechanism remains unclear. The aim of this report was to describe the clinical and neuroimaging findings in an unusual case of acute encephalitis due to disulfiram toxicity associated to chronic intranasal consume.",
+      "mesh_terms": [
+        "Adult",
+        "Humans",
+        "Disulfiram",
+        "Brain Diseases",
+        "Magnetic Resonance Imaging",
+        "Neuroimaging",
+        "Brain"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 91,
+      "sentence_count": 6,
+      "technical_term_count": 0,
+      "medical_term_count": 3,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.0963,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.3,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.18
+      },
+      "extracted_at": "2025-10-23T04:11:53.743753"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Safety_Information",
+      "confidence": 0.6000000000000001,
+      "reasoning": "Three-way disagreement resolved by weighted voting: Safety_Information (weighted score: 0.188, models: rule=Safety_Information, bert=ICSR, llm=Non-ICSR)",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 5019,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.6000000000000001,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:11:53.743761"
+    },
+    "collected_at": "2025-10-23T04:11:53.743763",
+    "data_id": "Intranasal disulfiram-induced encephalopathy: clin_1761210713.743763"
+  },
+  {
+    "features": {
+      "title": "Probable ertapenem-induced encephalopathy; case report and suggested alternatives for chronic prostatitis.",
+      "abstract": "Ertapenem is a carbapenem antibiotic usually reserved for complicated infections. Drug-induced neurotoxicity is a rare adverse reaction associated with ertapenem, and may be directly related to its chemical structure. We report a case of a 64-year-old male with a hematological history and chronic prostatitis that was admitted to hospital for gait instability, clumsiness, dysarthria and tremors. He started ertapenem intravenous 1\u00a0g once daily a week prior to admission. Creatinine clearance calculation by the Cockcroft-Gault method was 52\u00a0mL/min and total protein levels were low. Ertapenem's administration was discontinued and the patient's neurological symptoms improved dramatically just one day after. The result of the Naranjo Scale was six, suggesting a probable adverse drug reaction. We discussed if he could receive meropenem in case of severe infection such as septic shock. Considering the patient's medical history, the chemical structure of meropenem and the fact that there are almost no reported cases of neurotoxicity from this drug, we assume that meropenem could be used in case of severe infection in patients with history of neurotoxicity caused by ertapenem if no added risk factors are present, such as renal failure.",
+      "mesh_terms": [
+        "Anti-Bacterial Agents",
+        "Brain Diseases",
+        "Ertapenem",
+        "Humans",
+        "Male",
+        "Meropenem",
+        "Middle Aged",
+        "Neurotoxicity Syndromes",
+        "Prostatitis"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 198,
+      "sentence_count": 11,
+      "technical_term_count": 3,
+      "medical_term_count": 14,
+      "patient_mentions": 5,
+      "drug_mentions": 5,
+      "adverse_event_mentions": 8,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "neurology",
+      "complexity_score": 0.3734,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.46
+      },
+      "extracted_at": "2025-10-23T04:11:59.018315"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4768,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:11:59.018327"
+    },
+    "collected_at": "2025-10-23T04:11:59.018329",
+    "data_id": "Probable ertapenem-induced encephalopathy; case re_1761210719.01833"
+  },
+  {
+    "features": {
+      "title": "A Rare Case of Late-Onset Ertapenem-Induced Encephalopathy.",
+      "abstract": "Encephalopathy is a rare side effect associated with carbapenem antibiotics, typically presenting within one week of initiating treatment. It is almost exclusively seen in patients with poor renal function. We present a case of a middle-aged male with a history of cerebral vascular accident and normal renal function admitted for agitation, delirium, and insomnia more than two weeks after starting ertapenem to treat osteomyelitis. He was empirically treated for meningitis on admission, and ertapenem was discontinued. After an extensive negative workup for infectious and neurological etiologies of encephalopathy, a presumptive diagnosis of ertapenem-induced encephalopathy was made. The patient returned to his baseline mental status five days after discontinuing ertapenem. The nature of his neurological symptoms and timely resolution after stopping ertapenem is consistent with ertapenem-induced encephalopathy and represents a notably delayed symptom onset compared to previously described cases.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 145,
+      "sentence_count": 9,
+      "technical_term_count": 0,
+      "medical_term_count": 14,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 9,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "neurology",
+      "complexity_score": 0.2895,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 1.0,
+        "overall_confidence": 0.7
+      },
+      "extracted_at": "2025-10-23T04:12:04.759989"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 5235,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:12:04.760001"
+    },
+    "collected_at": "2025-10-23T04:12:04.760003",
+    "data_id": "A Rare Case of Late-Onset Ertapenem-Induced Enceph_1761210724.760004"
+  },
+  {
+    "features": {
+      "title": "Valproate-Associated Hyperammonaemic Encephalopathy.",
+      "abstract": "We present the case of a 55 year old who presented multiple times with altered conscious levels. He was often treated as being post-ictal, when in fact, he had Sodium Valproate induced hyperammonaemic encephalopathy. Sodium Valproate can frequently increase ammonia levels, and in some patient lead to hyperammonaemic encephalopathy.",
+      "mesh_terms": [
+        "Anticonvulsants",
+        "Brain Diseases",
+        "Humans",
+        "Hyperammonemia",
+        "Male",
+        "Middle Aged",
+        "Neurotoxicity Syndromes",
+        "Valproic Acid"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 52,
+      "sentence_count": 5,
+      "technical_term_count": 0,
+      "medical_term_count": 2,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.0656,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.4,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.16000000000000003
+      },
+      "extracted_at": "2025-10-23T04:12:10.101543"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4834,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:12:10.101553"
+    },
+    "collected_at": "2025-10-23T04:12:10.101555",
+    "data_id": "Valproate-Associated Hyperammonaemic Encephalopath_1761210730.101556"
+  },
+  {
+    "features": {
+      "title": "Cefepime-Induced Neurotoxicity in a 74-Year-Old Woman.",
+      "abstract": "Cefepime is a fourth-generation cephalosporin with anti-pseudomonal coverage. It has been known to cause neurotoxicity, especially in critically ill patients and those with renal impairment. This neurotoxicity is poorly characterized and under-recognized. We present a case of cefepime-induced neurotoxicity in a 74-year-old woman being treated for cellulitis and osteomyelitis. Symptoms were gradual in onset and included confusion, verbal perseveration, and myoclonus. EEG findings included generalized periodic discharges (GPD) and generalized rhythmic delta activity with admixed sharps (GRDA + S). Symptoms resolved one to two days after the cessation of cefepime and anti-epileptic therapy with lorazepam, topiramate, and levetiracetam. We follow this with a discussion of available literature and recommend regular therapeutic drug monitoring in the future.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 122,
+      "sentence_count": 10,
+      "technical_term_count": 0,
+      "medical_term_count": 10,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 3,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.2266,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.6,
+        "overall_confidence": 0.5800000000000001
+      },
+      "extracted_at": "2025-10-23T04:12:14.917411"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4307,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:12:14.917422"
+    },
+    "collected_at": "2025-10-23T04:12:14.917424",
+    "data_id": "Cefepime-Induced Neurotoxicity in a 74-Year-Old Wo_1761210734.917425"
+  },
+  {
+    "features": {
+      "title": "Toxic-metabolic encephalopathy induced by metronidazole and disulfiram: classics never die.",
+      "abstract": "A 53-year-old male with recovering alcohol dependency, diagnosed with bipolar disorder and recurrent episodes of diverticulitis, came to the emergency department with disorientation and confusion after 3\u2009days of treatment with metronidazole 250\u2009mg/12\u2009hours and ciprofloxacin 500\u2009mg/12\u2009hours for acute diverticulitis. In the hospital emergency department, he presented moments of agitation, fluctuations of attitude, increased basal tremor, with rhythmic movement of the left arm and leg, as well as generalised rigidity with an episode of tonic-clonic seizure of 1.5-2\u2009min duration. After performing different diagnostic tests, significant brain findings were ruled out. The pharmacy department recommended the discontinuation of one of the two drugs. As a result, the on-call doctor adjusted the patient's treatment: disulfiram and previous antibiotic therapy (metronidazole and ciprofloxacin) were discontinued, and amoxicillin/clavulanic acid 2\u2009g/8\u2009hour was prescribed instead. The patient progressed well and fully recovered.",
+      "mesh_terms": [
+        "Humans",
+        "Male",
+        "Metronidazole",
+        "Middle Aged",
+        "Disulfiram",
+        "Brain Diseases, Metabolic",
+        "Neurotoxicity Syndromes",
+        "Alcohol Deterrents",
+        "Anti-Bacterial Agents",
+        "Anti-Infective Agents"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 152,
+      "sentence_count": 9,
+      "technical_term_count": 0,
+      "medical_term_count": 14,
+      "patient_mentions": 9,
+      "drug_mentions": 9,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 4,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "neurology",
+      "complexity_score": 0.29159999999999997,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.8,
+        "overall_confidence": 0.64
+      },
+      "extracted_at": "2025-10-23T04:12:23.724022"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "ICSR",
+      "confidence": 0.5925,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.56",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4409,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.5925,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:12:23.724029"
+    },
+    "collected_at": "2025-10-23T04:12:23.724030",
+    "data_id": "Toxic-metabolic encephalopathy induced by metronid_1761210743.724031"
+  },
+  {
+    "features": {
+      "title": "Neurotoxicity including posterior reversible encephalopathy syndrome after initiation of calcineurin inhibitors in transplanted methylmalonic acidemia patients: Two case reports and review of the literature.",
+      "abstract": "New neurological symptoms in methylmalonic acidemia (MMA) patients after liver and/or kidney transplantation (LKT) are often described as metabolic stroke-like-events. Since calcineurin inhibitors (CNIs) are a well-known cause of new neurological symptoms in non-MMA transplanted patients, we investigated the incidence of CNI-induced neurotoxicity including posterior reversible encephalopathy syndrome (PRES) in post-transplanted MMA patients.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Journal Article"
+      ],
+      "word_count": 77,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 6,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 2,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.1291,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.8,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.4,
+        "overall_confidence": 0.44000000000000006
+      },
+      "extracted_at": "2025-10-23T04:12:32.350401"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4382,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.42000000000000004,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-23T04:12:32.350408"
+    },
+    "collected_at": "2025-10-23T04:12:32.350410",
+    "data_id": "Neurotoxicity including posterior reversible encep_1761210752.35041"
+  }
+]
