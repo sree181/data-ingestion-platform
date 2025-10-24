@@ -1,0 +1,68 @@
+# Base Configuration for RL Training System
+# This file contains default configuration values
+
+training:
+  episodes: 1000
+  max_steps_per_episode: 100
+  evaluation_frequency: 50
+  save_frequency: 100
+  learning_rate: 0.001
+  gamma: 0.99
+  epsilon: 0.1
+  epsilon_min: 0.01
+  epsilon_decay: 0.995
+  batch_size: 32
+  memory_size: 10000
+  target_update_frequency: 100
+
+agent:
+  state_dim: 20
+  action_dim: 10
+  hidden_dim: 128
+  network_layers: 3
+  activation: "relu"
+  dropout: 0.1
+  weight_decay: 1e-5
+
+model:
+  model_name: "MultiObjectiveRLAgent"
+  checkpoint_dir: "checkpoints"
+  model_registry_url: "http://localhost:5000"
+  model_version: "latest"
+  auto_save: true
+  save_best_only: true
+
+infrastructure:
+  num_workers: 4
+  prefetch_factor: 2
+  pin_memory: true
+  distributed: false
+  gpu_enabled: true
+  mixed_precision: true
+  gradient_checkpointing: false
+
+data:
+  data_path: "data/training"
+  cache_size: 10000
+  batch_size: 32
+  shuffle: true
+  validation_split: 0.2
+  augmentation: false
+  compression: "gzip"
+
+monitoring:
+  enable_metrics: true
+  metrics_port: 8000
+  log_level: "INFO"
+  log_format: "json"
+  enable_tracing: true
+  trace_endpoint: "http://localhost:14268/api/traces"
+
+security:
+  encryption_key: null
+  vault_url: null
+  vault_token: null
+  aws_region: "us-east-1"
+  aws_secrets_manager: false
+  enable_audit_logging: true
+  data_encryption: true

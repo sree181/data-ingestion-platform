@@ -1,0 +1,53 @@
+# Development Environment Configuration
+# Overrides base configuration for development
+
+training:
+  episodes: 100
+  max_steps_per_episode: 50
+  evaluation_frequency: 10
+  save_frequency: 20
+  learning_rate: 0.01
+  batch_size: 16
+  memory_size: 1000
+
+agent:
+  state_dim: 20
+  action_dim: 10
+  hidden_dim: 64
+  network_layers: 2
+  dropout: 0.2
+
+infrastructure:
+  num_workers: 2
+  prefetch_factor: 1
+  pin_memory: false
+  distributed: false
+  gpu_enabled: false
+  mixed_precision: false
+  gradient_checkpointing: false
+
+data:
+  data_path: "data/development"
+  cache_size: 1000
+  batch_size: 16
+  shuffle: true
+  validation_split: 0.3
+  augmentation: true
+  compression: "none"
+
+monitoring:
+  enable_metrics: true
+  metrics_port: 8001
+  log_level: "DEBUG"
+  log_format: "text"
+  enable_tracing: false
+  trace_endpoint: "http://localhost:14268/api/traces"
+
+security:
+  encryption_key: null
+  vault_url: null
+  vault_token: null
+  aws_region: "us-east-1"
+  aws_secrets_manager: false
+  enable_audit_logging: false
+  data_encryption: false

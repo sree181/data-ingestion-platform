@@ -1,0 +1,267 @@
+# Data Collection Configuration for RL Training
+
+# Collection settings
+collection:
+  max_documents: 1000
+  batch_size: 50
+  output_directory: "rl_optimization/data"
+  save_interval: 100  # Save every N documents
+
+# Data sources
+sources:
+  classification_service:
+    url: "http://localhost:8012"
+    endpoints:
+      classify: "/api/v1/classify/ensemble"
+      batch_classify: "/api/v1/classify/ensemble/batch"
+      health: "/health"
+    timeout: 30
+    retry_attempts: 3
+  
+  elasticsearch:
+    url: "http://localhost:9200"
+    index_name: "documents"
+    query_size: 100
+    scroll_timeout: "5m"
+  
+  file_sources:
+    - "data/classification_results.json"
+    - "logs/classification_logs.json"
+
+# Feature extraction settings
+feature_extraction:
+  medical_terms:
+    adverse_events:
+      - "adverse"
+      - "reaction"
+      - "side effect"
+      - "toxicity"
+      - "complication"
+      - "injury"
+      - "death"
+      - "hospitalization"
+      - "discontinued"
+      - "withdrawn"
+      - "hepatotoxicity"
+      - "nephrotoxicity"
+      - "cardiotoxicity"
+      - "neurotoxicity"
+      - "anaphylaxis"
+      - "hypersensitivity"
+      - "allergic"
+      - "rash"
+      - "fever"
+    
+    clinical_terms:
+      - "patient"
+      - "case report"
+      - "diagnosed"
+      - "presented"
+      - "developed"
+      - "experienced"
+      - "symptoms"
+      - "treatment"
+      - "therapy"
+      - "medication"
+      - "dose"
+      - "dosage"
+      - "mg"
+      - "tablet"
+      - "injection"
+      - "administration"
+    
+    temporal_terms:
+      - "after"
+      - "following"
+      - "within"
+      - "days"
+      - "weeks"
+      - "months"
+      - "onset"
+      - "duration"
+      - "rechallenge"
+      - "dechallenge"
+      - "recovery"
+  
+  technical_terms:
+    - "in vitro"
+    - "in vivo"
+    - "animal model"
+    - "cell culture"
+    - "molecular"
+    - "docking"
+    - "simulation"
+    - "protein"
+    - "structure"
+    - "crystal"
+    - "polymorphism"
+    - "pharmacokinetics"
+    - "pharmacodynamics"
+    - "metabolism"
+  
+  icsr_mesh_terms:
+    - "Case Reports"
+    - "Drug-Related Side Effects and Adverse Reactions"
+    - "Adverse Drug Reaction Reporting Systems"
+    - "Product Surveillance, Postmarketing"
+    - "Pharmacovigilance"
+    - "Drug Toxicity"
+    - "Drug Hypersensitivity"
+    - "Drug-Induced Liver Injury"
+    - "Stevens-Johnson Syndrome"
+    - "Anaphylaxis"
+    - "Drug Eruptions"
+  
+  non_icsr_mesh_terms:
+    - "Meta-Analysis"
+    - "Randomized Controlled Trial"
+    - "Clinical Trial"
+    - "Multicenter Study"
+    - "Review"
+    - "Systematic Review"
+    - "Animals"
+    - "In Vitro Techniques"
+    - "Cell Line"
+    - "Molecular Structure"
+  
+  rejected_keywords:
+    - "in vitro"
+    - "in vivo"
+    - "animal model"
+    - "cell culture"
+    - "molecular docking"
+    - "computational"
+    - "simulation"
+    - "protein structure"
+    - "crystal structure"
+    - "genetic polymorphism"
+    - "pharmacokinetics study"
+
+# Validation settings
+validation:
+  thresholds:
+    min_word_count: 10
+    max_word_count: 10000
+    min_confidence: 0.0
+    max_confidence: 1.0
+    min_processing_time: 1  # ms
+    max_processing_time: 30000  # ms
+    min_cost: 0.0
+    max_cost: 1.0
+    min_accuracy_rate: 0.0
+    max_accuracy_rate: 1.0
+  
+  required_fields:
+    features:
+      - "title"
+      - "abstract"
+      - "mesh_terms"
+      - "publication_types"
+      - "word_count"
+      - "sentence_count"
+      - "technical_term_count"
+      - "medical_term_count"
+      - "patient_mentions"
+      - "drug_mentions"
+      - "adverse_event_mentions"
+      - "temporal_mentions"
+      - "icsr_mesh_count"
+      - "non_icsr_mesh_count"
+      - "rejected_signals"
+      - "domain"
+      - "complexity_score"
+      - "confidence_indicators"
+    
+    outcome:
+      - "true_classification"
+      - "predicted_classification"
+      - "confidence"
+      - "reasoning"
+      - "models_used"
+      - "decision_path"
+      - "processing_time_ms"
+      - "cost_estimate"
+      - "is_correct"
+      - "confidence_penalty"
+      - "cost_efficiency"
+  
+  valid_values:
+    classifications:
+      - "ICSR"
+      - "Safety_Information"
+      - "Non-ICSR"
+      - "Rejected"
+    
+    domains:
+      - "hepatology"
+      - "cardiology"
+      - "neurology"
+      - "oncology"
+      - "general_medicine"
+    
+    decision_paths:
+      - "rule_based_only"
+      - "rule_based_and_bert"
+      - "full_ensemble"
+    
+    models:
+      - "rule_based"
+      - "bert"
+      - "llm"
+
+# Quality thresholds
+quality:
+  min_quality_score: 0.7
+  max_issues_per_entry: 3
+  max_warnings_per_entry: 5
+  min_valid_rate: 0.8
+  min_dataset_size: 100
+
+# Logging settings
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "rl_optimization/logs/data_collection.log"
+  max_size: "10MB"
+  backup_count: 5
+
+# Performance settings
+performance:
+  max_concurrent_requests: 10
+  request_timeout: 30
+  retry_delay: 1  # seconds
+  max_retries: 3
+  memory_limit_mb: 1024
+
+# Output settings
+output:
+  formats:
+    - "json"
+    - "csv"
+    - "parquet"
+  
+  compression: "gzip"
+  include_metadata: true
+  include_validation_results: true
+  include_statistics: true
+
+# Monitoring settings
+monitoring:
+  enable_metrics: true
+  metrics_interval: 60  # seconds
+  alert_thresholds:
+    error_rate: 0.1
+    processing_time: 1000  # ms
+    memory_usage: 0.8  # fraction
+  
+  notifications:
+    email:
+      enabled: false
+      recipients: []
+      smtp_server: ""
+      smtp_port: 587
+    
+    webhook:
+      enabled: false
+      url: ""
+      timeout: 10

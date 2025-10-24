@@ -1,0 +1,18 @@
+{
+  "total": 25,
+  "successful": 25,
+  "failed": 0,
+  "classifications": {
+    "Non-ICSR": 21,
+    "Safety_Information": 1,
+    "ICSR": 3
+  },
+  "domains": {
+    "cardiology": 18,
+    "general_medicine": 3,
+    "oncology": 2,
+    "hepatology": 2
+  },
+  "valid_entries": 0,
+  "invalid_entries": 25
+}

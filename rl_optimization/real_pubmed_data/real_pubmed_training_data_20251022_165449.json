@@ -1,0 +1,1386 @@
+[
+  {
+    "features": {
+      "title": "Using the Common Terminology Criteria for Adverse Events (CTCAE - Version 5.0) to Evaluate the Severity of Adverse Events of Anticancer Therapies.",
+      "abstract": "Abstract for PMID 32891586",
+      "mesh_terms": [
+        "Adverse Drug Reaction Reporting Systems",
+        "National Cancer Institute (U.S.)",
+        "United States"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 26,
+      "sentence_count": 3,
+      "technical_term_count": 0,
+      "medical_term_count": 2,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 1,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "oncology",
+      "complexity_score": 0.0498,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.2,
+        "icsr_mesh_ratio": 1.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.38
+      },
+      "extracted_at": "2025-10-22T16:53:04.437834"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Three-way disagreement resolved by weighted voting: Safety_Information (weighted score: 0.188, models: rule=Safety_Information, bert=ICSR, llm=Non-ICSR)",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4819,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:53:04.437842"
+    },
+    "collected_at": "2025-10-22T16:53:04.437844",
+    "data_id": "Using the Common Terminology Criteria for Adverse _1761169984.437845"
+  },
+  {
+    "features": {
+      "title": "Cefepime-induced neurotoxicity.",
+      "abstract": "We present a case of severe cefepime-induced neurotoxicity following acute kidney injury in a patient with a fracture-related infection. Despite stopping cefepime, the patient required intubation, ventilation, multiple antiepileptic drugs for seizure control, and haemodialysis.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 37,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 6,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "neurology",
+      "complexity_score": 0.1171,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.8,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.38000000000000006
+      },
+      "extracted_at": "2025-10-22T16:53:09.479604"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4535,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:53:09.479617"
+    },
+    "collected_at": "2025-10-22T16:53:09.479620",
+    "data_id": "Cefepime-induced neurotoxicity._1761169989.479621"
+  },
+  {
+    "features": {
+      "title": "Tirzepatide-Induced Injection Site Reaction.",
+      "abstract": "A male in his 70s developed a rash on his lower abdomen after changing his subcutaneous injection drug from dulaglutide to tirzepatide.\u00a0The rash diminished after stopping tirzepatide injection.\u00a0This case illustrated that tirzepatide can potentially lead to an injection site rash, despite another glucagon-like peptide-1 (GLP-1) receptor agonist (RA) being used without adverse reactions. Injection site reactions are one of the potential adverse events associated with GLP-1 RA use.\u00a0To the best of our knowledge, this is the first reported case of tirzepatide-induced injection site reaction.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 91,
+      "sentence_count": 7,
+      "technical_term_count": 0,
+      "medical_term_count": 16,
+      "patient_mentions": 7,
+      "drug_mentions": 7,
+      "adverse_event_mentions": 7,
+      "temporal_mentions": 2,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.2953,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.4,
+        "overall_confidence": 0.52
+      },
+      "extracted_at": "2025-10-22T16:53:14.817179"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.56",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4829,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:53:14.817190"
+    },
+    "collected_at": "2025-10-22T16:53:14.817192",
+    "data_id": "Tirzepatide-Induced Injection Site Reaction._1761169994.817193"
+  },
+  {
+    "features": {
+      "title": "Tocilizumab-Induced Erythema Annulare Centrifugum.",
+      "abstract": "We report the case of a 42-year-old woman with rheumatoid arthritis undergoing treatment with subcutaneous tocilizumab for the past 6 months. Three days after the administration, an asymptomatic inflammatory annular plaque of 4 cm with discrete whitish scales at the inner border margin developed at the injection site in the left iliac fossa. A smaller plaque in the left groin appeared soon after. The mycological exam was negative. Histology showed a lymphoplasmacytic superficial and deep perivascular, and periadnexal, dermal infiltrate, without epidermal changes. Lesions spontaneously regressed in 4 months. The diagnosis was clinically and histologically consistent with erythema annulare centrifugum, following the exclusion of other differential diagnoses. Erythema annulare centrifugum represents a delayed-type hypersensitivity reaction generally considered idiopathic or otherwise related to numerous triggers, including drugs such as biologics. We describe the first reported case of tocilizumab-induced erythema annulare centrifugum. This case should alert dermatologists to this relatively rare and complex entity and should raise awareness to cutaneous biologic drug reactions.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 165,
+      "sentence_count": 12,
+      "technical_term_count": 0,
+      "medical_term_count": 12,
+      "patient_mentions": 4,
+      "drug_mentions": 4,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 6,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.27749999999999997,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 1.0,
+        "overall_confidence": 0.7
+      },
+      "extracted_at": "2025-10-22T16:53:19.787838"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.56",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4461,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:53:19.787846"
+    },
+    "collected_at": "2025-10-22T16:53:19.787849",
+    "data_id": "Tocilizumab-Induced Erythema Annulare Centrifugum._1761169999.787849"
+  },
+  {
+    "features": {
+      "title": "Allodynia (skin tenderness) associated with semaglutide: A case series.",
+      "abstract": "The glucagon-like peptide-1 receptor agonist (GLP-1RA) class of medications are widely prescribed for management of diabetes mellitus as well as obesity or weight management. Although there have been rare reports of skin hypersensitivity associated with GLP-1RA medications, no published reports have documented allodynia or skin pain to the touch.",
+      "mesh_terms": [
+        "Humans",
+        "Diabetes Mellitus, Type 2",
+        "Dose-Response Relationship, Drug",
+        "Glucagon-Like Peptide-1 Receptor Agonists",
+        "Glucagon-Like Peptides",
+        "Hyperalgesia",
+        "Hypoglycemic Agents",
+        "Obesity",
+        "Glucagon-Like Peptide 1"
+      ],
+      "publication_types": [
+        "Journal Article",
+        "Case Reports"
+      ],
+      "word_count": 58,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 1,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.0484,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.1,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.04000000000000001
+      },
+      "extracted_at": "2025-10-22T16:53:24.957608"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4661,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:53:24.957615"
+    },
+    "collected_at": "2025-10-22T16:53:24.957617",
+    "data_id": "Allodynia (skin tenderness) associated with semagl_1761170004.957618"
+  },
+  {
+    "features": {
+      "title": "Topical Diclofenac-Induced Hepatotoxicity.",
+      "abstract": "The hepatotoxic potential of diclofenac, a commonly used non-steroidal anti-inflammatory agent, is well established in literature. However, cases of diclofenac-induced liver disease have occurred almost exclusively with the oral formulation of this medication. We report the case of an elderly man with Paget's disease and osteoarthritis who developed acute hepatotoxicity, as evidenced by laboratory diagnostics, four months after use of topical diclofenac 1% gel. Once diclofenac gel was discontinued, repeat blood work three weeks after discharge demonstrated return of liver function tests to baseline. Given the temporal relationship between the initiation and escalation of topical diclofenac and the changes in liver function tests, the likelihood of diclofenac-induced liver injury was deemed possible using a well-recognized causality assessment tool. Further research on topically administered non-steroidal anti-inflammatory agents is needed to identify monitoring intervals for early detection and avoidance of adverse effects in patients using topical diclofenac.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 148,
+      "sentence_count": 8,
+      "technical_term_count": 0,
+      "medical_term_count": 11,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 5,
+      "temporal_mentions": 4,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.2414,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.8,
+        "overall_confidence": 0.64
+      },
+      "extracted_at": "2025-10-22T16:53:30.761206"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.49",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 5294,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:53:30.761216"
+    },
+    "collected_at": "2025-10-22T16:53:30.761218",
+    "data_id": "Topical Diclofenac-Induced Hepatotoxicity._1761170010.761219"
+  },
+  {
+    "features": {
+      "title": "Valproate-induced Periorbital Edema.",
+      "abstract": "Valproate is an antiepileptic medication that can be used to manage behavioral symptoms associated with Alzheimer's dementia. We present a rare case of valproate-induced periorbital edema.",
+      "mesh_terms": [
+        "Aged",
+        "Aggression",
+        "Alzheimer Disease",
+        "Edema",
+        "Humans",
+        "Male",
+        "Valproic Acid"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 29,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 2,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.0547,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.4,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.16000000000000003
+      },
+      "extracted_at": "2025-10-22T16:53:35.334530"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4068,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:53:35.334540"
+    },
+    "collected_at": "2025-10-22T16:53:35.334543",
+    "data_id": "Valproate-induced Periorbital Edema._1761170015.334543"
+  },
+  {
+    "features": {
+      "title": "Candesartan-Associated Lichenoid Drug Eruption.",
+      "abstract": "Lichenoid drug eruption (LDE) is an uncommon adverse drug reaction, with few published cases implicating the angiotensin II receptor blocker candesartan. We report a 67-year-old woman who developed pruritic violaceous papules and plaques on the trunk and extremities two years after initiating candesartan. Skin biopsy confirmed LDE. The eruption gradually resolved over five to six months after candesartan was replaced by amlodipine, with no recurrence observed at the 12-month follow-up. This case underscores the diagnostic challenges associated with LDE: latency may extend over years, clinical and histopathologic features closely mimic idiopathic lichen planus, and confirmatory tests, such as patch testing and drug-induced lymphocyte stimulation testing, often yield low sensitivity. Dermatologists and prescribing physicians should maintain a high index of suspicion for drug-induced lichenoid reactions, even when no recent medication changes are reported, as prompt recognition and withdrawal of the offending agent are essential for achieving durable remission.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 151,
+      "sentence_count": 8,
+      "technical_term_count": 0,
+      "medical_term_count": 7,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 3,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.18230000000000002,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.9,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.6,
+        "overall_confidence": 0.54
+      },
+      "extracted_at": "2025-10-22T16:53:40.710772"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.56",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4867,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:53:40.710778"
+    },
+    "collected_at": "2025-10-22T16:53:40.710781",
+    "data_id": "Candesartan-Associated Lichenoid Drug Eruption._1761170020.710781"
+  },
+  {
+    "features": {
+      "title": "Severe adverse drug reaction to allopurinol.",
+      "abstract": "Abstract for PMID 36110177",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 10,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 2,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.040999999999999995,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.2,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.08000000000000002
+      },
+      "extracted_at": "2025-10-22T16:53:45.051529"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Three-way disagreement resolved by weighted voting: Safety_Information (weighted score: 0.188, models: rule=Safety_Information, bert=ICSR, llm=Non-ICSR)",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3835,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:53:45.051537"
+    },
+    "collected_at": "2025-10-22T16:53:45.051538",
+    "data_id": "Severe adverse drug reaction to allopurinol._1761170025.051539"
+  },
+  {
+    "features": {
+      "title": "Imatinib-induced ulcerative colitis.",
+      "abstract": "Imatinib, a tyrosine kinase inhibitor, is the first-line therapy for patients with KIT mutation in gastrointestinal stromal tumor (GIST). Nausea, vomiting, diarrhea, dyspepsia and abdominal pain are common gastrointestinal adverse reactions of imatinib, but imatinib-induced ulcerative colitis (UC) is rarely reported.",
+      "mesh_terms": [
+        "Humans",
+        "Imatinib Mesylate",
+        "Colitis, Ulcerative",
+        "Male",
+        "Middle Aged",
+        "Gastrointestinal Stromal Tumors",
+        "Antineoplastic Agents",
+        "Protein Kinase Inhibitors",
+        "Diarrhea"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 44,
+      "sentence_count": 4,
+      "technical_term_count": 0,
+      "medical_term_count": 2,
+      "patient_mentions": 1,
+      "drug_mentions": 1,
+      "adverse_event_mentions": 1,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "oncology",
+      "complexity_score": 0.059199999999999996,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.3,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.12
+      },
+      "extracted_at": "2025-10-22T16:53:49.837186"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4278,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:53:49.837196"
+    },
+    "collected_at": "2025-10-22T16:53:49.837198",
+    "data_id": "Imatinib-induced ulcerative colitis._1761170029.837199"
+  },
+  {
+    "features": {
+      "title": "Hemoptysis in a cannabis user.",
+      "abstract": "A healthy young man presented to the emergency department with mild hemoptysis associated with cannabis abuse. He was on no medications and cocaine abuse was ruled out by both history and negative toxicology screens. There were neither signs of an infection, nor of a systemic or cardiac disease. Imaging studies were consistent with diffuse alveolar hemorrhage, a reported, albeit rare adverse drug reaction of tetrahydrocannabinol (Naranjo score 6). The patient improved spontaneously within a few days, hemoptysis stopped and repeat imaging was entirely normal. With the increase in cannabis abuse and enhanced cannabis potency worldwide clinicians may increasingly encounter even unusual cannabis-associated adverse drug reactions, including associated diffuse alveolar hemorrhage.",
+      "mesh_terms": [
+        "Hemoptysis",
+        "Humans",
+        "Male",
+        "Marijuana Abuse",
+        "Pulmonary Alveoli",
+        "Smokers",
+        "Young Adult"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 115,
+      "sentence_count": 8,
+      "technical_term_count": 0,
+      "medical_term_count": 7,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 2,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "cardiology",
+      "complexity_score": 0.17149999999999999,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.9,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.4,
+        "overall_confidence": 0.48000000000000004
+      },
+      "extracted_at": "2025-10-22T16:53:54.761023"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4414,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:53:54.761033"
+    },
+    "collected_at": "2025-10-22T16:53:54.761036",
+    "data_id": "Hemoptysis in a cannabis user._1761170034.761036"
+  },
+  {
+    "features": {
+      "title": "[Adverse drug reaction in a patient with autoimmune disease: Case report].",
+      "abstract": "Adverse drug reactions are harmful and unintentional events related to medication use. Stevens-Johnson Syndrome is a serious adverse drug reaction that can progress to toxic epidermal necrolysis and is related to certain medications. It can even be triggered by infections and genetic factors.",
+      "mesh_terms": [
+        "Humans",
+        "Female",
+        "Middle Aged",
+        "Ibuprofen",
+        "Acetaminophen",
+        "Stevens-Johnson Syndrome",
+        "Autoimmune Diseases",
+        "Self Medication"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "English Abstract",
+        "Journal Article"
+      ],
+      "word_count": 54,
+      "sentence_count": 5,
+      "technical_term_count": 0,
+      "medical_term_count": 8,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 5,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 1,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.1562,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 1.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.7
+      },
+      "extracted_at": "2025-10-22T16:53:55.269928"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "High-confidence rule-based classification: High confidence: Case Report publication type with ICSR MeSH terms and clear patient-drug-event narrative",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 1,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-22T16:53:55.269934"
+    },
+    "collected_at": "2025-10-22T16:53:55.269935",
+    "data_id": "[Adverse drug reaction in a patient with autoimmun_1761170035.269936"
+  },
+  {
+    "features": {
+      "title": "A Case of Tacrolimus Maculopathy.",
+      "abstract": "(1) Background: Tacrolimus is an immunosuppressive agent commonly used in the management of solid organ allogeneic transplants in the prevention of rejection. Serious ophthalmic adverse effects with Tacrolimus have been reported in the literature, which includes cortical blindness and optic neuropathy. (2) Methods: We describe a rare case of maculopathy as a possible complication of Tacrolimus therapy. A 56-year-old man receiving Tacrolimus for immunosuppression after liver transplantation developed unilateral visual disturbance with a central scotoma. (3) Results: Ophthalmologic examination revealed unilateral maculopathy; a Tacrolimus macular toxicity was suspected. After drug discontinuation, a complete visual recovery was observed; however, the ultrastructural macular damage was irreversible. (4) Conclusions: Reports regarding maculopathy associated with Tacrolimus are limited. This case report adds to the current literature regarding the possible macular toxicity of this immunosuppressive agent, especially if it exceeds therapeutic serum levels. Further data are needed to confirm this possible association. A careful ophthalmologic examination should be promptly performed in patients manifesting visual disturbance while taking Tacrolimus to prevent irreversible, permanent vision loss due to possible drug toxicity.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 179,
+      "sentence_count": 12,
+      "technical_term_count": 0,
+      "medical_term_count": 11,
+      "patient_mentions": 3,
+      "drug_mentions": 3,
+      "adverse_event_mentions": 5,
+      "temporal_mentions": 3,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "hepatology",
+      "complexity_score": 0.2667,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.6,
+        "overall_confidence": 0.5800000000000001
+      },
+      "extracted_at": "2025-10-22T16:54:00.548751"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4771,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:54:00.548758"
+    },
+    "collected_at": "2025-10-22T16:54:00.548761",
+    "data_id": "A Case of Tacrolimus Maculopathy._1761170040.548761"
+  },
+  {
+    "features": {
+      "title": "Esomeprazole fixed drug eruption.",
+      "abstract": "Abstract for PMID 31967328",
+      "mesh_terms": [
+        "Aged",
+        "Drug Eruptions",
+        "Esomeprazole",
+        "Humans",
+        "Male",
+        "Proton Pump Inhibitors"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 8,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 0,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 1,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.0104,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.0,
+        "icsr_mesh_ratio": 1.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.3
+      },
+      "extracted_at": "2025-10-22T16:54:03.980352"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 2924,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:54:03.980361"
+    },
+    "collected_at": "2025-10-22T16:54:03.980363",
+    "data_id": "Esomeprazole fixed drug eruption._1761170043.980363"
+  },
+  {
+    "features": {
+      "title": "Consensus clustering for case series identification and adverse event profiles in pharmacovigilance.",
+      "abstract": "To describe and evaluate vigiGroup - a consensus clustering algorithm which can identify groups of individual case reports referring to similar suspected adverse drug reactions and describe associated adverse event profiles, accounting for co-reported adverse event terms.",
+      "mesh_terms": [
+        "Adverse Drug Reaction Reporting Systems",
+        "Bayes Theorem",
+        "Cluster Analysis",
+        "Consensus",
+        "Databases, Factual",
+        "Drug-Related Side Effects and Adverse Reactions",
+        "Humans",
+        "Pharmacovigilance"
+      ],
+      "publication_types": [
+        "Journal Article"
+      ],
+      "word_count": 49,
+      "sentence_count": 3,
+      "technical_term_count": 0,
+      "medical_term_count": 4,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 3,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.0867,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.4,
+        "icsr_mesh_ratio": 1.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.46
+      },
+      "extracted_at": "2025-10-22T16:54:08.455421"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Three-way disagreement resolved by weighted voting: Safety_Information (weighted score: 0.188, models: rule=Safety_Information, bert=ICSR, llm=Non-ICSR)",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3968,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:54:08.455430"
+    },
+    "collected_at": "2025-10-22T16:54:08.455432",
+    "data_id": "Consensus clustering for case series identificatio_1761170048.455432"
+  },
+  {
+    "features": {
+      "title": "Linezolid-induced lactic acidosis.",
+      "abstract": "Linezolid is a commonly prescribed antibiotic in clinical practice. Although thrombocytopenia and peripheral neuropathy are frequently encountered following prolonged administration of linezolid, lactic acidosis is a rare adverse drug reaction. We present the case of a patient on linezolid for disseminated multidrug-resistant tuberculosis who presented with vomiting, dyspnoea, hypotension and high anion gap metabolic acidosis. The initial presentation mimicked sepsis syndrome. Ketoacidosis and renal dysfunction were ruled out. There was no history of ingestion of toxins/toxic alcohols. Sepsis was unlikely because extensive radiological and microbiological testing could not identify an infection. Given the possibility of linezolid-induced lactic acidosis (LILA), linezolid was discontinued on admission. The patient's lactic acidosis resolved, and his overall condition improved. A retrospective diagnosis of LILA was thus established. LILA should be considered when patients on linezolid present with lactic acidosis and other causes for the lactic acidosis have been ruled out.",
+      "mesh_terms": [
+        "Humans",
+        "Linezolid",
+        "Acidosis, Lactic",
+        "Retrospective Studies",
+        "Anti-Bacterial Agents",
+        "Acidosis"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 148,
+      "sentence_count": 13,
+      "technical_term_count": 0,
+      "medical_term_count": 8,
+      "patient_mentions": 4,
+      "drug_mentions": 4,
+      "adverse_event_mentions": 3,
+      "temporal_mentions": 1,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.21639999999999998,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.2,
+        "overall_confidence": 0.46
+      },
+      "extracted_at": "2025-10-22T16:54:13.150133"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): ICSR with avg confidence 0.56",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4186,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:54:13.150141"
+    },
+    "collected_at": "2025-10-22T16:54:13.150143",
+    "data_id": "Linezolid-induced lactic acidosis._1761170053.150144"
+  },
+  {
+    "features": {
+      "title": "Semaglutide-induced fixed drug eruption.",
+      "abstract": "Abstract for PMID 39845462",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 8,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 0,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.0104,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.0
+      },
+      "extracted_at": "2025-10-22T16:54:17.214930"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3557,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:54:17.214937"
+    },
+    "collected_at": "2025-10-22T16:54:17.214939",
+    "data_id": "Semaglutide-induced fixed drug eruption._1761170057.21494"
+  },
+  {
+    "features": {
+      "title": "Case report: Eczematous adverse drug reaction after selpercatinib treatment.",
+      "abstract": "This study reports a 50-year-old patient presented with eczematous drug-eruption induced by selpercatinib after the treatment of non-small cell lung cancer (NSCLC). The patient has symmetric erythematous papules and plaques all over the body with dry, scaly skin accompanied by severe pruritus and visible scarring. After systemic treatment with glucocorticoids, the patient' skin lesions were reduced well. Currently, the medical literature on the incidence of selpercatinib-induced cutaneous eczematous reactions and their clinical management is scarce. Therefore, this study provides novel evidence for the treatment of selpercatinib-induced cutaneous eczematous reactions.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 98,
+      "sentence_count": 7,
+      "technical_term_count": 0,
+      "medical_term_count": 14,
+      "patient_mentions": 9,
+      "drug_mentions": 9,
+      "adverse_event_mentions": 2,
+      "temporal_mentions": 3,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "oncology",
+      "complexity_score": 0.26739999999999997,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.6,
+        "overall_confidence": 0.5800000000000001
+      },
+      "extracted_at": "2025-10-22T16:54:21.836166"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Both rule-based and BERT agree on ICSR (avg confidence: 0.75)",
+      "models_used": [
+        "rule_based",
+        "bert"
+      ],
+      "decision_path": "rule_based_and_bert",
+      "processing_time_ms": 4114,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-22T16:54:21.836173"
+    },
+    "collected_at": "2025-10-22T16:54:21.836175",
+    "data_id": "Case report: Eczematous adverse drug reaction afte_1761170061.836175"
+  },
+  {
+    "features": {
+      "title": "Two Cases of Vancomycin-Induced Neutropenia.",
+      "abstract": "(1) Background: The incidence of vancomycin-induced neutropenia in hospitalized patients is estimated to be around 2 to 8 percent Data surrounding vancomycin-induced neutropenia is limited as it is based on a small number of observational case reports. Additionally, it is difficult to provide generalized conclusions since patient characteristics and indications for treatment vary between reports. (2) Case Reports: We present two cases of vancomycin-induced neutropenia that occurred at our facility; a 50-year-old male who developed neutropenia after treatment with vancomycin for a gluteal abscess and a 51-year-old female who developed neutropenia after treatment with vancomycin for lumbar osteomyelitis. In both cases, neutropenia resolved within 2 days of discontinuation of vancomycin. (3) Conclusions: Vancomycin-induced neutropenia is thought to be a relatively uncommon adverse drug reaction. These two cases of neutropenia likely caused by prolonged exposure to vancomycin occurred at our facility within 3 months of each other. Additional studies are needed to better understand the true incidence of this adverse drug reaction and to identify risk factors that may predispose patients to vancomycin-induced neutropenia.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 178,
+      "sentence_count": 9,
+      "technical_term_count": 0,
+      "medical_term_count": 16,
+      "patient_mentions": 6,
+      "drug_mentions": 6,
+      "adverse_event_mentions": 4,
+      "temporal_mentions": 6,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.32939999999999997,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 1.0,
+        "overall_confidence": 0.7
+      },
+      "extracted_at": "2025-10-22T16:54:22.347293"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "High-confidence rule-based classification: High confidence: Strong presence of all four ICSR elements (patient, drug, event, temporal)",
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time_ms": 1,
+      "cost_estimate": 0.0,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 1.0,
+      "classified_at": "2025-10-22T16:54:22.347297"
+    },
+    "collected_at": "2025-10-22T16:54:22.347299",
+    "data_id": "Two Cases of Vancomycin-Induced Neutropenia._1761170062.3473"
+  },
+  {
+    "features": {
+      "title": "Tralokinumab-induced injection-site reactions.",
+      "abstract": "Abstract for PMID 39129394",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 7,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 1,
+      "patient_mentions": 1,
+      "drug_mentions": 1,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.025099999999999997,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.2,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.08000000000000002
+      },
+      "extracted_at": "2025-10-22T16:54:26.384521"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3530,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:54:26.384528"
+    },
+    "collected_at": "2025-10-22T16:54:26.384530",
+    "data_id": "Tralokinumab-induced injection-site reactions._1761170066.38453"
+  },
+  {
+    "features": {
+      "title": "Drug Reaction With Eosinophilia and Systemic Symptoms: A Diagnostic Dilemma.",
+      "abstract": "Drug reaction with eosinophilia and systemic symptoms (DRESS) is an adverse reaction to medications such as sulfonamide-containing antibiotics, anticonvulsants, vancomycin, and non-steroidal anti-inflammatory drugs (NSAIDs). It typically presents with a characteristic rash, eosinophilia, and visceral organ failure. Patients who do not present with characteristic features of DRESS are at risk for delayed diagnosis and treatment. Early diagnosis of DRESS is imperative in preventing unfavorable outcomes such as multi-organ involvement and death. This case report presents the case of a patient who was diagnosed with DRESS but did not display a classic presentation.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 102,
+      "sentence_count": 7,
+      "technical_term_count": 0,
+      "medical_term_count": 12,
+      "patient_mentions": 6,
+      "drug_mentions": 6,
+      "adverse_event_mentions": 6,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.23859999999999998,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 1.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.4
+      },
+      "extracted_at": "2025-10-22T16:54:31.295017"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4404,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:54:31.295024"
+    },
+    "collected_at": "2025-10-22T16:54:31.295026",
+    "data_id": "Drug Reaction With Eosinophilia and Systemic Sympt_1761170071.295027"
+  },
+  {
+    "features": {
+      "title": "Simvastatin-induced erythromelalgia: less is more.",
+      "abstract": "We describe a case of a woman with uncomplicated Type 2 diabetes mellitus, presenting with severe burning pains and intense redness of the legs, for which only cooling could provide relief. Although the description was classic of erythromelalgia, the lack of familiarity of the disorder caused considerable doctor's delay as well as the erroneous advice to start pain killers and amitriptyline. However, empirical discontinuation of simvastatin made all symptoms disappear. Erthyromelalgia is a rare but debilitating disease which is diagnosed by exclusion only. It usually occurs as a secondary feature to (hematologic) malignant disorders, autoimmune diseases or, infections or, most notoriously, to pharmacological agents. One of the latter might be simvastatin, and possibly all HMG CoA Reductase inhibitors.",
+      "mesh_terms": [
+        "Erythromelalgia",
+        "Female",
+        "Humans",
+        "Hydroxymethylglutaryl-CoA Reductase Inhibitors",
+        "Middle Aged",
+        "Simvastatin"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 123,
+      "sentence_count": 8,
+      "technical_term_count": 0,
+      "medical_term_count": 2,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.09889999999999999,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.4,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.16000000000000003
+      },
+      "extracted_at": "2025-10-22T16:54:35.991539"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4190,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:54:35.991545"
+    },
+    "collected_at": "2025-10-22T16:54:35.991547",
+    "data_id": "Simvastatin-induced erythromelalgia: less is more._1761170075.991547"
+  },
+  {
+    "features": {
+      "title": "Methylphenidate-Induced Menorrhagia in Twin Girls.",
+      "abstract": null,
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 6,
+      "sentence_count": 2,
+      "technical_term_count": 0,
+      "medical_term_count": 0,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 0,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.0098,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.0,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.0
+      },
+      "extracted_at": "2025-10-22T16:54:39.667831"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3169,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:54:39.667838"
+    },
+    "collected_at": "2025-10-22T16:54:39.667840",
+    "data_id": "Methylphenidate-Induced Menorrhagia in Twin Girls._1761170079.66784"
+  },
+  {
+    "features": {
+      "title": "Artificial Intelligence in Pharmacovigilance and COVID-19.",
+      "abstract": "The history of pharmacovigilance started back 169 years ago with the death of a 15- year-old girl, Hannah greener. However, the Thalidomide incident of 1961 brought a sharp change in the pharmacovigilance process, with adverse drug reaction reporting being systematic, spontaneous, and regulated timely. Therefore, continuous monitoring of marketed drugs was essential to ensure the safety of public health. Any observed adverse drug reaction detected by signals was to be reported by the health profession. Moreover, signal detection became the primary goal of pharmacovigilance based on reported cases. Among various methods used for signal detection, the Spontaneous Reporting System was most widely preferred; although, it had the limitation of \"under- reporting\". Gradually, the World Health Organization collaborating centre and \"Uppsala Monitoring Centre\" were established in 1978 for international monitoring of drugs. The centre was responsible for operating various databases like vigiflow, vigibase, vigilyze, and vigiaccess. Recently, huge data could be generated through spontaneous reporting linked with computational methods, such as Bayesian Framework, E-Synthesis. Furthermore, drug safety surveillance at an early stage prior to the official alerts or regulatory changes was made possible through social media. In addition, India created a National Pharmacovigilance Program, and Schedule Y of the Drug and Cosmetic Act 1945 was reviewed and amended in 2005. The collaboration of Information Technology and Pharmaceutical Company can further enhance the awareness regarding artificial intelligence in pharmacovigilance, which was in its infancy until 2017. Artificial intelligence helps improve the quality and accuracy of information much quickly.",
+      "mesh_terms": [
+        "Female",
+        "Humans",
+        "Adolescent",
+        "Pharmacovigilance",
+        "Adverse Drug Reaction Reporting Systems",
+        "Artificial Intelligence",
+        "Bayes Theorem",
+        "COVID-19",
+        "Drug-Related Side Effects and Adverse Reactions"
+      ],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 252,
+      "sentence_count": 15,
+      "technical_term_count": 0,
+      "medical_term_count": 5,
+      "patient_mentions": 0,
+      "drug_mentions": 0,
+      "adverse_event_mentions": 5,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 3,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 1,
+      "domain": "general_medicine",
+      "complexity_score": 0.2106,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.5,
+        "icsr_mesh_ratio": 1.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.5
+      },
+      "extracted_at": "2025-10-22T16:54:44.010648"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Majority vote (2/3): Non-ICSR with avg confidence 0.40",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 3834,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:54:44.010656"
+    },
+    "collected_at": "2025-10-22T16:54:44.010659",
+    "data_id": "Artificial Intelligence in Pharmacovigilance and C_1761170084.010659"
+  },
+  {
+    "features": {
+      "title": "Sildenafil-induced drug reaction with eosinophilia and systemic symptoms.",
+      "abstract": "Drug reaction with eosinophilia and systemic symptoms (DRESS)/drug-induced hypersensitivity syndrome (DIHS) is a life-threatening, multi-organ adverse drug reaction with a mortality rate of approximately 10\u00a0%-20\u00a0%. The most common culprit drugs are anticonvulsants, some antibiotics such as dapsone and minocycline, salazosulfapyridine, allopurinol and some antiretroviral molecules such as abacavir and nevirapine. Only one case of DRESS induced by sildenafil has been reported in the literature. Here we report a new case.",
+      "mesh_terms": [],
+      "publication_types": [
+        "Case Reports",
+        "Journal Article"
+      ],
+      "word_count": 80,
+      "sentence_count": 6,
+      "technical_term_count": 0,
+      "medical_term_count": 7,
+      "patient_mentions": 2,
+      "drug_mentions": 2,
+      "adverse_event_mentions": 5,
+      "temporal_mentions": 0,
+      "icsr_mesh_count": 0,
+      "non_icsr_mesh_count": 0,
+      "rejected_signals": 0,
+      "domain": "general_medicine",
+      "complexity_score": 0.153,
+      "confidence_indicators": {
+        "icsr_evidence_strength": 0.9,
+        "icsr_mesh_ratio": 0.0,
+        "non_icsr_mesh_ratio": 0.0,
+        "temporal_evidence": 0.0,
+        "overall_confidence": 0.36000000000000004
+      },
+      "extracted_at": "2025-10-22T16:54:48.738360"
+    },
+    "outcome": {
+      "true_classification": "Unknown",
+      "predicted_classification": "Unknown",
+      "confidence": 0.0,
+      "reasoning": "Three-way disagreement resolved by weighted voting: Safety_Information (weighted score: 0.188, models: rule=Safety_Information, bert=ICSR, llm=Non-ICSR)",
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time_ms": 4219,
+      "cost_estimate": 0.005,
+      "is_correct": false,
+      "confidence_penalty": -0.0,
+      "cost_efficiency": 0.0,
+      "classified_at": "2025-10-22T16:54:48.738367"
+    },
+    "collected_at": "2025-10-22T16:54:48.738369",
+    "data_id": "Sildenafil-induced drug reaction with eosinophilia_1761170088.73837"
+  }
+]

@@ -1,0 +1,62 @@
+# Production Environment Configuration
+# Overrides base configuration for production
+
+training:
+  episodes: 2000
+  max_steps_per_episode: 150
+  evaluation_frequency: 100
+  save_frequency: 200
+  learning_rate: 0.0005
+  batch_size: 64
+  memory_size: 50000
+
+agent:
+  state_dim: 20
+  action_dim: 10
+  hidden_dim: 256
+  network_layers: 4
+  dropout: 0.1
+  weight_decay: 1e-4
+
+model:
+  model_name: "MultiObjectiveRLAgent"
+  checkpoint_dir: "/opt/checkpoints"
+  model_registry_url: "https://model-registry.production.com"
+  model_version: "latest"
+  auto_save: true
+  save_best_only: true
+
+infrastructure:
+  num_workers: 8
+  prefetch_factor: 4
+  pin_memory: true
+  distributed: true
+  gpu_enabled: true
+  mixed_precision: true
+  gradient_checkpointing: true
+
+data:
+  data_path: "/opt/data/training"
+  cache_size: 100000
+  batch_size: 64
+  shuffle: true
+  validation_split: 0.2
+  augmentation: false
+  compression: "gzip"
+
+monitoring:
+  enable_metrics: true
+  metrics_port: 8000
+  log_level: "WARNING"
+  log_format: "json"
+  enable_tracing: true
+  trace_endpoint: "https://jaeger.production.com:14268/api/traces"
+
+security:
+  encryption_key: null  # Will be injected from secrets
+  vault_url: "https://vault.production.com:8200"
+  vault_token: null  # Will be injected from secrets
+  aws_region: "us-east-1"
+  aws_secrets_manager: true
+  enable_audit_logging: true
+  data_encryption: true

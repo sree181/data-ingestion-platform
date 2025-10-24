@@ -1,0 +1,53 @@
+# Staging Environment Configuration
+# Overrides base configuration for staging
+
+training:
+  episodes: 500
+  max_steps_per_episode: 75
+  evaluation_frequency: 25
+  save_frequency: 50
+  learning_rate: 0.005
+  batch_size: 24
+  memory_size: 5000
+
+agent:
+  state_dim: 20
+  action_dim: 10
+  hidden_dim: 96
+  network_layers: 3
+  dropout: 0.15
+
+infrastructure:
+  num_workers: 3
+  prefetch_factor: 2
+  pin_memory: true
+  distributed: false
+  gpu_enabled: true
+  mixed_precision: true
+  gradient_checkpointing: false
+
+data:
+  data_path: "data/staging"
+  cache_size: 5000
+  batch_size: 24
+  shuffle: true
+  validation_split: 0.25
+  augmentation: true
+  compression: "gzip"
+
+monitoring:
+  enable_metrics: true
+  metrics_port: 8000
+  log_level: "INFO"
+  log_format: "json"
+  enable_tracing: true
+  trace_endpoint: "http://localhost:14268/api/traces"
+
+security:
+  encryption_key: null
+  vault_url: "http://vault-staging:8200"
+  vault_token: null
+  aws_region: "us-east-1"
+  aws_secrets_manager: false
+  enable_audit_logging: true
+  data_encryption: true

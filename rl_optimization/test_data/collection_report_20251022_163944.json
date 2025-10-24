@@ -1,0 +1,37 @@
+{
+  "collection_summary": {
+    "total_collected": 2,
+    "valid_entries": 0,
+    "invalid_entries": 2,
+    "valid_rate": 0.0,
+    "avg_quality_score": 0.7,
+    "duration_seconds": null
+  },
+  "domain_distribution": {
+    "general_medicine": 2
+  },
+  "classification_distribution": {
+    "ICSR": 1,
+    "Non-ICSR": 1
+  },
+  "decision_path_distribution": {
+    "rule_based_only": 2
+  },
+  "quality_analysis": {
+    "total_issues": 2,
+    "total_warnings": 4,
+    "avg_issues_per_entry": 1.0,
+    "avg_warnings_per_entry": 2.0,
+    "most_common_issues": [
+      [
+        "Large discrepancy between feature confidence indicators and outcome confidence",
+        2
+      ]
+    ]
+  },
+  "recommendations": [
+    "Data quality is low - consider improving data collection process",
+    "Dataset is small - collect more data for better RL training",
+    "Consider collecting data from more diverse medical domains"
+  ]
+}

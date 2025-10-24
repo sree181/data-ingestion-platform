@@ -1,0 +1,44 @@
+[
+  {
+    "is_valid": false,
+    "quality_score": 0.75,
+    "issues": [
+      "Large discrepancy between feature confidence indicators and outcome confidence"
+    ],
+    "warnings": [
+      "Very low complexity score - document may be too simple"
+    ],
+    "recommendations": [],
+    "statistics": {
+      "word_count": 11,
+      "complexity_score": 0.0113,
+      "confidence": 0.85,
+      "processing_time_ms": 10,
+      "cost_estimate": 0.0,
+      "is_correct": true
+    }
+  },
+  {
+    "is_valid": false,
+    "quality_score": 0.65,
+    "issues": [
+      "Large discrepancy between feature confidence indicators and outcome confidence"
+    ],
+    "warnings": [
+      "Very low word count: 9",
+      "Very low complexity score - document may be too simple",
+      "Low overall confidence indicators"
+    ],
+    "recommendations": [
+      "Consider filtering out very short documents"
+    ],
+    "statistics": {
+      "word_count": 9,
+      "complexity_score": 0.0107,
+      "confidence": 0.78,
+      "processing_time_ms": 12,
+      "cost_estimate": 0.0,
+      "is_correct": true
+    }
+  }
+]

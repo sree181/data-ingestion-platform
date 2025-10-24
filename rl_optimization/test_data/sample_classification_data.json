@@ -1,0 +1,42 @@
+[
+  {
+    "title": "File Document 1",
+    "abstract": "This is a test document from file collection.",
+    "mesh_terms": [
+      "Case Reports"
+    ],
+    "publication_types": [
+      "Case Report"
+    ],
+    "classification": "ICSR",
+    "classification_confidence": 0.85,
+    "reasoning": "File-based classification",
+    "models_used": [
+      "rule_based"
+    ],
+    "decision_path": "rule_based_only",
+    "processing_time_ms": 10,
+    "cost_estimate": 0.0,
+    "true_classification": "ICSR"
+  },
+  {
+    "title": "File Document 2",
+    "abstract": "Another test document for file collection.",
+    "mesh_terms": [
+      "Review"
+    ],
+    "publication_types": [
+      "Review"
+    ],
+    "classification": "Non-ICSR",
+    "classification_confidence": 0.78,
+    "reasoning": "File-based classification",
+    "models_used": [
+      "rule_based"
+    ],
+    "decision_path": "rule_based_only",
+    "processing_time_ms": 12,
+    "cost_estimate": 0.0,
+    "true_classification": "Non-ICSR"
+  }
+]

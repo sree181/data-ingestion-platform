@@ -1,0 +1,19 @@
+{
+  "collection_summary": {
+    "total_collected": 0,
+    "valid_entries": 0,
+    "invalid_entries": 20,
+    "valid_rate": 0.0,
+    "avg_quality_score": 0,
+    "duration_seconds": null
+  },
+  "domain_distribution": {},
+  "classification_distribution": {},
+  "decision_path_distribution": {},
+  "quality_analysis": {},
+  "recommendations": [
+    "Data quality is low - consider improving data collection process",
+    "Dataset is small - collect more data for better RL training",
+    "Consider collecting data from more diverse medical domains"
+  ]
+}
