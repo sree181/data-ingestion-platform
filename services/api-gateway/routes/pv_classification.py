@@ -44,6 +44,7 @@ class ICSRProjectIngestRequest(BaseModel):
     """Request to ingest documents into ICSR project"""
     domain: str = Field(default="hepatotoxicity", description="Domain: hepatotoxicity | cardiotoxicity | neurotoxicity")
     max_articles: int = Field(default=50, ge=1, le=200, description="Maximum articles to ingest")
+    force_ensemble: bool = Field(default=False, description="Force all 3 models (Rule+BERT+LLM) to run for every document")
 
 
 class ICSRProjectIngestResponse(BaseModel):
@@ -57,7 +58,7 @@ class ICSRProjectIngestResponse(BaseModel):
 
 
 # Service URLs
-PV_CLASSIFICATION_SERVICE = "http://pv-classification-service:8012"
+PV_CLASSIFICATION_SERVICE = "http://pv-classification-service:8002"
 
 
 @router.get("/health")
@@ -115,7 +116,8 @@ async def ingest_and_classify_for_icsr_project(
             domain=request.domain,
             max_articles=request.max_articles,
             project_id="icsr",
-            user_id=user["user_id"]
+            user_id=user["user_id"],
+            force_ensemble=request.force_ensemble
         )
         
         processing_time = (datetime.utcnow() - start_time).total_seconds()

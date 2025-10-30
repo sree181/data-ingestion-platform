@@ -311,7 +311,7 @@ class UnifiedIngestionService:
                     logger.info(f"🔍 DEBUG: processing_options = {processing_options}")
                     if processing_options.get("enable_icsr_classification", False):
                         logger.info(f"🎯 Running ICSR classification for document {doc.id}")
-                        await self._classify_document_icsr(doc, space_id, ai_result)
+                        await self._classify_document_icsr(doc, space_id, ai_result, processing_options)
                     else:
                         logger.warning(f"⚠️ ICSR classification SKIPPED for {doc.id} - enable_icsr_classification is False")
                     
@@ -588,8 +588,10 @@ class UnifiedIngestionService:
             "errors": job.errors
         }
     
-    async def _classify_document_icsr(self, doc: UnifiedDocument, space_id: str, ai_results: Dict[str, Any]):
+    async def _classify_document_icsr(self, doc: UnifiedDocument, space_id: str, ai_results: Dict[str, Any], processing_options: Dict = None):
         """Classify document using PV Classification Service"""
+        if processing_options is None:
+            processing_options = {}
         try:
             import httpx
             
@@ -612,25 +614,49 @@ class UnifiedIngestionService:
                     "id": doc.id,
                     "title": doc.title or "",
                     "abstract": content  # Use the prepared content as abstract
-                }
+                },
+                "force_ensemble": processing_options.get('force_ensemble', False)
             }
+            
+            # Add LLM model selection if specified
+            model_name = processing_options.get('model_name', '')
+            if model_name:
+                # Map UI model names to LLM provider/model format
+                if 'gpt' in model_name.lower() or 'openai' in model_name.lower():
+                    classification_request['llm'] = {
+                        "provider": "openai",
+                        "model": model_name
+                    }
+                elif 'llama' in model_name.lower():
+                    classification_request['llm'] = {
+                        "provider": "ollama",
+                        "model": "llama3.1:8b"
+                    }
+                elif 'phi' in model_name.lower():
+                    classification_request['llm'] = {
+                        "provider": "ollama",
+                        "model": "phi3:mini"
+                    }
+            
+            # Debug logging
+            logger.info(f"🔍 DEBUG (unified): Sending classification for {doc.id}, force_ensemble={classification_request['force_ensemble']}, model={model_name}, llm={classification_request.get('llm', 'default')}")
             
             # Call PV Classification Service using ensemble endpoint
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    "http://pv-classification-service:8012/api/v1/classify/ensemble",
+                    "http://pv-classification-service:8002/api/v1/classify/ensemble",
                     json=classification_request,
                     timeout=60.0
                 )
                 
                 if response.status_code == 200:
                     response_data = response.json()
-                    # Extract the nested classification object
+                    # Extract the nested classification object for logging
                     classification_result = response_data.get("classification", {})
                     logger.info(f"✅ ICSR classification completed for {doc.id}: {classification_result.get('classification')} ({classification_result.get('confidence', 0):.2%})")
                     
-                    # Update Elasticsearch with classification results
-                    await self._update_document_classification(doc.id, classification_result, space_id)
+                    # Update Elasticsearch with FULL classification results (including ensemble_metadata)
+                    await self._update_document_classification(doc.id, response_data, space_id)
                     
                 else:
                     logger.warning(f"ICSR classification failed for {doc.id}: {response.status_code}")
@@ -644,22 +670,37 @@ class UnifiedIngestionService:
         try:
             import httpx
             
-            # Prepare update payload - use flat field names to match existing Elasticsearch mapping
-            # Extract scalar values from the classification_result dict
-            classification_value = classification_result.get("classification", "")
-            confidence_value = classification_result.get("confidence", 0.0)
-            entities_value = classification_result.get("key_entities", [])
-            reasoning_value = classification_result.get("reasoning", "")
-            cost_value = classification_result.get("cost", 0)
+            # Extract classification and ensemble metadata from response
+            cls_block = classification_result.get("classification", {})
+            meta = classification_result.get("ensemble_metadata", {})
+            
+            classification_label = cls_block.get("classification", "")
+            classification_conf = cls_block.get("confidence", 0.0)
+            classification_reason = cls_block.get("reasoning", "")
+            classification_entities = cls_block.get("key_entities", [])
+            
+            models_used = meta.get("models_used", [])
+            proc_time = meta.get("processing_time_ms", 0)
+            cost = meta.get("cost_estimate", 0.0)
+            decision_path = meta.get("decision_path", "")
+            individual_results = meta.get("individual_results", {})
             
             update_payload = {
                 "doc": {
-                    "classification": classification_value if isinstance(classification_value, str) else str(classification_value),
-                    "classification_confidence": float(confidence_value) if confidence_value else 0.0,
-                    "classification_entities": entities_value if isinstance(entities_value, list) else [],
-                    "classification_reasoning": reasoning_value if isinstance(reasoning_value, str) else str(reasoning_value),
-                    "classification_cost": float(cost_value) if cost_value else 0.0,
-                    "classified_at": datetime.utcnow().isoformat()
+                    "classification": classification_label,
+                    "classification_confidence": classification_conf,
+                    "classification_entities": classification_entities,
+                    "classification_reasoning": classification_reason,
+                    "classified_at": datetime.utcnow().isoformat(),
+                    "classification_model": classification_result.get("model", "pv-ensemble"),
+                    "ensemble_models_used": models_used,
+                    "decision_path": decision_path,
+                    "processing_time_ms": proc_time,
+                    "classification_cost": cost,
+                    "individual_results": individual_results,
+                    "processing_status": "classified",
+                    "ai_processed": True,
+                    "updated_at": datetime.utcnow().isoformat()
                 }
             }
             

@@ -469,7 +469,7 @@ async def process_single_file(file_path: str, space_id: str, job_id: str, proces
                 # If ICSR Classification is enabled, classify the document
                 if processing_options.get('enable_icsr_classification', False) and doc_id:
                     try:
-                        await classify_document_icsr(doc_id, ai_results, space_id)
+                        await classify_document_icsr(doc_id, ai_results, space_id, processing_options)
                         logger.info("ICSR classification completed", file=file_path, doc_id=doc_id)
                     except Exception as icsr_error:
                         logger.warning("Failed to classify document for ICSR (non-fatal)", 
@@ -620,8 +620,10 @@ async def process_batch_ingestion(job_id: str, request: BatchIngestionRequest, s
         logger.error("Batch ingestion failed", job_id=job_id, error=str(e))
 
 
-async def classify_document_icsr(doc_id: str, ai_results: Dict, space_id: str):
+async def classify_document_icsr(doc_id: str, ai_results: Dict, space_id: str, processing_options: Dict = None):
     """Classify document using PV Classification Service"""
+    if processing_options is None:
+        processing_options = {}
     try:
         import httpx
         
@@ -644,13 +646,19 @@ async def classify_document_icsr(doc_id: str, ai_results: Dict, space_id: str):
                 "id": doc_id,
                 "title": ai_results.get('title', ''),
                 "abstract": content  # Use the prepared content as abstract
-            }
+            },
+            "force_ensemble": processing_options.get('force_ensemble', False)
         }
+        
+        # Debug: Log what we're sending
+        logger.info(f"🔍 DEBUG: Sending classification request for {doc_id}")
+        logger.info(f"🔍 DEBUG: force_ensemble in request = {classification_request['force_ensemble']}")
+        logger.info(f"🔍 DEBUG: processing_options = {processing_options}")
         
         # Call PV Classification Service using ensemble endpoint
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                "http://pv-classification-service:8012/api/v1/classify/ensemble",
+                "http://pv-classification-service:8002/api/v1/classify/ensemble",
                 json=classification_request,
                 timeout=60.0
             )
@@ -675,15 +683,51 @@ async def update_document_classification(doc_id: str, classification_result: Dic
     try:
         import httpx
         
-        # Prepare update payload
+        # Debug: Log the classification_result structure
+        logger.info(f"🔍 DEBUG update_document_classification for {doc_id}")
+        logger.info(f"🔍 DEBUG classification_result keys: {list(classification_result.keys())}")
+        logger.info(f"🔍 DEBUG has ensemble_metadata: {'ensemble_metadata' in classification_result}")
+        
+        # Map ensemble response structure → flat fields expected by UI/ES
+        cls_block = classification_result.get("classification") or {}
+        if isinstance(cls_block, dict):
+            classification_label = cls_block.get("classification")
+            classification_conf = cls_block.get("confidence", 0.0)
+            classification_reason = cls_block.get("reasoning", "")
+            classification_entities = cls_block.get("key_entities", [])
+        else:
+            # Backward compatibility: top-level fields
+            classification_label = classification_result.get("classification")
+            classification_conf = classification_result.get("confidence", 0.0)
+            classification_reason = classification_result.get("reasoning", "")
+            classification_entities = classification_result.get("entities", [])
+
+        # Extract ensemble metadata if present (for UI badges)
+        meta = classification_result.get("ensemble_metadata", {}) if isinstance(classification_result, dict) else {}
+        models_used = meta.get("models_used", [])
+        proc_time = meta.get("processing_time_ms", 0)
+        cost = meta.get("cost_estimate", 0.0)
+        decision_path = meta.get("decision_path", "")
+        individual_results = meta.get("individual_results", {})
+
+        # Prepare update payload with normalized fields
         update_payload = {
             "doc": {
-                "classification": classification_result.get("classification"),
-                "classification_confidence": classification_result.get("confidence", 0.0),
-                "classification_entities": classification_result.get("entities", []),
-                "classification_reasoning": classification_result.get("reasoning", ""),
+                "classification": classification_label,
+                "classification_confidence": classification_conf,
+                "classification_entities": classification_entities,
+                "classification_reasoning": classification_reason,
                 "classified_at": datetime.utcnow().isoformat(),
-                "classification_model": classification_result.get("model", "unknown")
+                "classification_model": classification_result.get("model", "pv-ensemble"),
+                "ensemble_models_used": models_used,
+                "decision_path": decision_path,
+                "processing_time_ms": proc_time,
+                "classification_cost": cost,
+                "individual_results": individual_results,  # Full per-model breakdown
+                # Ensure UI badge logic sees it as classified
+                "processing_status": "classified",
+                "ai_processed": True,
+                "updated_at": datetime.utcnow().isoformat()
             }
         }
         

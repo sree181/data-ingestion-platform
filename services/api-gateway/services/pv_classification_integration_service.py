@@ -19,7 +19,7 @@ class PVClassificationIntegrationService:
     """
     
     def __init__(self):
-        self.pv_classification_url = "http://pv-classification-service:8012"
+        self.pv_classification_url = "http://pv-classification-service:8002"
         self.elasticsearch_url = "http://elasticsearch:9200"
         self.neo4j_url = "bolt://neo4j:7687"
         
@@ -28,7 +28,8 @@ class PVClassificationIntegrationService:
         domain: str,
         max_articles: int,
         project_id: str = "icsr",
-        user_id: str = None
+        user_id: str = None,
+        force_ensemble: bool = False
     ) -> Dict:
         """
         Complete workflow: Fetch → Store → Classify → Extract Entities
@@ -56,7 +57,7 @@ class PVClassificationIntegrationService:
         logger.info("Stored articles in Elasticsearch", count=stored_count)
         
         # Step 3: Classify articles
-        classifications = await self._classify_articles(articles)
+        classifications = await self._classify_articles(articles, force_ensemble=force_ensemble)
         logger.info("Classified articles", count=len(classifications))
         
         # Step 4: Update Elasticsearch with classifications
@@ -179,7 +180,7 @@ class PVClassificationIntegrationService:
             logger.error("Failed to store articles in Elasticsearch", error=str(e), exc_info=True)
             return 0
     
-    async def _classify_articles(self, articles: List[Dict]) -> List[Dict]:
+    async def _classify_articles(self, articles: List[Dict], force_ensemble: bool = False) -> List[Dict]:
         """
         Classify articles using PV classification service
         """
@@ -201,7 +202,7 @@ class PVClassificationIntegrationService:
                 # Use ensemble batch endpoint for 75% cost savings and 2.2x speed improvement
                 response = await client.post(
                     f"{self.pv_classification_url}/api/v1/classify/ensemble/batch",
-                    json={"documents": documents},
+                    json={"documents": documents, "force_ensemble": force_ensemble},
                     timeout=180.0
                 )
                 
@@ -227,30 +228,40 @@ class PVClassificationIntegrationService:
             
             # Create mapping of document_id to classification
             classification_map = {
-                c["document_id"]: c["classification"]
+                c["document_id"]: c
                 for c in classifications
             }
             
             # Update each document
             for article in articles:
                 if article["id"] in classification_map:
-                    classification = classification_map[article["id"]]
+                    cls_block_full = classification_map[article["id"]]
+                    cls_block = cls_block_full.get("classification", {})
+                    meta = cls_block_full.get("ensemble_metadata", {})
                     
                     update_doc = {
-                        "classification": classification["classification"],
-                        "classification_confidence": classification["confidence"],
-                        "classification_reasoning": classification["reasoning"],
+                        "classification": cls_block.get("classification"),
+                        "classification_confidence": cls_block.get("confidence"),
+                        "classification_reasoning": cls_block.get("reasoning", ""),
                         "classification_entities": [
                             {
                                 "entity": e["entity"],
                                 "type": e["type"],
-                                "confidence": e["confidence"],
-                                "relevance": e["relevance"]
+                                "confidence": e.get("confidence", 0.0),
+                                "relevance": e.get("relevance", "")
                             }
-                            for e in classification.get("key_entities", [])
+                            for e in cls_block.get("key_entities", [])
                         ],
-                        "regulatory_elements": classification.get("regulatory_elements", {}),
-                        "classified_at": datetime.utcnow().isoformat()
+                        "regulatory_elements": cls_block.get("regulatory_elements", {}),
+                        "ensemble_models_used": meta.get("models_used", []),
+                        "decision_path": meta.get("decision_path", ""),
+                        "processing_time_ms": meta.get("processing_time_ms", 0),
+                        "classification_cost": meta.get("cost_estimate", 0.0),
+                        "individual_results": meta.get("individual_results", {}),  # Full per-model breakdown
+                        "processing_status": "classified",
+                        "ai_processed": True,
+                        "classified_at": datetime.utcnow().isoformat(),
+                        "updated_at": datetime.utcnow().isoformat()
                     }
                     
                     try:

@@ -41,6 +41,7 @@ except Exception as e:
 
 # Import Ollama LLM classifier
 from ollama_llm_classifier import ollama_llm_classifier
+from llm_resolver import LLMResolver, llm_resolver
 
 # Configure logging
 structlog.configure(
@@ -97,6 +98,10 @@ class Document(BaseModel):
 class ClassificationRequest(BaseModel):
     """Request to classify a document"""
     document: Document
+    # Optional per-request LLM override
+    llm: Optional[Dict[str, str]] = Field(default=None, description="{ provider, model }")
+    # Force all three models to run (for comparison/validation)
+    force_ensemble: bool = Field(default=False, description="If True, always run Rule+BERT+LLM")
 
 
 class ClassificationResponse(BaseModel):
@@ -110,6 +115,9 @@ class ClassificationResponse(BaseModel):
 class BatchClassificationRequest(BaseModel):
     """Request to classify multiple documents"""
     documents: List[Document]
+    llm: Optional[Dict[str, str]] = Field(default=None, description="{ provider, model } for this batch")
+    # Force all three models to run for every document
+    force_ensemble: bool = Field(default=False, description="If True, always run Rule+BERT+LLM for all docs")
 
 
 class BatchClassificationResponse(BaseModel):
@@ -123,46 +131,59 @@ class BatchClassificationResponse(BaseModel):
 # Classification Prompts
 PHARMACOVIGILANCE_EXPERT_PROMPT = """
 You are an expert pharmacovigilance (PV) reviewer trained in EMA GVP Module VI and FDA FAERS reporting standards.
-Your goal is to classify biomedical literature records (titles + abstracts) into pharmacovigilance categories based on the
-presence and completeness of Individual Case Safety Report (ICSR) information.
+Your goal is to classify biomedical literature records into pharmacovigilance categories based on ICH E2D and WHO-UMC principles.
 
-Follow ICH E2D and WHO-UMC principles:
-An ICSR must describe at least one identifiable patient, one identifiable reporter, one suspected medicinal product,
-and one suspected adverse event (AE).
+An ICSR must describe: (1) identifiable patient, (2) identifiable reporter, (3) suspected medicinal product, (4) suspected adverse event.
 
-Possible output categories:
+**Classification Categories:**
 
 1. **ICSR (Individual Case Safety Report)**
-   The article clearly describes one or more identifiable patient cases where:
-   - A medicinal product was administered/exposed;
-   - An adverse event, reaction, or outcome was observed;
-   - Sufficient clinical detail exists (age/sex, timeline, dose, dechallenge/rechallenge, outcome);
-   - The report can be used for regulatory PV case processing.
+   - Describes one or more identifiable patient cases with drug-event relationship
+   - Contains: patient demographics, drug administered, adverse event, temporal relationship
+   - Suitable for regulatory PV case processing
+   - Examples: "A 45-year-old female developed rash after penicillin", "Case of hepatotoxicity following drug X"
 
-2. **Non-ICSR**
-   The article concerns drugs or AEs but **does not contain identifiable patient-level data**.
-   Examples: reviews, RCTs, mechanistic studies, meta-analyses, signal-detection studies, animal or in-vitro research.
+2. **Safety_Information**
+   - Discusses drug safety, tolerability, or adverse events at population/aggregate level
+   - NO individual patient cases, but safety-relevant information
+   - Examples: Clinical trial safety data, post-marketing surveillance, meta-analyses of safety, pharmacovigilance studies
+   - Keywords: "safety profile", "tolerability", "adverse events in clinical trial", "post-marketing surveillance"
 
-3. **Safety_Information**
-   The article discusses safety, toxicity, or risk without individual cases.
-   Examples:
-   - Reports of dose-response, adverse-effect mechanisms, or class safety;
-   - Epidemiological or pharmacological safety data;
-   - Aggregated summaries of spontaneous reports.
+3. **Non-ICSR**
+   - Concerns drugs/diseases but NOT safety-focused and NOT individual cases
+   - Examples: Mechanistic studies, reviews (non-safety), efficacy studies, pharmacokinetics, guidelines
+   - Keywords: "mechanism", "pathophysiology", "review of", "guidelines", "in vitro", "animal model"
 
 4. **Rejected**
-   The article is irrelevant for PV purposes.
-   Examples:
-   - No medicinal product or AE mentioned;
-   - Editorials, news, letters without scientific case data;
-   - Animal/in-vitro studies outside PV scope;
-   - Diagnostic or therapeutic method papers unrelated to safety.
+   - Irrelevant for pharmacovigilance purposes
+   - Examples: Retracted articles, duplicates, insufficient information, non-drug topics
+   - Keywords: "RETRACTED", "DUPLICATE", very short abstracts (<50 words)
 
-You must produce a structured JSON output that includes the classification label, confidence score,
-a rationale explaining the decision, and extracted evidence.
+**Classification Examples:**
 
-Be conservative when labeling ICSR: only classify as ICSR if the core four elements (drug, event, patient, reporter context)
-are clearly or strongly implied.
+Example 1 - ICSR:
+Title: "Severe allergic rash in a 50-year-old patient after amoxicillin"
+Abstract: "A 50-year-old male developed widespread urticaria 2 hours after receiving amoxicillin 500mg..."
+→ Classification: ICSR, Confidence: 0.90
+→ Reasoning: Clear patient case with drug, adverse event, and temporal relationship
+
+Example 2 - Safety_Information:
+Title: "Safety and tolerability of Drug X in Phase III trial"
+Abstract: "450 patients received Drug X. Adverse events included headache (12%), nausea (8%)..."
+→ Classification: Safety_Information, Confidence: 0.85
+→ Reasoning: Clinical trial safety data with aggregate adverse event rates, not individual cases
+
+Example 3 - Non-ICSR:
+Title: "Mechanisms of drug-induced liver injury: a review"
+Abstract: "This review discusses molecular pathways involved in hepatotoxicity..."
+→ Classification: Non-ICSR, Confidence: 0.90
+→ Reasoning: Review article about mechanisms, not safety data or individual cases
+
+Example 4 - Rejected:
+Title: "RETRACTED: Case report of adverse reaction"
+Abstract: "This article has been retracted due to data fabrication..."
+→ Classification: Rejected, Confidence: 0.95
+→ Reasoning: Retracted publication, not suitable for PV purposes
 
 **Document to Classify:**
 
@@ -174,22 +195,24 @@ are clearly or strongly implied.
 
 **Publication Types:** {publication_types}
 
-**Instructions:**
-1. Identify the four core ICSR elements:
-   - Identifiable patient (age, gender, demographics)
-   - Medicinal product (drug name, vaccine, etc.)
-   - Adverse event/reaction (specific outcome)
-   - Reporter context (case report, clinical observation)
+**Classification Instructions:**
+1. Identify if this describes individual patient case(s) → likely ICSR
+2. Check if it's aggregate safety data (trial, surveillance) → likely Safety_Information
+3. Check if it's mechanistic/review without safety focus → likely Non-ICSR
+4. Check for retraction/duplicate/insufficient data → likely Rejected
+5. Use publication types and MeSH terms as strong signals
+6. Assign appropriate confidence based on clarity of evidence
 
-2. Assess completeness and regulatory relevance
-
-3. Classify conservatively
+**Confidence Guidelines:**
+- High confidence (0.85-0.95): Clear, unambiguous classification
+- Moderate confidence (0.65-0.84): Some ambiguity but leaning toward one class
+- Low confidence (0.50-0.64): Uncertain, borderline case
 
 **Output Format (JSON only, no additional text):**
 {{
-  "classification": "ICSR|Non-ICSR|Safety_Information|Rejected",
-  "confidence": 0.0-1.0,
-  "reasoning": "2-4 sentences explaining the classification decision based on ICH E2D principles",
+  "classification": "ICSR|Safety_Information|Non-ICSR|Rejected",
+  "confidence": 0.50-0.95,
+  "reasoning": "2-4 sentences explaining the classification decision with specific evidence from the document",
   "key_entities": [
     {{
       "entity": "extracted text",
@@ -295,9 +318,12 @@ class PVClassificationService:
             )
             
             # Call OpenAI API
-            response = await self.client.chat.completions.create(
-                model=self.model,
-                messages=[
+            # Check if model supports JSON mode (gpt-4-turbo, gpt-4o, gpt-4o-mini, but NOT gpt-4)
+            supports_json_mode = "turbo" in self.model.lower() or "gpt-4o" in self.model.lower() or "gpt-3.5" in self.model.lower()
+            
+            api_params = {
+                "model": self.model,
+                "messages": [
                     {
                         "role": "system",
                         "content": "You are an expert pharmacovigilance reviewer. Always respond with valid JSON only, no additional text."
@@ -307,10 +333,15 @@ class PVClassificationService:
                         "content": prompt
                     }
                 ],
-                response_format={"type": "json_object"},
-                temperature=0.3,
-                max_tokens=2000
-            )
+                "temperature": 0.5,
+                "max_tokens": 2000
+            }
+            
+            # Only add response_format for models that support it
+            if supports_json_mode:
+                api_params["response_format"] = {"type": "json_object"}
+            
+            response = await self.client.chat.completions.create(**api_params)
             
             message_content = response.choices[0].message.content
             
@@ -319,11 +350,11 @@ class PVClassificationService:
                 classification_data = json.loads(message_content)
             except json.JSONDecodeError as e:
                 logger.error("Failed to parse GPT response", error=str(e), content=message_content[:200])
-                # Fallback classification
+                # Fallback classification with low confidence
                 classification_data = {
                     "classification": "Non-ICSR",
-                    "confidence": 0.5,
-                    "reasoning": "Failed to parse LLM response, defaulting to Non-ICSR",
+                    "confidence": 0.3,
+                    "reasoning": "Failed to parse LLM response, defaulting to Non-ICSR with low confidence",
                     "key_entities": [],
                     "regulatory_elements": {}
                 }
@@ -401,6 +432,7 @@ pv_service = PVClassificationService()
 
 # Initialize ensemble classifier (will be done in startup event)
 ensemble = None
+resolver: Optional[LLMResolver] = None
 
 # Include RL router (if available)
 if RL_AVAILABLE:
@@ -410,7 +442,7 @@ if RL_AVAILABLE:
 @app.on_event("startup")
 async def startup_event():
     """Initialize services on startup"""
-    global ensemble
+    global ensemble, resolver
     
     print("🚀 Starting PV Classification Service")
     print("=" * 50)
@@ -435,6 +467,16 @@ async def startup_event():
         ensemble = EnsembleClassifier(llm_classifier=None)
         print("✅ Ensemble classifier initialized (Rule-based + BERT only)")
     
+    # Initialize LLM resolver (options + current selection)
+    try:
+        global llm_resolver
+        resolver = LLMResolver(ollama_client=ollama_llm_classifier.client)
+        await resolver.initialize()
+        llm_resolver = resolver
+        print("✅ LLM Resolver initialized")
+    except Exception as e:
+        print(f"⚠️  Failed to initialize LLM Resolver: {e}")
+
     print("=" * 50)
     print("🎯 Service ready for document classification!")
 
@@ -482,16 +524,56 @@ async def classify_document_ensemble(request: ClassificationRequest):
     Uses rule-based → BERT → LLM cascade for optimal speed/cost/accuracy
     """
     try:
+        print("🔍 DEBUG: Endpoint called", flush=True)
+        logger.info("🔍 Ensemble classify endpoint called", document_id=request.document.id)
+        
         start_time = datetime.utcnow()
         
+        print(f"🔍 DEBUG: About to call ensemble.classify", flush=True)
+        print(f"🔍 DEBUG: force_ensemble parameter = {request.force_ensemble}", flush=True)
+        print(f"🔍 DEBUG: request.llm = {request.llm}", flush=True)
+        logger.info("🔍 Starting ensemble classification", force_ensemble=request.force_ensemble)
+        
+        # Choose LLM based on override or selection
+        effective = resolver.resolve(request.llm) if resolver else {"provider": "ollama", "model": "llama3.1:8b"}
+        print(f"🔍 DEBUG: Effective LLM = {effective}", flush=True)
+        
+        # Swap ensemble.llm_classifier to match selection
+        if effective.get("provider") == "ollama":
+            print(f"🔍 DEBUG: Using Ollama classifier", flush=True)
+            ensemble.llm_classifier = ollama_llm_classifier
+        else:
+            print(f"🔍 DEBUG: Using OpenAI classifier (pv_service)", flush=True)
+            # Configure PV service to use OpenAI (not Ollama)
+            pv_service.use_ollama = False
+            # Ensure OpenAI client is initialized
+            if not hasattr(pv_service, 'client') or pv_service.client is None:
+                openai_api_key = os.getenv("OPENAI_API_KEY")
+                if openai_api_key:
+                    pv_service.client = AsyncOpenAI(api_key=openai_api_key)
+                    pv_service.model = effective.get("model", "gpt-4o-mini")  # Use the requested model
+                    print(f"🔍 DEBUG: OpenAI client initialized with model {pv_service.model}", flush=True)
+                else:
+                    print(f"⚠️  WARNING: No OpenAI API key, falling back to Ollama", flush=True)
+                    pv_service.use_ollama = True
+            else:
+                # Update model if different
+                pv_service.model = effective.get("model", "gpt-4o-mini")
+                print(f"🔍 DEBUG: Using existing OpenAI client with model {pv_service.model}", flush=True)
+            # Use PV service as OpenAI adapter
+            ensemble.llm_classifier = pv_service
+
         # Run ensemble classification
         ensemble_result = await ensemble.classify(
             title=request.document.title,
             abstract=request.document.abstract,
             mesh_terms=request.document.mesh_terms,
             publication_types=request.document.publication_types,
-            force_ensemble=False  # Use smart cascade
+            force_ensemble=request.force_ensemble  # Honor request parameter
         )
+        
+        print(f"🔍 DEBUG: Ensemble classification complete", flush=True)
+        logger.info("🔍 Ensemble classification returned successfully")
         
         processing_time = (datetime.utcnow() - start_time).total_seconds()
         logger.info(
@@ -583,6 +665,13 @@ async def classify_batch_ensemble(request: BatchClassificationRequest):
         
         logger.info(f"Starting ensemble batch classification for {len(request.documents)} documents")
         
+        # Choose LLM per batch
+        effective = resolver.resolve(request.llm) if resolver else {"provider": "ollama", "model": "llama3.1:8b"}
+        if effective.get("provider") == "ollama":
+            ensemble.llm_classifier = ollama_llm_classifier
+        else:
+            ensemble.llm_classifier = pv_service
+
         # Classify documents in parallel using ensemble
         tasks = [
             ensemble.classify(
@@ -590,7 +679,7 @@ async def classify_batch_ensemble(request: BatchClassificationRequest):
                 abstract=doc.abstract,
                 mesh_terms=doc.mesh_terms,
                 publication_types=doc.publication_types,
-                force_ensemble=False
+                force_ensemble=request.force_ensemble  # Honor request parameter
             )
             for doc in request.documents
         ]
@@ -669,6 +758,37 @@ async def classify_batch_ensemble(request: BatchClassificationRequest):
     except Exception as e:
         logger.error("Ensemble batch classification error", error=str(e), exc_info=True)
         raise HTTPException(status_code=500, detail=f"Ensemble batch classification failed: {str(e)}")
+
+
+# LLM model management endpoints
+@app.get("/api/v1/llm/options")
+async def get_llm_options():
+    if not resolver:
+        raise HTTPException(status_code=503, detail="LLM resolver not initialized")
+    return {"options": resolver.get_options()}
+
+
+@app.get("/api/v1/llm/selection")
+async def get_llm_selection():
+    if not resolver:
+        raise HTTPException(status_code=503, detail="LLM resolver not initialized")
+    return resolver.get_selection()
+
+
+class LLMSelection(BaseModel):
+    provider: str
+    model: str
+
+
+@app.post("/api/v1/llm/selection")
+async def set_llm_selection(selection: LLMSelection):
+    if not resolver:
+        raise HTTPException(status_code=503, detail="LLM resolver not initialized")
+    try:
+        updated = resolver.set_selection(selection.provider, selection.model)
+        return updated
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/api/v1/stats")

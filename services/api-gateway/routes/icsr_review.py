@@ -16,7 +16,7 @@ logger = structlog.get_logger(__name__)
 router = APIRouter(prefix="/api/v1/icsr", tags=["ICSR Review"])
 
 # Configuration
-PV_CLASSIFICATION_SERVICE = "http://pv-classification-service:8012"
+PV_CLASSIFICATION_SERVICE = "http://pv-classification-service:8002"
 ELASTICSEARCH_HOST = "http://elasticsearch:9200"
 
 

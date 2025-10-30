@@ -256,6 +256,7 @@ function EnhancedProjectSpacesOptimized() {
   const [enableEntityExtraction, setEnableEntityExtraction] = useState(true);
   const [enableRelationshipExtraction, setEnableRelationshipExtraction] = useState(true);
   const [enableICSRClassification, setEnableICSRClassification] = useState(false);
+  const [forceEnsemble, setForceEnsemble] = useState(false);
   const [isIngesting, setIsIngesting] = useState(false);
   const [ingestionJobId, setIngestionJobId] = useState(null);
   const [ingestionProgress, setIngestionProgress] = useState(0);
@@ -519,7 +520,8 @@ function EnhancedProjectSpacesOptimized() {
           enable_ai_analysis: enableAIAnalysis,
           enable_entity_extraction: enableEntityExtraction,
           enable_relationship_extraction: enableRelationshipExtraction,
-          enable_icsr_classification: enableICSRClassification
+          enable_icsr_classification: enableICSRClassification,
+          force_ensemble: forceEnsemble
         }
       });
 
@@ -1646,7 +1648,8 @@ Type "DELETE ALL" to confirm:`;
           enable_ai_analysis: enableAIAnalysis,
           enable_entity_extraction: enableEntityExtraction,
           enable_relationship_extraction: enableRelationshipExtraction,
-          enable_icsr_classification: enableICSRClassification
+          enable_icsr_classification: enableICSRClassification,
+          force_ensemble: forceEnsemble
         }
       };
       
@@ -2572,10 +2575,27 @@ Type "DELETE ALL" to confirm:`;
                           }}>
                             <Typography variant="body2" sx={{ 
                               color: 'text.secondary',
-                              fontStyle: 'italic'
+                              fontStyle: 'italic',
+                              mb: 1
                             }}>
                               💡 <strong>ICSR Classification</strong> automatically identifies Individual Case Safety Reports for pharmacovigilance compliance
                             </Typography>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={forceEnsemble}
+                                  onChange={(e) => setForceEnsemble(e.target.checked)}
+                                  color="secondary"
+                                  size="small"
+                                />
+                              }
+                              label="Force Full Ensemble (Run Rule+BERT+LLM for all documents)"
+                              sx={{ 
+                                fontWeight: 500,
+                                color: 'text.secondary',
+                                fontSize: '0.875rem'
+                              }}
+                            />
                           </Box>
                         )}
                       </Box>

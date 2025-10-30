@@ -18,6 +18,12 @@ import {
   ListItemText,
   ListItemIcon,
   Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -193,7 +199,7 @@ function DocumentViewer() {
                 <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
                   ⚡ Ensemble Classification Details
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
                   {document.ensemble_models_used && document.ensemble_models_used.length > 0 && (
                     <Box>
                       <Typography variant="body2" sx={{ fontWeight: 600, color: '#7b1fa2' }}>
@@ -239,6 +245,97 @@ function DocumentViewer() {
                     </Box>
                   )}
                 </Box>
+                
+                {/* Per-Model Results Table */}
+                {document.individual_results && Object.keys(document.individual_results).length > 0 && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1, color: '#7b1fa2' }}>
+                      📊 Per-Model Results (Force Ensemble Mode)
+                    </Typography>
+                    <TableContainer component={Paper} variant="outlined" sx={{ maxWidth: '100%', overflow: 'auto' }}>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Model</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Classification</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Confidence</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Reasoning</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {['rule_based', 'bert', 'llm'].map((modelKey) => {
+                            const modelResult = document.individual_results[modelKey];
+                            if (!modelResult) return null;
+                            return (
+                              <TableRow key={modelKey}>
+                                <TableCell>
+                                  <Chip 
+                                    label={modelKey.replace('_', '-').toUpperCase()} 
+                                    size="small" 
+                                    sx={{ 
+                                      backgroundColor: modelKey === 'rule_based' ? '#e3f2fd' : modelKey === 'bert' ? '#f3e5f5' : '#fff3e0',
+                                      color: modelKey === 'rule_based' ? '#1976d2' : modelKey === 'bert' ? '#7b1fa2' : '#e65100',
+                                      fontWeight: 600
+                                    }} 
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Chip 
+                                    label={modelResult.classification || 'N/A'} 
+                                    size="small" 
+                                    sx={{ 
+                                      backgroundColor: modelResult.classification === 'ICSR' ? '#ffebee' : 
+                                                      modelResult.classification === 'Safety_Information' ? '#e3f2fd' : '#e1f5fe',
+                                      color: modelResult.classification === 'ICSR' ? '#d32f2f' : 
+                                             modelResult.classification === 'Safety_Information' ? '#1976d2' : '#0288d1',
+                                      fontWeight: 600
+                                    }} 
+                                  />
+                                </TableCell>
+                                <TableCell>{((modelResult.confidence || 0) * 100).toFixed(0)}%</TableCell>
+                                <TableCell sx={{ maxWidth: '300px', fontSize: '0.875rem' }}>
+                                  {(modelResult.reasoning || 'N/A').substring(0, 100)}{(modelResult.reasoning || '').length > 100 ? '...' : ''}
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                          {/* Final Verdict Row */}
+                          <TableRow sx={{ backgroundColor: '#f5f5f5', borderTop: '2px solid #9e9e9e' }}>
+                            <TableCell sx={{ fontWeight: 'bold' }}>
+                              <Chip 
+                                label="FINAL VERDICT" 
+                                size="small" 
+                                sx={{ 
+                                  backgroundColor: '#9c27b0',
+                                  color: 'white',
+                                  fontWeight: 700
+                                }} 
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Chip 
+                                label={document.classification || 'N/A'} 
+                                size="small" 
+                                sx={{ 
+                                  backgroundColor: document.classification === 'ICSR' ? '#d32f2f' : 
+                                                  document.classification === 'Safety_Information' ? '#1976d2' : '#0288d1',
+                                  color: 'white',
+                                  fontWeight: 700
+                                }} 
+                              />
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>
+                              {(document.classification_confidence * 100).toFixed(0)}%
+                            </TableCell>
+                            <TableCell sx={{ fontStyle: 'italic', fontSize: '0.875rem' }}>
+                              Ensemble vote from {document.ensemble_models_used?.length || 0} model(s)
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Box>
+                )}
               </Alert>
             )}
           </Box>

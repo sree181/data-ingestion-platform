@@ -1,0 +1,333 @@
+{
+  "test_date": "2025-10-30T00:44:37.366118",
+  "total_tests": 20,
+  "passed_tests": 6,
+  "failed_tests": 14,
+  "pass_rate": 0.3,
+  "results": [
+    {
+      "test_name": "ICSR - Severe Allergic Rash with Anaphylaxis",
+      "status": "passed",
+      "expected": "ICSR",
+      "predicted": "ICSR",
+      "confidence": 0.95,
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time": 0.015613794326782227,
+      "class_match": true,
+      "confidence_ok": true,
+      "models_ok": true
+    },
+    {
+      "test_name": "ICSR - Stevens-Johnson Syndrome",
+      "status": "passed",
+      "expected": "ICSR",
+      "predicted": "ICSR",
+      "confidence": 0.95,
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time": 0.0037870407104492188,
+      "class_match": true,
+      "confidence_ok": true,
+      "models_ok": true
+    },
+    {
+      "test_name": "ICSR - Drug-Induced Hepatotoxicity",
+      "status": "failed",
+      "expected": "ICSR",
+      "predicted": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time": 2.894843101501465,
+      "class_match": false,
+      "confidence_ok": false,
+      "models_ok": true
+    },
+    {
+      "test_name": "ICSR - Complex Multi-Drug Reaction",
+      "status": "passed",
+      "expected": "ICSR",
+      "predicted": "ICSR",
+      "confidence": 0.95,
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time": 0.008281230926513672,
+      "class_match": true,
+      "confidence_ok": true,
+      "models_ok": true
+    },
+    {
+      "test_name": "ICSR - Pediatric Allergic Reaction",
+      "status": "passed",
+      "expected": "ICSR",
+      "predicted": "ICSR",
+      "confidence": 0.95,
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time": 0.0059931278228759766,
+      "class_match": true,
+      "confidence_ok": true,
+      "models_ok": true
+    },
+    {
+      "test_name": "Safety_Info - Clinical Trial Safety Analysis",
+      "status": "failed",
+      "expected": "Safety_Information",
+      "predicted": "Non-ICSR",
+      "confidence": 0.95,
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time": 0.004867076873779297,
+      "class_match": false,
+      "confidence_ok": true,
+      "models_ok": true
+    },
+    {
+      "test_name": "Safety_Info - Post-Marketing Surveillance",
+      "status": "failed",
+      "expected": "Safety_Information",
+      "predicted": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time": 2.2404000759124756,
+      "class_match": false,
+      "confidence_ok": false,
+      "models_ok": true
+    },
+    {
+      "test_name": "Safety_Info - Meta-Analysis",
+      "status": "failed",
+      "expected": "Safety_Information",
+      "predicted": "Non-ICSR",
+      "confidence": 0.95,
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time": 0.00584721565246582,
+      "class_match": false,
+      "confidence_ok": true,
+      "models_ok": true
+    },
+    {
+      "test_name": "Safety_Info - Pregnancy Safety Study",
+      "status": "failed",
+      "expected": "Safety_Information",
+      "predicted": "Non-ICSR",
+      "confidence": 0.41619047619047617,
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time": 2.1442461013793945,
+      "class_match": false,
+      "confidence_ok": false,
+      "models_ok": true
+    },
+    {
+      "test_name": "Non-ICSR - Review Article",
+      "status": "passed",
+      "expected": "Non-ICSR",
+      "predicted": "Non-ICSR",
+      "confidence": 0.95,
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time": 0.005911827087402344,
+      "class_match": true,
+      "confidence_ok": true,
+      "models_ok": true
+    },
+    {
+      "test_name": "Non-ICSR - Mechanistic Study",
+      "status": "failed",
+      "expected": "Non-ICSR",
+      "predicted": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time": 2.063084125518799,
+      "class_match": true,
+      "confidence_ok": false,
+      "models_ok": true
+    },
+    {
+      "test_name": "Non-ICSR - Epidemiological Study",
+      "status": "failed",
+      "expected": "Non-ICSR",
+      "predicted": "Non-ICSR",
+      "confidence": 0.47095238095238096,
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time": 2.3162097930908203,
+      "class_match": true,
+      "confidence_ok": false,
+      "models_ok": true
+    },
+    {
+      "test_name": "Non-ICSR - Clinical Guidelines",
+      "status": "failed",
+      "expected": "Non-ICSR",
+      "predicted": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time": 2.239103078842163,
+      "class_match": true,
+      "confidence_ok": false,
+      "models_ok": true
+    },
+    {
+      "test_name": "Rejected - Retracted Article",
+      "status": "failed",
+      "expected": "Rejected",
+      "predicted": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time": 1.9045701026916504,
+      "class_match": false,
+      "confidence_ok": false,
+      "models_ok": true
+    },
+    {
+      "test_name": "Rejected - Duplicate Publication",
+      "status": "failed",
+      "expected": "Rejected",
+      "predicted": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time": 2.502479076385498,
+      "class_match": false,
+      "confidence_ok": false,
+      "models_ok": true
+    },
+    {
+      "test_name": "Rejected - Insufficient Information",
+      "status": "failed",
+      "expected": "Rejected",
+      "predicted": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time": 1.4409868717193604,
+      "class_match": false,
+      "confidence_ok": false,
+      "models_ok": true
+    },
+    {
+      "test_name": "Edge Case - Case Series (Borderline)",
+      "status": "failed",
+      "expected": "ICSR",
+      "predicted": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time": 2.0234761238098145,
+      "class_match": false,
+      "confidence_ok": false,
+      "models_ok": true
+    },
+    {
+      "test_name": "Edge Case - No Metadata (Text Only)",
+      "status": "passed",
+      "expected": "ICSR",
+      "predicted": "ICSR",
+      "confidence": 0.7424999999999999,
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time": 2.088747978210449,
+      "class_match": true,
+      "confidence_ok": true,
+      "models_ok": true
+    },
+    {
+      "test_name": "Edge Case - Conflicting Signals",
+      "status": "failed",
+      "expected": "ICSR",
+      "predicted": "Non-ICSR",
+      "confidence": 0.95,
+      "models_used": [
+        "rule_based"
+      ],
+      "decision_path": "rule_based_only",
+      "processing_time": 0.00792694091796875,
+      "class_match": false,
+      "confidence_ok": true,
+      "models_ok": true
+    },
+    {
+      "test_name": "Edge Case - Perfect ICSR (All Signals)",
+      "status": "failed",
+      "expected": "ICSR",
+      "predicted": "Non-ICSR",
+      "confidence": 0.42000000000000004,
+      "models_used": [
+        "rule_based",
+        "bert",
+        "llm"
+      ],
+      "decision_path": "full_ensemble",
+      "processing_time": 2.508526086807251,
+      "class_match": false,
+      "confidence_ok": false,
+      "models_ok": true
+    }
+  ]
+}

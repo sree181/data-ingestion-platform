@@ -27,22 +27,87 @@ class OllamaLLMClassifier:
         self.timeout = timeout
         self.client = None
         
-        # Classification prompt template
+        # Classification prompt template (aligned with OpenAI prompt)
         self.classification_prompt = """
-You are a medical literature classification expert. Classify the following document into one of these categories:
+You are an expert pharmacovigilance (PV) reviewer trained in EMA GVP Module VI and FDA FAERS reporting standards.
+Your goal is to classify biomedical literature records into pharmacovigilance categories based on ICH E2D and WHO-UMC principles.
 
-1. **ICSR** (Individual Case Safety Report) - Individual patient case reports of adverse drug reactions
-2. **Safety_Information** - General safety information, warnings, or guidelines
-3. **Non-ICSR** - Research studies, reviews, or other non-case report literature
-4. **Rejected** - Not relevant to pharmacovigilance
+An ICSR must describe: (1) identifiable patient, (2) identifiable reporter, (3) suspected medicinal product, (4) suspected adverse event.
 
-Document Information:
-Title: {title}
-Abstract: {abstract}
-MeSH Terms: {mesh_terms}
-Publication Type: {publication_types}
+**Classification Categories:**
 
-Respond with ONLY the classification category name (ICSR, Safety_Information, Non-ICSR, or Rejected) and a brief reasoning.
+1. **ICSR (Individual Case Safety Report)**
+   - Describes one or more identifiable patient cases with drug-event relationship
+   - Contains: patient demographics, drug administered, adverse event, temporal relationship
+   - Suitable for regulatory PV case processing
+   - Examples: "A 45-year-old female developed rash after penicillin", "Case of hepatotoxicity following drug X"
+
+2. **Safety_Information**
+   - Discusses drug safety, tolerability, or adverse events at population/aggregate level
+   - NO individual patient cases, but safety-relevant information
+   - Examples: Clinical trial safety data, post-marketing surveillance, meta-analyses of safety, pharmacovigilance studies
+   - Keywords: "safety profile", "tolerability", "adverse events in clinical trial", "post-marketing surveillance"
+
+3. **Non-ICSR**
+   - Concerns drugs/diseases but NOT safety-focused and NOT individual cases
+   - Examples: Mechanistic studies, reviews (non-safety), efficacy studies, pharmacokinetics, guidelines
+   - Keywords: "mechanism", "pathophysiology", "review of", "guidelines", "in vitro", "animal model"
+
+4. **Rejected**
+   - Irrelevant for pharmacovigilance purposes
+   - Examples: Retracted articles, duplicates, insufficient information, non-drug topics
+   - Keywords: "RETRACTED", "DUPLICATE", very short abstracts (<50 words)
+
+**Classification Examples:**
+
+Example 1 - ICSR:
+Title: "Severe allergic rash in a 50-year-old patient after amoxicillin"
+Abstract: "A 50-year-old male developed widespread urticaria 2 hours after receiving amoxicillin 500mg..."
+→ Classification: ICSR, Confidence: 0.90
+→ Reasoning: Clear patient case with drug, adverse event, and temporal relationship
+
+Example 2 - Safety_Information:
+Title: "Safety and tolerability of Drug X in Phase III trial"
+Abstract: "450 patients received Drug X. Adverse events included headache (12%), nausea (8%)..."
+→ Classification: Safety_Information, Confidence: 0.85
+→ Reasoning: Clinical trial safety data with aggregate adverse event rates, not individual cases
+
+Example 3 - Non-ICSR:
+Title: "Mechanisms of drug-induced liver injury: a review"
+Abstract: "This review discusses molecular pathways involved in hepatotoxicity..."
+→ Classification: Non-ICSR, Confidence: 0.90
+→ Reasoning: Review article about mechanisms, not safety data or individual cases
+
+Example 4 - Rejected:
+Title: "RETRACTED: Case report of adverse reaction"
+Abstract: "This article has been retracted due to data fabrication..."
+→ Classification: Rejected, Confidence: 0.95
+→ Reasoning: Retracted publication, not suitable for PV purposes
+
+**Document to Classify:**
+
+**Title:** {title}
+
+**Abstract:** {abstract}
+
+**MeSH Terms:** {mesh_terms}
+
+**Publication Types:** {publication_types}
+
+**Classification Instructions:**
+1. Identify if this describes individual patient case(s) → likely ICSR
+2. Check if it's aggregate safety data (trial, surveillance) → likely Safety_Information
+3. Check if it's mechanistic/review without safety focus → likely Non-ICSR
+4. Check for retraction/duplicate/insufficient data → likely Rejected
+5. Use publication types and MeSH terms as strong signals
+6. Assign appropriate confidence based on clarity of evidence
+
+**Confidence Guidelines:**
+- High confidence (0.85-0.95): Clear, unambiguous classification
+- Moderate confidence (0.65-0.84): Some ambiguity but leaning toward one class
+- Low confidence (0.50-0.64): Uncertain, borderline case
+
+Respond with the classification category (ICSR, Safety_Information, Non-ICSR, or Rejected), confidence score (0.50-0.95), and brief reasoning (2-3 sentences).
 
 Classification:"""
 
@@ -112,9 +177,9 @@ Classification:"""
                 "prompt": prompt,
                 "stream": False,
                 "options": {
-                    "temperature": 0.1,  # Low temperature for consistent classification
+                    "temperature": 0.5,  # Increased from 0.1 for more variation
                     "top_p": 0.9,
-                    "max_tokens": 200
+                    "max_tokens": 500  # Increased for detailed reasoning
                 }
             })
             

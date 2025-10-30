@@ -69,6 +69,10 @@ class EnsembleClassifier:
         Returns:
             Dictionary with classification results and metadata
         """
+        print("🔍 DEBUG: Ensemble.classify() called", flush=True)
+        print(f"🔍 DEBUG: force_ensemble = {force_ensemble} (type: {type(force_ensemble)})", flush=True)
+        logger.info("🔍 Ensemble classify method called", title=title[:50] if title else None, force_ensemble=force_ensemble)
+        
         start_time = datetime.utcnow()
         
         results = {
@@ -82,10 +86,15 @@ class EnsembleClassifier:
         }
         
         # Step 1: Rule-based classification (always run, it's fast and free)
-        logger.info("Running rule-based classifier")
+        print("🔍 DEBUG: About to run rule-based classifier", flush=True)
+        logger.info("🔍 Running rule-based classifier")
+        
         rule_class, rule_conf, rule_reason, rule_evidence = rule_based_classifier.classify(
             title, abstract, mesh_terms, publication_types
         )
+        
+        print(f"🔍 DEBUG: Rule-based complete: {rule_class} ({rule_conf})", flush=True)
+        logger.info("🔍 Rule-based classifier complete", classification=rule_class, confidence=rule_conf)
         
         results['models_used'].append('rule_based')
         results['individual_results']['rule_based'] = {
@@ -96,8 +105,10 @@ class EnsembleClassifier:
         }
         
         # Check if rule-based is confident enough
+        print(f"🔍 DEBUG: Checking rule-based threshold: force_ensemble={force_ensemble}, rule_conf={rule_conf}, threshold={self.CONFIDENCE_THRESHOLDS['rule_based']}", flush=True)
         if not force_ensemble and rule_conf >= self.CONFIDENCE_THRESHOLDS['rule_based']:
             # High confidence from rules, use this result
+            print("🔍 DEBUG: Using rule-based only (high confidence)", flush=True)
             results['ensemble_result'] = rule_class
             results['confidence'] = rule_conf
             results['reasoning'] = f"High-confidence rule-based classification: {rule_reason}"
@@ -109,10 +120,15 @@ class EnsembleClassifier:
                        reason="High confidence from rules")
         else:
             # Step 2: BERT classification (medium cost)
-            logger.info("Running BERT classifier")
+            print("🔍 DEBUG: About to run BERT classifier", flush=True)
+            logger.info("🔍 Running BERT classifier")
+            
             bert_class, bert_conf, bert_reason = bert_classifier.classify(
                 title, abstract, mesh_terms
             )
+            
+            print(f"🔍 DEBUG: BERT complete: {bert_class} ({bert_conf})", flush=True)
+            logger.info("🔍 BERT classifier complete", classification=bert_class, confidence=bert_conf)
             
             results['models_used'].append('bert')
             results['individual_results']['bert'] = {
@@ -122,8 +138,10 @@ class EnsembleClassifier:
             }
             
             # Check if we have enough confidence from rule + BERT
+            print(f"🔍 DEBUG: Checking BERT threshold: force_ensemble={force_ensemble}, bert_conf={bert_conf}, threshold={self.CONFIDENCE_THRESHOLDS['bert']}", flush=True)
             if not force_ensemble and bert_conf >= self.CONFIDENCE_THRESHOLDS['bert']:
                 # Use weighted vote of rule-based + BERT
+                print("🔍 DEBUG: Using rule-based + BERT only (high BERT confidence)", flush=True)
                 ensemble_result = self._vote_two_models(
                     (rule_class, rule_conf),
                     (bert_class, bert_conf)
@@ -140,17 +158,34 @@ class EnsembleClassifier:
             else:
                 # Step 3: LLM classification (highest cost, best accuracy)
                 if self.llm_classifier:
-                    logger.info("Running LLM classifier")
-                    llm_result = await self.llm_classifier.classify_document_llm_only(
-                        title, abstract, mesh_terms, publication_types
-                    )
+                    print("🔍 DEBUG: About to run LLM classifier", flush=True)
+                    logger.info("🔍 Running LLM classifier")
+                    
+                    # Check if LLM classifier has classify_document_llm_only method (PVService)
+                    # or classify_document method (OllamaLLMClassifier)
+                    if hasattr(self.llm_classifier, 'classify_document_llm_only'):
+                        llm_result = await self.llm_classifier.classify_document_llm_only(
+                            title, abstract, mesh_terms, publication_types
+                        )
+                        llm_class = llm_result.classification
+                        llm_conf = llm_result.confidence
+                        llm_reason = llm_result.reasoning
+                        llm_entities = [e.dict() for e in llm_result.key_entities]
+                    else:
+                        # Direct Ollama classifier - returns tuple
+                        llm_class, llm_conf, llm_reason, llm_entities = await self.llm_classifier.classify_document(
+                            title, abstract, mesh_terms, publication_types
+                        )
+                    
+                    print(f"🔍 DEBUG: LLM complete: {llm_class} ({llm_conf})", flush=True)
+                    logger.info("🔍 LLM classifier complete", classification=llm_class, confidence=llm_conf)
                     
                     results['models_used'].append('llm')
                     results['individual_results']['llm'] = {
-                        'classification': llm_result.classification,
-                        'confidence': llm_result.confidence,
-                        'reasoning': llm_result.reasoning,
-                        'key_entities': [e.dict() for e in llm_result.key_entities]
+                        'classification': llm_class,
+                        'confidence': llm_conf,
+                        'reasoning': llm_reason,
+                        'key_entities': llm_entities
                     }
                     results['cost_estimate'] += 0.005  # ~$0.005 per LLM call
                     
@@ -158,7 +193,7 @@ class EnsembleClassifier:
                     ensemble_result = self._vote_three_models(
                         (rule_class, rule_conf),
                         (bert_class, bert_conf),
-                        (llm_result.classification, llm_result.confidence)
+                        (llm_class, llm_conf)
                     )
                     
                     results['ensemble_result'] = ensemble_result['classification']

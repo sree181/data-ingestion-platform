@@ -22,8 +22,18 @@ class RuleBasedClassifier:
                    'diagnosed with', 'presented with', 'developed', 'experienced'],
         'drug': ['administered', 'prescribed', 'treatment with', 'therapy with', 'received', 
                 'medication', 'dose', 'dosage', 'mg', 'tablet', 'injection'],
-        'adverse_event': ['adverse', 'reaction', 'side effect', 'toxicity', 'complication',
-                         'injury', 'death', 'hospitalization', 'discontinued', 'withdrawn'],
+        'adverse_event': [
+            # General terms
+            'adverse', 'reaction', 'side effect', 'toxicity', 'complication',
+            'injury', 'death', 'hospitalization', 'discontinued', 'withdrawn',
+            # Specific adverse events
+            'anaphylaxis', 'anaphylactic', 'rash', 'urticaria', 'angioedema',
+            'hepatotoxicity', 'liver injury', 'nephrotoxicity', 'kidney injury',
+            'cardiotoxicity', 'arrhythmia', 'stevens-johnson', 'dress syndrome',
+            'rhabdomyolysis', 'seizure', 'hypersensitivity', 'allergy', 'allergic',
+            'dermatitis', 'exanthema', 'pruritus', 'nausea', 'vomiting', 'diarrhea',
+            'headache', 'dizziness', 'fatigue', 'fever', 'chills'
+        ],
         'temporal': ['after', 'following', 'within', 'days', 'weeks', 'months', 'onset',
                     'duration', 'rechallenge', 'dechallenge']
     }
@@ -43,18 +53,32 @@ class RuleBasedClassifier:
         'Drug Eruptions'
     }
     
+    # MeSH terms for Safety_Information
+    SAFETY_INFO_MESH_TERMS = {
+        'Pharmacovigilance',
+        'Drug Safety',
+        'Product Surveillance, Postmarketing',
+        'Adverse Drug Reaction Reporting Systems',
+        'Clinical Trials, Phase I',
+        'Clinical Trials, Phase II',
+        'Clinical Trials, Phase III',
+        'Clinical Trials, Phase IV',
+        'Meta-Analysis',
+        'Systematic Review',
+        'Risk Assessment',
+        'Drug Monitoring',
+        'Safety Management',
+        'Drug Toxicity',
+        'Observational Study'
+    }
+    
     # MeSH terms that indicate non-ICSR
     NON_ICSR_MESH_TERMS = {
-        'Meta-Analysis',
-        'Randomized Controlled Trial',
-        'Clinical Trial',
-        'Multicenter Study',
-        'Review',
-        'Systematic Review',
         'Animals',
         'In Vitro Techniques',
         'Cell Line',
-        'Molecular Structure'
+        'Molecular Structure',
+        'Review Literature'
     }
     
     # Publication types
@@ -64,14 +88,34 @@ class RuleBasedClassifier:
         'Case Report'
     }
     
-    NON_ICSR_PUBLICATION_TYPES = {
-        'Meta-Analysis',
-        'Randomized Controlled Trial',
+    SAFETY_INFO_PUBLICATION_TYPES = {
         'Clinical Trial',
+        'Clinical Trial, Phase I',
+        'Clinical Trial, Phase II',
+        'Clinical Trial, Phase III',
+        'Clinical Trial, Phase IV',
+        'Meta-Analysis',
+        'Systematic Review',
+        'Observational Study',
+        'Cohort Study',
         'Multicenter Study',
-        'Review',
-        'Systematic Review'
+        'Randomized Controlled Trial'
     }
+    
+    NON_ICSR_PUBLICATION_TYPES = {
+        'Review',
+        'Guideline',
+        'Practice Guideline',
+        'Research Support'
+    }
+    
+    # Safety_Information keywords
+    SAFETY_INFO_KEYWORDS = [
+        'safety profile', 'safety analysis', 'safety data', 'tolerability',
+        'safety and efficacy', 'post-marketing', 'surveillance',
+        'pharmacovigilance', 'risk assessment', 'safety monitoring',
+        'clinical trial safety', 'adverse events', 'safety study'
+    ]
     
     REJECTED_KEYWORDS = [
         'in vitro', 'in vivo', 'animal model', 'cell culture', 'molecular docking',
@@ -124,6 +168,8 @@ class RuleBasedClassifier:
             'temporal_mentions': 0,
             'icsr_mesh_count': 0,
             'non_icsr_mesh_count': 0,
+            'safety_info_mesh_count': 0,
+            'safety_info_keywords': 0,
             'rejected_signals': 0
         }
         
@@ -143,6 +189,12 @@ class RuleBasedClassifier:
         # Count MeSH term matches
         evidence['icsr_mesh_count'] = len(mesh_set & self.ICSR_MESH_TERMS)
         evidence['non_icsr_mesh_count'] = len(mesh_set & self.NON_ICSR_MESH_TERMS)
+        evidence['safety_info_mesh_count'] = len(mesh_set & self.SAFETY_INFO_MESH_TERMS)
+        
+        # Count safety_info keywords
+        for keyword in self.SAFETY_INFO_KEYWORDS:
+            if keyword in text:
+                evidence['safety_info_keywords'] += 1
         
         # Check for rejection signals
         for keyword in self.REJECTED_KEYWORDS:
@@ -159,22 +211,59 @@ class RuleBasedClassifier:
     ) -> Tuple[str, float, str]:
         """
         Make classification decision based on evidence
+        Priority order: Rejected > ICSR > Safety_Information > Non-ICSR
         
         Returns:
             (classification, confidence, reasoning)
         """
         
-        # HIGH CONFIDENCE ICSR RULES
-        # Rule 1: Case Report publication type + ICSR MeSH terms
-        if (pub_types & self.ICSR_PUBLICATION_TYPES) and evidence['icsr_mesh_count'] >= 1:
-            if evidence['patient_mentions'] >= 2 and evidence['adverse_event_mentions'] >= 1:
+        # ============================================================================
+        # PRIORITY 1: REJECTED RULES (Check first to filter out invalid documents)
+        # ============================================================================
+        
+        # Rule R1: Retracted publications
+        if any('RETRACT' in str(term).upper() for term in mesh_set):
+            return (
+                "Rejected",
+                0.95,
+                "High confidence: Retracted publication detected via MeSH terms"
+            )
+        
+        # Rule R2: Duplicate publications
+        if any('DUPLICATE' in str(term).upper() for term in mesh_set):
+            return (
+                "Rejected",
+                0.95,
+                "High confidence: Duplicate publication detected"
+            )
+        
+        # Rule R3: In vitro/animal studies (non-clinical)
+        if evidence['rejected_signals'] >= 2:
+            return (
+                "Rejected",
+                0.90,
+                "High confidence: Multiple signals indicate non-clinical research (in vitro, animal models, computational)"
+            )
+        
+        # ============================================================================
+        # PRIORITY 2: ICSR RULES (Individual case safety reports)
+        # ============================================================================
+        
+        # Rule I1: Case Report publication type + ICSR evidence
+        # PRIORITIZE Case Reports even if other publication types present
+        if pub_types & self.ICSR_PUBLICATION_TYPES:
+            # Check if this is truly a case report (not just a review mentioning cases)
+            if evidence['icsr_mesh_count'] >= 1 or (
+                evidence['patient_mentions'] >= 2 and 
+                evidence['adverse_event_mentions'] >= 1
+            ):
                 return (
                     "ICSR",
                     0.95,
-                    "High confidence: Case Report publication type with ICSR MeSH terms and clear patient-drug-event narrative"
+                    "High confidence: Case Report publication type with ICSR evidence"
                 )
         
-        # Rule 2: Strong ICSR signals
+        # Rule I2: Strong ICSR signals (all four elements present)
         if (evidence['patient_mentions'] >= 3 and 
             evidence['drug_mentions'] >= 2 and 
             evidence['adverse_event_mentions'] >= 2 and
@@ -185,34 +274,7 @@ class RuleBasedClassifier:
                 "High confidence: Strong presence of all four ICSR elements (patient, drug, event, temporal)"
             )
         
-        # HIGH CONFIDENCE NON-ICSR RULES
-        # Rule 3: Review or RCT publication types
-        if pub_types & self.NON_ICSR_PUBLICATION_TYPES:
-            return (
-                "Non-ICSR",
-                0.95,
-                "High confidence: Publication type indicates systematic review or clinical trial, not individual case report"
-            )
-        
-        # Rule 4: Strong non-ICSR signals
-        if evidence['non_icsr_mesh_count'] >= 2:
-            return (
-                "Non-ICSR",
-                0.88,
-                "High confidence: Multiple non-ICSR MeSH terms suggest research study or review article"
-            )
-        
-        # HIGH CONFIDENCE REJECTED RULES
-        # Rule 5: In vitro/animal studies
-        if evidence['rejected_signals'] >= 2:
-            return (
-                "Rejected",
-                0.92,
-                "High confidence: Multiple signals indicate non-clinical research (in vitro, animal models, computational)"
-            )
-        
-        # MEDIUM CONFIDENCE ICSR RULES
-        # Rule 6: Moderate ICSR evidence
+        # Rule I3: Moderate ICSR evidence
         if (evidence['patient_mentions'] >= 1 and 
             evidence['adverse_event_mentions'] >= 1 and
             evidence['drug_mentions'] >= 1):
@@ -222,17 +284,70 @@ class RuleBasedClassifier:
                 "Medium confidence: Presence of patient, drug, and adverse event mentions suggest possible ICSR"
             )
         
-        # MEDIUM CONFIDENCE SAFETY INFO RULES
-        # Rule 7: Safety-related but no patient details
-        if evidence['adverse_event_mentions'] >= 2 and evidence['patient_mentions'] == 0:
+        # ============================================================================
+        # PRIORITY 3: SAFETY_INFORMATION RULES (Aggregate safety data)
+        # ============================================================================
+        
+        # Rule S1: Clinical trial or meta-analysis with safety focus
+        if (pub_types & self.SAFETY_INFO_PUBLICATION_TYPES) and (
+            evidence['safety_info_keywords'] >= 2 or 
+            evidence['safety_info_mesh_count'] >= 1
+        ):
+            return (
+                "Safety_Information",
+                0.85,
+                "High confidence: Clinical trial/meta-analysis with safety focus"
+            )
+        
+        # Rule S2: Pharmacovigilance/surveillance study
+        if evidence['safety_info_mesh_count'] >= 2:
+            return (
+                "Safety_Information",
+                0.80,
+                "High confidence: Multiple pharmacovigilance/safety MeSH terms"
+            )
+        
+        # Rule S3: Safety keywords without individual case
+        if (evidence['safety_info_keywords'] >= 3 and 
+            evidence['patient_mentions'] < 2):
             return (
                 "Safety_Information",
                 0.75,
-                "Medium confidence: Discusses adverse events but lacks identifiable patient information"
+                "Moderate confidence: Safety-focused content without individual case reports"
             )
         
-        # LOW CONFIDENCE - DEFER TO ML MODELS
-        # Rule 8: Insufficient evidence
+        # Rule S4: Safety-related adverse events but no patient details
+        if evidence['adverse_event_mentions'] >= 2 and evidence['patient_mentions'] == 0:
+            return (
+                "Safety_Information",
+                0.70,
+                "Moderate confidence: Discusses adverse events but lacks identifiable patient information"
+            )
+        
+        # ============================================================================
+        # PRIORITY 4: NON-ICSR RULES (Reviews, mechanistic studies, etc.)
+        # ============================================================================
+        
+        # Rule N1: Review or guideline publication types
+        if pub_types & self.NON_ICSR_PUBLICATION_TYPES:
+            return (
+                "Non-ICSR",
+                0.90,
+                "High confidence: Publication type indicates review or guideline, not case report or safety study"
+            )
+        
+        # Rule N2: Strong non-ICSR signals
+        if evidence['non_icsr_mesh_count'] >= 2:
+            return (
+                "Non-ICSR",
+                0.85,
+                "High confidence: Multiple non-ICSR MeSH terms suggest research study or review article"
+            )
+        
+        # ============================================================================
+        # DEFAULT: LOW CONFIDENCE - DEFER TO ML MODELS
+        # ============================================================================
+        
         return (
             "Non-ICSR",
             0.50,
