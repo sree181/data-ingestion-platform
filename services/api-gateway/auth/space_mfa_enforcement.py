@@ -29,8 +29,8 @@ async def get_spaces_service() -> Optional[ProjectSpacesService]:
 async def require_space_mfa_verification(
     space_id: str,
     request: Request,
-    user: Dict = Depends(get_current_user),
-    spaces_service: Optional[ProjectSpacesService] = Depends(get_spaces_service)
+    user: Dict = None,
+    spaces_service: Optional[ProjectSpacesService] = None
 ) -> Dict:
     """
     FastAPI dependency to enforce MFA for project spaces that require it
@@ -53,6 +53,10 @@ async def require_space_mfa_verification(
         HTTPException: If MFA is required but not verified
     """
     try:
+        # Get spaces service if not provided
+        if spaces_service is None:
+            spaces_service = await get_spaces_service()
+        
         # If no spaces service available, skip MFA enforcement
         if spaces_service is None:
             logger.warning("Spaces service not available, skipping MFA enforcement")

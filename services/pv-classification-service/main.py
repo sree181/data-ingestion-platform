@@ -16,15 +16,31 @@ import uvicorn
 import os
 from openai import AsyncOpenAI
 
-# Import ICSR extraction services
-from icsr_extractor import icsr_extractor, ICSRData
-from icsr_narrative_generator import narrative_generator
-from ich_e2b_xml_generator import xml_generator
+# Import ICSR extraction services (with error handling)
+try:
+    from icsr_extractor import icsr_extractor, ICSRData
+    from icsr_narrative_generator import narrative_generator
+    from ich_e2b_xml_generator import xml_generator
+    ICSR_SERVICES_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️  ICSR services not available: {e}")
+    ICSR_SERVICES_AVAILABLE = False
 
 # Import ensemble classifier components
 from ensemble_classifier import initialize_ensemble
 from rule_based_classifier import rule_based_classifier
 from bert_classifier import bert_classifier
+
+# Import RL-enhanced components
+try:
+    from rl_api_endpoints import router as rl_router
+    RL_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️  RL components not available: {e}")
+    RL_AVAILABLE = False
+
+# Import Ollama LLM classifier
+from ollama_llm_classifier import ollama_llm_classifier
 
 # Configure logging
 structlog.configure(
@@ -197,17 +213,25 @@ Classify now:
 class PVClassificationService:
     """
     Pharmacovigilance Classification Service
-    Uses OpenAI GPT-4 for classification
+    Uses Ollama LLM for classification (local, free)
     """
     
-    def __init__(self, openai_api_key: Optional[str] = None):
-        self.openai_api_key = openai_api_key or os.getenv("OPENAI_API_KEY")
-        if not self.openai_api_key:
-            raise ValueError("OPENAI_API_KEY environment variable must be set")
+    def __init__(self, use_ollama: bool = True):
+        self.use_ollama = use_ollama
+        self.ollama_classifier = None
         
-        self.client = AsyncOpenAI(api_key=self.openai_api_key)
-        self.model = "gpt-4o-mini"  # Using GPT-4o-mini for cost efficiency with good quality
-        logger.info("PV Classification Service initialized", model=self.model)
+        if use_ollama:
+            # Use Ollama LLM classifier
+            self.ollama_classifier = ollama_llm_classifier
+            logger.info("PV Classification Service initialized with Ollama LLM")
+        else:
+            # Fallback to OpenAI (requires API key)
+            openai_api_key = os.getenv("OPENAI_API_KEY")
+            if not openai_api_key:
+                raise ValueError("OPENAI_API_KEY environment variable must be set")
+            self.client = AsyncOpenAI(api_key=openai_api_key)
+            self.model = "gpt-4o-mini"
+            logger.info("PV Classification Service initialized with OpenAI", model=self.model)
     
     async def classify_document_llm_only(
         self,
@@ -228,14 +252,32 @@ class PVClassificationService:
         Returns:
             Classification result
         """
-        document = Document(
-            id="temp",
-            title=title,
-            abstract=abstract,
-            mesh_terms=mesh_terms,
-            publication_types=publication_types
-        )
-        return await self.classify_document(document)
+        if self.use_ollama and self.ollama_classifier:
+            # Use Ollama LLM classifier
+            classification, confidence, reasoning, key_entities = await self.ollama_classifier.classify_document(
+                title=title,
+                abstract=abstract,
+                mesh_terms=mesh_terms,
+                publication_types=publication_types
+            )
+            
+            return ClassificationResult(
+                classification=classification,
+                confidence=confidence,
+                reasoning=reasoning,
+                key_entities=key_entities,
+                regulatory_elements={}
+            )
+        else:
+            # Fallback to OpenAI
+            document = Document(
+                id="temp",
+                title=title,
+                abstract=abstract,
+                mesh_terms=mesh_terms,
+                publication_types=publication_types
+            )
+            return await self.classify_document(document)
     
     async def classify_document(self, document: Document) -> ClassificationResult:
         """
@@ -357,8 +399,44 @@ class PVClassificationService:
 # Initialize service
 pv_service = PVClassificationService()
 
-# Initialize ensemble classifier with LLM service
-ensemble = initialize_ensemble(pv_service)
+# Initialize ensemble classifier (will be done in startup event)
+ensemble = None
+
+# Include RL router (if available)
+if RL_AVAILABLE:
+    app.include_router(rl_router)
+
+# Startup event
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup"""
+    global ensemble
+    
+    print("🚀 Starting PV Classification Service")
+    print("=" * 50)
+    print("📊 Available Models:")
+    print("   ✅ Rule-based Classifier (Free, Fast)")
+    print("   ✅ BERT Classifier (facebook/bart-large-mnli)")
+    
+    # Initialize Ollama LLM classifier
+    try:
+        await ollama_llm_classifier.initialize()
+        print("   ✅ Ollama LLM Classifier (Local, Free)")
+        
+        # Initialize ensemble with Ollama LLM
+        from ensemble_classifier import EnsembleClassifier
+        ensemble = EnsembleClassifier(llm_classifier=ollama_llm_classifier)
+        print("✅ Ensemble classifier initialized with Ollama LLM support")
+        
+    except Exception as e:
+        print(f"   ⚠️  Ollama LLM not available: {e}")
+        # Initialize ensemble without LLM
+        from ensemble_classifier import EnsembleClassifier
+        ensemble = EnsembleClassifier(llm_classifier=None)
+        print("✅ Ensemble classifier initialized (Rule-based + BERT only)")
+    
+    print("=" * 50)
+    print("🎯 Service ready for document classification!")
 
 
 # API Endpoints
@@ -673,5 +751,5 @@ async def extract_icsr_data(request: Dict[str, Any]):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8012)
+    uvicorn.run(app, host="0.0.0.0", port=8002)
 

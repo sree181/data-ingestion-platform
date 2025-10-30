@@ -17,6 +17,7 @@ import {
   Dashboard as DashboardIcon,
   Description as DocumentsIcon,
   Psychology as EntityIcon,
+  Psychology as PsychologyIcon,
   Chat as ChatIcon,
   Folder as SpacesIcon,
   Security as SecurityIcon,
@@ -106,10 +107,22 @@ const menuItems = [
     description: 'Review & approve extracted ICSRs',
   },
   {
+    path: '/rl-dashboard',
+    label: 'RL Dashboard',
+    icon: <PsychologyIcon />,
+    description: 'Reinforcement Learning Intelligence',
+  },
+  {
     path: '/security',
     label: 'Security Dashboard',
     icon: <SecurityIcon />,
     description: 'Security & compliance',
+  },
+  {
+    path: '/security-testing',
+    label: 'Security Testing',
+    icon: <SecurityIcon />,
+    description: 'Test security features',
   },
 ];
 

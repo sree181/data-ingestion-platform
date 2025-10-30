@@ -48,6 +48,7 @@ import {
   ListItemButton,
   Stack,
   Checkbox,
+  Collapse,
   OutlinedInput
 } from '@mui/material';
 import {
@@ -254,11 +255,16 @@ function EnhancedProjectSpacesOptimized() {
   const [enableAIAnalysis, setEnableAIAnalysis] = useState(true);
   const [enableEntityExtraction, setEnableEntityExtraction] = useState(true);
   const [enableRelationshipExtraction, setEnableRelationshipExtraction] = useState(true);
+  const [enableICSRClassification, setEnableICSRClassification] = useState(false);
   const [isIngesting, setIsIngesting] = useState(false);
   const [ingestionJobId, setIngestionJobId] = useState(null);
   const [ingestionProgress, setIngestionProgress] = useState(0);
   const [ingestionStatus, setIngestionStatus] = useState('');
   const [ingestionStatusData, setIngestionStatusData] = useState(null);
+  
+  // New UI state variables
+  const [showMultiSourceForm, setShowMultiSourceForm] = useState(false);
+  const [showAIOptions, setShowAIOptions] = useState(true);
   
   // Form states
   const [newProject, setNewProject] = useState({
@@ -512,7 +518,8 @@ function EnhancedProjectSpacesOptimized() {
           model_name: selectedModel,
           enable_ai_analysis: enableAIAnalysis,
           enable_entity_extraction: enableEntityExtraction,
-          enable_relationship_extraction: enableRelationshipExtraction
+          enable_relationship_extraction: enableRelationshipExtraction,
+          enable_icsr_classification: enableICSRClassification
         }
       });
 
@@ -1635,7 +1642,11 @@ Type "DELETE ALL" to confirm:`;
           model: selectedModel,  // ✅ Pass the selected model
           extract_text: true,
           extract_metadata: true,
-          generate_embeddings: true
+          generate_embeddings: true,
+          enable_ai_analysis: enableAIAnalysis,
+          enable_entity_extraction: enableEntityExtraction,
+          enable_relationship_extraction: enableRelationshipExtraction,
+          enable_icsr_classification: enableICSRClassification
         }
       };
       
@@ -2249,172 +2260,353 @@ Type "DELETE ALL" to confirm:`;
                 Document Ingestion Pipeline
               </Typography>
               
-              <Grid container spacing={3}>
-                {/* Local Documents Section */}
-                <Grid item xs={12} md={6}>
-                  <Card variant="outlined" sx={{ p: 2 }}>
-                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <FolderIcon />
-                      Local Documents
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      Select documents from the Searchable/ folder for ingestion into this project space.
-                    </Typography>
-                    
-                    <Button
-                      variant="contained"
-                      startIcon={<UploadIcon />}
-                      fullWidth
-                      sx={{ mb: 2 }}
+              {/* Step-by-Step Ingestion Flow */}
+              <Box sx={{ mb: 4 }}>
+                <Typography variant="h6" sx={{ mb: 3, textAlign: 'center', color: 'text.primary' }}>
+                  Choose Your Ingestion Method
+                </Typography>
+                
+                <Grid container spacing={3}>
+                  {/* Local Documents Section */}
+                  <Grid item xs={12} md={6}>
+                    <Card 
+                      variant="outlined" 
+                      sx={{ 
+                        p: 3, 
+                        height: '100%',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                          transform: 'translateY(-2px)'
+                        }
+                      }}
                       onClick={handleBrowseLocalFiles}
                     >
-                      Browse Local Files
-                    </Button>
-                    
-                    <Typography variant="body2" color="text.secondary">
-                      📁 Available: ~2,600 PDF documents
-                    </Typography>
-                  </Card>
-                </Grid>
-
-                {/* Multi-Source Ingestion Section */}
-                <Grid item xs={12} md={6}>
-                  <Card variant="outlined" sx={{ p: 2 }}>
-                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <ApiIcon />
-                      Multi-Source Ingestion
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      Search and ingest documents from multiple external data sources.
-                    </Typography>
-                    
-                    <Stack spacing={2}>
-                      {/* Search Query */}
-                      <TextField
-                        fullWidth
-                        label="Search Query"
-                        placeholder="Enter search query (e.g., 'COVID-19 vaccine efficacy')"
-                        value={ingestionQuery}
-                        onChange={(e) => setIngestionQuery(e.target.value)}
-                        size="small"
-                      />
-                      
-                      {/* Data Sources Selection */}
-                      <Box>
-                        <Typography variant="subtitle2" gutterBottom>
-                          Select Data Sources
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                          {Object.entries(SOURCE_CONFIG).map(([sourceId, config]) => (
-                            <Chip
-                              key={sourceId}
-                              label={config.name}
-                              icon={config.icon}
-                              color={selectedIngestionSources.includes(sourceId) ? 'primary' : 'default'}
-                              variant={selectedIngestionSources.includes(sourceId) ? 'filled' : 'outlined'}
-                              onClick={() => {
-                                if (selectedIngestionSources.includes(sourceId)) {
-                                  setSelectedIngestionSources(prev => prev.filter(s => s !== sourceId));
-                                } else {
-                                  setSelectedIngestionSources(prev => [...prev, sourceId]);
-                                }
-                              }}
-                              disabled={!config.enabled}
-                              size="small"
-                              sx={{
-                                '&.MuiChip-filled': {
-                                  bgcolor: config.color,
-                                  color: 'white'
-                                }
-                              }}
-                            />
-                          ))}
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Box sx={{ 
+                          width: 80, 
+                          height: 80, 
+                          borderRadius: '50%', 
+                          bgcolor: 'primary.light', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          mx: 'auto',
+                          mb: 2
+                        }}>
+                          <FolderIcon sx={{ fontSize: 40, color: 'primary.main' }} />
                         </Box>
+                        
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                          Local Documents
+                        </Typography>
+                        
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                          Upload and process PDF documents from your local filesystem
+                        </Typography>
+                        
+                        <Button
+                          variant="contained"
+                          startIcon={<UploadIcon />}
+                          fullWidth
+                          sx={{ mb: 2 }}
+                        >
+                          Browse & Upload Files
+                        </Button>
+                        
+                        <Typography variant="caption" color="text.secondary">
+                          📁 ~2,600 PDF documents available
+                        </Typography>
                       </Box>
+                    </Card>
+                  </Grid>
+
+                  {/* Multi-Source Ingestion Section */}
+                  <Grid item xs={12} md={6}>
+                    <Card 
+                      variant="outlined" 
+                      sx={{ 
+                        p: 3, 
+                        height: '100%',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                          transform: 'translateY(-2px)'
+                        }
+                      }}
+                    >
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Box sx={{ 
+                          width: 80, 
+                          height: 80, 
+                          borderRadius: '50%', 
+                          bgcolor: 'secondary.light', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          mx: 'auto',
+                          mb: 2
+                        }}>
+                          <ApiIcon sx={{ fontSize: 40, color: 'secondary.main' }} />
+                        </Box>
+                        
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                          External Sources
+                        </Typography>
+                        
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                          Search and ingest from PubMed, ClinicalTrials, FDA, and other databases
+                        </Typography>
+                        
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          startIcon={<SearchIcon />}
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          onClick={() => setShowMultiSourceForm(true)}
+                        >
+                          Search External Sources
+                        </Button>
+                        
+                        <Typography variant="caption" color="text.secondary">
+                          🔍 Multiple scientific databases
+                        </Typography>
+                      </Box>
+                    </Card>
+                  </Grid>
+                </Grid>
+              </Box>
+
+              {/* Multi-Source Ingestion Form - Only shown when user clicks External Sources */}
+              {showMultiSourceForm && (
+                <Card sx={{ mb: 3, border: '2px solid', borderColor: 'secondary.main' }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                      <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <ApiIcon />
+                        Multi-Source Ingestion
+                      </Typography>
+                      <IconButton onClick={() => setShowMultiSourceForm(false)}>
+                        <CloseIcon />
+                      </IconButton>
+                    </Box>
+                    
+                    <Grid container spacing={3}>
+                      {/* Search Configuration */}
+                      <Grid item xs={12} md={8}>
+                        <Stack spacing={3}>
+                          {/* Search Query */}
+                          <TextField
+                            fullWidth
+                            label="Search Query"
+                            placeholder="Enter search query (e.g., 'COVID-19 vaccine efficacy')"
+                            value={ingestionQuery}
+                            onChange={(e) => setIngestionQuery(e.target.value)}
+                            size="medium"
+                          />
+                          
+                          {/* Data Sources Selection */}
+                          <Box>
+                            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
+                              Select Data Sources
+                            </Typography>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                              {Object.entries(SOURCE_CONFIG).map(([sourceId, config]) => (
+                                <Chip
+                                  key={sourceId}
+                                  label={config.name}
+                                  icon={config.icon}
+                                  color={selectedIngestionSources.includes(sourceId) ? 'primary' : 'default'}
+                                  variant={selectedIngestionSources.includes(sourceId) ? 'filled' : 'outlined'}
+                                  onClick={() => {
+                                    if (selectedIngestionSources.includes(sourceId)) {
+                                      setSelectedIngestionSources(prev => prev.filter(s => s !== sourceId));
+                                    } else {
+                                      setSelectedIngestionSources(prev => [...prev, sourceId]);
+                                    }
+                                  }}
+                                  disabled={!config.enabled}
+                                  sx={{
+                                    '&.MuiChip-filled': {
+                                      bgcolor: config.color,
+                                      color: 'white'
+                                    }
+                                  }}
+                                />
+                              ))}
+                            </Box>
+                          </Box>
+                        </Stack>
+                      </Grid>
                       
                       {/* Advanced Options */}
-                      <Box>
-                        <Typography variant="subtitle2" gutterBottom>
-                          Advanced Options
+                      <Grid item xs={12} md={4}>
+                        <Stack spacing={2}>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                            Advanced Options
+                          </Typography>
+                          
+                          <TextField
+                            fullWidth
+                            label="Max Results per Source"
+                            type="number"
+                            value={maxResultsPerSource}
+                            onChange={(e) => setMaxResultsPerSource(parseInt(e.target.value) || 5)}
+                            size="small"
+                          />
+                          
+                          <FormControl fullWidth size="small">
+                            <InputLabel>AI Model</InputLabel>
+                            <Select
+                              value={selectedModel}
+                              onChange={(e) => setSelectedModel(e.target.value)}
+                              label="AI Model"
+                            >
+                              <MenuItem value="phi3:mini">Phi3 Mini</MenuItem>
+                              <MenuItem value="llama3.1:8b">Llama 3.1 8B</MenuItem>
+                              <MenuItem value="gpt-4">GPT-4</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Stack>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* AI Processing Options - Contextual and Collapsible */}
+              {(showMultiSourceForm || selectedFiles.size > 0) && (
+                <Card sx={{ mb: 3 }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <SmartToyIcon />
+                        AI Processing Configuration
+                      </Typography>
+                      <IconButton onClick={() => setShowAIOptions(!showAIOptions)}>
+                        {showAIOptions ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                      </IconButton>
+                    </Box>
+                    
+                    <Collapse in={showAIOptions}>
+                      <Box sx={{ 
+                        p: 2, 
+                        bgcolor: 'grey.50', 
+                        borderRadius: 2,
+                        border: '1px solid',
+                        borderColor: 'grey.200'
+                      }}>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 3, fontStyle: 'italic' }}>
+                          Configure how AI will process your documents. These settings apply to all ingestion methods.
                         </Typography>
-                        <Grid container spacing={1}>
-                          <Grid item xs={6}>
-                            <TextField
-                              fullWidth
-                              label="Max Results per Source"
-                              type="number"
-                              value={maxResultsPerSource}
-                              onChange={(e) => setMaxResultsPerSource(parseInt(e.target.value) || 5)}
-                              inputProps={{ min: 1, max: 50 }}
-                              size="small"
+                        
+                        <Grid container spacing={2}>
+                          <Grid item xs={12} sm={6} md={3}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={enableAIAnalysis}
+                                  onChange={(e) => setEnableAIAnalysis(e.target.checked)}
+                                  color="primary"
+                                />
+                              }
+                              label="AI Analysis"
+                              sx={{ fontWeight: 500 }}
                             />
                           </Grid>
-                          <Grid item xs={6}>
-                            <FormControl fullWidth size="small">
-                              <InputLabel>AI Model</InputLabel>
-                              <Select
-                                value={selectedModel}
-                                onChange={(e) => setSelectedModel(e.target.value)}
-                                label="AI Model"
-                              >
-                                <MenuItem value="phi3:mini">Phi3 Mini</MenuItem>
-                                <MenuItem value="llama3.1:8b">Llama 3.1 8B</MenuItem>
-                                <MenuItem value="gpt-4">GPT-4</MenuItem>
-                              </Select>
-                            </FormControl>
+                          <Grid item xs={12} sm={6} md={3}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={enableEntityExtraction}
+                                  onChange={(e) => setEnableEntityExtraction(e.target.checked)}
+                                  color="primary"
+                                />
+                              }
+                              label="Entity Extraction"
+                              sx={{ fontWeight: 500 }}
+                            />
+                          </Grid>
+                          <Grid item xs={12} sm={6} md={3}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={enableRelationshipExtraction}
+                                  onChange={(e) => setEnableRelationshipExtraction(e.target.checked)}
+                                  color="primary"
+                                />
+                              }
+                              label="Relationships"
+                              sx={{ fontWeight: 500 }}
+                            />
+                          </Grid>
+                          <Grid item xs={12} sm={6} md={3}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={enableICSRClassification}
+                                  onChange={(e) => setEnableICSRClassification(e.target.checked)}
+                                  color="secondary"
+                                />
+                              }
+                              label="ICSR Classification"
+                              sx={{ 
+                                fontWeight: 600,
+                                color: 'secondary.main'
+                              }}
+                            />
                           </Grid>
                         </Grid>
                         
-                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 1 }}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={enableAIAnalysis}
-                                onChange={(e) => setEnableAIAnalysis(e.target.checked)}
-                                size="small"
-                              />
-                            }
-                            label="AI Analysis"
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={enableEntityExtraction}
-                                onChange={(e) => setEnableEntityExtraction(e.target.checked)}
-                                size="small"
-                              />
-                            }
-                            label="Entity Extraction"
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={enableRelationshipExtraction}
-                                onChange={(e) => setEnableRelationshipExtraction(e.target.checked)}
-                                size="small"
-                              />
-                            }
-                            label="Relationships"
-                          />
-                        </Box>
+                        {enableICSRClassification && (
+                          <Box sx={{ 
+                            mt: 2, 
+                            p: 2, 
+                            bgcolor: 'rgba(156, 39, 176, 0.05)',
+                            borderRadius: 1,
+                            border: '1px solid',
+                            borderColor: 'secondary.light'
+                          }}>
+                            <Typography variant="body2" sx={{ 
+                              color: 'text.secondary',
+                              fontStyle: 'italic'
+                            }}>
+                              💡 <strong>ICSR Classification</strong> automatically identifies Individual Case Safety Reports for pharmacovigilance compliance
+                            </Typography>
+                          </Box>
+                        )}
                       </Box>
-                      
-                      {/* Start Ingestion Button */}
-                      <Button
-                        variant="contained"
-                        startIcon={isIngesting ? <CircularProgress size={16} /> : <UploadIcon />}
-                        fullWidth
-                        onClick={handleStartIngestion}
-                        disabled={isIngesting || !ingestionQuery || selectedIngestionSources.length === 0}
-                        sx={{ mt: 1 }}
-                      >
-                        {isIngesting ? 'Ingesting...' : 'Start Multi-Source Ingestion'}
-                      </Button>
-                    </Stack>
-                  </Card>
-                </Grid>
+                    </Collapse>
+                  </CardContent>
+                </Card>
+              )}
 
-                {/* Ingestion Status Section */}
+              {/* Start Ingestion Button - Only shown when form is configured */}
+              {showMultiSourceForm && (
+                <Box sx={{ textAlign: 'center', mb: 3 }}>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    startIcon={isIngesting ? <CircularProgress size={20} /> : <UploadIcon />}
+                    onClick={handleStartIngestion}
+                    disabled={isIngesting || !ingestionQuery || selectedIngestionSources.length === 0}
+                    sx={{ 
+                      px: 4, 
+                      py: 1.5,
+                      fontSize: '1.1rem',
+                      fontWeight: 600
+                    }}
+                  >
+                    {isIngesting ? 'Ingesting Documents...' : 'Start Multi-Source Ingestion'}
+                  </Button>
+                </Box>
+              )}
+
+              {/* Ingestion Status Section */}
+              <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <Card variant="outlined" sx={{ p: 2 }}>
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>

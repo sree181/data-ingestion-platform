@@ -36,6 +36,7 @@ import EnhancedProjectSpaces from './pages/EnhancedProjectSpaces';
 import OptimizedProjectSpaces from './pages/OptimizedProjectSpaces';
 import EnhancedProjectSpacesOptimized from './pages/EnhancedProjectSpacesOptimized';
 import SecurityDashboard from './pages/SecurityDashboard';
+import SecurityTesting from './pages/SecurityTesting';
 import UnifiedSearch from './pages/UnifiedSearch';
 import SourceConfiguration from './pages/SourceConfiguration';
 import KnowledgeHub from './pages/KnowledgeHub';
@@ -45,6 +46,7 @@ import WorkflowBuilder from './pages/WorkflowBuilder';
 import LiteratureAutomation from './pages/LiteratureAutomation';
 import ICSRAutomation from './pages/ICSRAutomation';
 import ICSRReviewer from './pages/ICSRReviewer';
+import RLDashboard from './pages/RLDashboard';
 import Login from './pages/Login';
 import { SecurityProvider } from './contexts/SecurityContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -116,7 +118,9 @@ function AppContent() {
                         <Route path="literature-automation" element={<LiteratureAutomation />} />
                         <Route path="icsr-automation" element={<ICSRAutomation />} />
                         <Route path="icsr-reviewer" element={<ICSRReviewer />} />
+                        <Route path="rl-dashboard" element={<RLDashboard />} />
                         <Route path="security" element={<ProtectedRoute requiredLevel="admin"><SecurityDashboard /></ProtectedRoute>} />
+                        <Route path="security-testing" element={<ProtectedRoute requiredLevel="admin"><SecurityTesting /></ProtectedRoute>} />
                       </Routes>
                     </Box>
                   </Box>

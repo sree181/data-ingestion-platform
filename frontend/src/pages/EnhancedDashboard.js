@@ -1059,6 +1059,20 @@ function EnhancedDashboard() {
           >
             Advanced
           </Button>
+          <Button
+            variant={activePanel === 'security' ? 'contained' : 'outlined'}
+            onClick={() => setActivePanel('security')}
+            startIcon={<SecurityIcon />}
+            sx={{ 
+              backgroundColor: activePanel === 'security' ? '#ff4444' : 'transparent',
+              color: activePanel === 'security' ? 'white' : 'inherit',
+              '&:hover': {
+                backgroundColor: activePanel === 'security' ? '#ff3333' : '#ff444420'
+              }
+            }}
+          >
+            Security
+          </Button>
           <IconButton onClick={handleRefresh} color="primary">
             <RefreshIcon />
           </IconButton>
@@ -1602,6 +1616,459 @@ function EnhancedDashboard() {
                   )}
                 </CardContent>
               </Card>
+          </Grid>
+        </Grid>
+      )}
+
+      {activePanel === 'security' && (
+        <Grid container spacing={3}>
+          {/* Security Overview Cards */}
+          <Grid item xs={12} md={3}>
+            <Card sx={{ 
+              background: 'linear-gradient(135deg, #ff4444 0%, #cc0000 100%)',
+              color: 'white',
+              height: '100%'
+            }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <SecurityIcon sx={{ fontSize: 32, mr: 1 }} />
+                  <Typography variant="h6" fontWeight={600}>
+                    Security Status
+                  </Typography>
+                </Box>
+                <Typography variant="h3" fontWeight={700} sx={{ mb: 1 }}>
+                  ACTIVE
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  All security systems operational
+                </Typography>
+                <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                  <Chip label="MFA Enabled" size="small" sx={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white' }} />
+                  <Chip label="Encryption On" size="small" sx={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white' }} />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <Card sx={{ 
+              background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
+              color: 'white',
+              height: '100%'
+            }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <WarningIcon sx={{ fontSize: 32, mr: 1 }} />
+                  <Typography variant="h6" fontWeight={600}>
+                    Active Alerts
+                  </Typography>
+                </Box>
+                <Typography variant="h3" fontWeight={700} sx={{ mb: 1 }}>
+                  3
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  High priority security events
+                </Typography>
+                <Box sx={{ mt: 2 }}>
+                  <Chip label="2 Critical" size="small" sx={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white', mr: 1 }} />
+                  <Chip label="1 High" size="small" sx={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white' }} />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <Card sx={{ 
+              background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+              color: 'white',
+              height: '100%'
+            }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <CheckCircleIcon sx={{ fontSize: 32, mr: 1 }} />
+                  <Typography variant="h6" fontWeight={600}>
+                    Compliance
+                  </Typography>
+                </Box>
+                <Typography variant="h3" fontWeight={700} sx={{ mb: 1 }}>
+                  98%
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  Overall compliance score
+                </Typography>
+                <Box sx={{ mt: 2 }}>
+                  <Chip label="GDPR ✓" size="small" sx={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white', mr: 1 }} />
+                  <Chip label="HIPAA ✓" size="small" sx={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white' }} />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <Card sx={{ 
+              background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+              color: 'white',
+              height: '100%'
+            }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <TimelineIcon sx={{ fontSize: 32, mr: 1 }} />
+                  <Typography variant="h6" fontWeight={600}>
+                    Audit Events
+                  </Typography>
+                </Box>
+                <Typography variant="h3" fontWeight={700} sx={{ mb: 1 }}>
+                  1,247
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  Events in last 24h
+                </Typography>
+                <Box sx={{ mt: 2 }}>
+                  <Chip label="+12%" size="small" sx={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white' }} />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Security Charts Row */}
+          <Grid item xs={12} lg={6}>
+            <Card sx={{ height: 400 }}>
+              <CardContent>
+                <Typography variant="h6" fontWeight={600} sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
+                  <SecurityIcon sx={{ mr: 1, color: '#ff4444' }} />
+                  Security Events Timeline
+                </Typography>
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={[
+                    { time: '00:00', login: 45, failed: 2, blocked: 0 },
+                    { time: '04:00', login: 32, failed: 1, blocked: 0 },
+                    { time: '08:00', login: 78, failed: 5, blocked: 1 },
+                    { time: '12:00', login: 95, failed: 3, blocked: 0 },
+                    { time: '16:00', login: 67, failed: 4, blocked: 2 },
+                    { time: '20:00', login: 52, failed: 2, blocked: 1 },
+                    { time: '24:00', login: 38, failed: 1, blocked: 0 }
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="time" />
+                    <YAxis />
+                    <RechartsTooltip />
+                    <Legend />
+                    <Area type="monotone" dataKey="login" stackId="1" stroke="#4facfe" fill="#4facfe" fillOpacity={0.6} />
+                    <Area type="monotone" dataKey="failed" stackId="2" stroke="#ff6b35" fill="#ff6b35" fillOpacity={0.6} />
+                    <Area type="monotone" dataKey="blocked" stackId="3" stroke="#ff4444" fill="#ff4444" fillOpacity={0.6} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} lg={6}>
+            <Card sx={{ height: 400 }}>
+              <CardContent>
+                <Typography variant="h6" fontWeight={600} sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
+                  <AssessmentIcon sx={{ mr: 1, color: '#ff6b35' }} />
+                  Risk Distribution
+                </Typography>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Low Risk', value: 65, color: '#43e97b' },
+                        { name: 'Medium Risk', value: 25, color: '#ff6b35' },
+                        { name: 'High Risk', value: 8, color: '#ff4444' },
+                        { name: 'Critical', value: 2, color: '#8b0000' }
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {[
+                        { name: 'Low Risk', value: 65, color: '#43e97b' },
+                        { name: 'Medium Risk', value: 25, color: '#ff6b35' },
+                        { name: 'High Risk', value: 8, color: '#ff4444' },
+                        { name: 'Critical', value: 2, color: '#8b0000' }
+                      ].map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Security Alerts Table */}
+          <Grid item xs={12} lg={8}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" fontWeight={600} sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
+                  <WarningIcon sx={{ mr: 1, color: '#ff4444' }} />
+                  Recent Security Alerts
+                </Typography>
+                <Box sx={{ overflow: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #e0e0e0' }}>
+                        <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>Time</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>Event</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>Severity</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>User</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>IP Address</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                        <td style={{ padding: '12px' }}>14:32:15</td>
+                        <td style={{ padding: '12px' }}>Multiple failed login attempts</td>
+                        <td style={{ padding: '12px' }}>
+                          <Chip label="Critical" size="small" sx={{ backgroundColor: '#ff4444', color: 'white' }} />
+                        </td>
+                        <td style={{ padding: '12px' }}>admin@company.com</td>
+                        <td style={{ padding: '12px' }}>203.0.113.45</td>
+                        <td style={{ padding: '12px' }}>
+                          <Chip label="Blocked" size="small" sx={{ backgroundColor: '#ff6b35', color: 'white' }} />
+                        </td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                        <td style={{ padding: '12px' }}>13:45:22</td>
+                        <td style={{ padding: '12px' }}>Unauthorized data access attempt</td>
+                        <td style={{ padding: '12px' }}>
+                          <Chip label="High" size="small" sx={{ backgroundColor: '#ff6b35', color: 'white' }} />
+                        </td>
+                        <td style={{ padding: '12px' }}>user123@company.com</td>
+                        <td style={{ padding: '12px' }}>192.168.1.100</td>
+                        <td style={{ padding: '12px' }}>
+                          <Chip label="Investigated" size="small" sx={{ backgroundColor: '#4facfe', color: 'white' }} />
+                        </td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                        <td style={{ padding: '12px' }}>12:18:33</td>
+                        <td style={{ padding: '12px' }}>Suspicious file download pattern</td>
+                        <td style={{ padding: '12px' }}>
+                          <Chip label="Medium" size="small" sx={{ backgroundColor: '#ffa726', color: 'white' }} />
+                        </td>
+                        <td style={{ padding: '12px' }}>researcher@company.com</td>
+                        <td style={{ padding: '12px' }}>10.0.0.50</td>
+                        <td style={{ padding: '12px' }}>
+                          <Chip label="Pending" size="small" sx={{ backgroundColor: '#9e9e9e', color: 'white' }} />
+                        </td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                        <td style={{ padding: '12px' }}>11:05:47</td>
+                        <td style={{ padding: '12px' }}>MFA bypass attempt detected</td>
+                        <td style={{ padding: '12px' }}>
+                          <Chip label="Critical" size="small" sx={{ backgroundColor: '#ff4444', color: 'white' }} />
+                        </td>
+                        <td style={{ padding: '12px' }}>manager@company.com</td>
+                        <td style={{ padding: '12px' }}>172.16.0.25</td>
+                        <td style={{ padding: '12px' }}>
+                          <Chip label="Resolved" size="small" sx={{ backgroundColor: '#43e97b', color: 'white' }} />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Security Metrics */}
+          <Grid item xs={12} lg={4}>
+            <Card sx={{ height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" fontWeight={600} sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
+                  <AnalyticsIcon sx={{ mr: 1, color: '#4facfe' }} />
+                  Security Metrics
+                </Typography>
+                
+                <Box sx={{ mb: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="body2">Login Success Rate</Typography>
+                    <Typography variant="body2" fontWeight={600}>94.2%</Typography>
+                  </Box>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={94.2} 
+                    sx={{ 
+                      height: 8, 
+                      borderRadius: 4,
+                      backgroundColor: '#e0e0e0',
+                      '& .MuiLinearProgress-bar': {
+                        backgroundColor: '#43e97b'
+                      }
+                    }} 
+                  />
+                </Box>
+
+                <Box sx={{ mb: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="body2">MFA Adoption</Typography>
+                    <Typography variant="body2" fontWeight={600}>87.5%</Typography>
+                  </Box>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={87.5} 
+                    sx={{ 
+                      height: 8, 
+                      borderRadius: 4,
+                      backgroundColor: '#e0e0e0',
+                      '& .MuiLinearProgress-bar': {
+                        backgroundColor: '#4facfe'
+                      }
+                    }} 
+                  />
+                </Box>
+
+                <Box sx={{ mb: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="body2">Encryption Coverage</Typography>
+                    <Typography variant="body2" fontWeight={600}>100%</Typography>
+                  </Box>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={100} 
+                    sx={{ 
+                      height: 8, 
+                      borderRadius: 4,
+                      backgroundColor: '#e0e0e0',
+                      '& .MuiLinearProgress-bar': {
+                        backgroundColor: '#43e97b'
+                      }
+                    }} 
+                  />
+                </Box>
+
+                <Box sx={{ mb: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="body2">Compliance Score</Typography>
+                    <Typography variant="body2" fontWeight={600}>98.1%</Typography>
+                  </Box>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={98.1} 
+                    sx={{ 
+                      height: 8, 
+                      borderRadius: 4,
+                      backgroundColor: '#e0e0e0',
+                      '& .MuiLinearProgress-bar': {
+                        backgroundColor: '#43e97b'
+                      }
+                    }} 
+                  />
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>
+                  Quick Actions
+                </Typography>
+                <Stack spacing={1}>
+                  <Button 
+                    variant="outlined" 
+                    size="small" 
+                    startIcon={<SecurityIcon />}
+                    sx={{ justifyContent: 'flex-start' }}
+                  >
+                    View All Alerts
+                  </Button>
+                  <Button 
+                    variant="outlined" 
+                    size="small" 
+                    startIcon={<AssessmentIcon />}
+                    sx={{ justifyContent: 'flex-start' }}
+                  >
+                    Generate Report
+                  </Button>
+                  <Button 
+                    variant="outlined" 
+                    size="small" 
+                    startIcon={<TimelineIcon />}
+                    sx={{ justifyContent: 'flex-start' }}
+                  >
+                    Audit Logs
+                  </Button>
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* User Activity Monitoring */}
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" fontWeight={600} sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
+                  <ViewIcon sx={{ mr: 1, color: '#4facfe' }} />
+                  User Activity Monitoring
+                </Typography>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+                      Top Active Users (Last 24h)
+                    </Typography>
+                    <List>
+                      {[
+                        { name: 'John Doe', role: 'Admin', activity: 47, status: 'online' },
+                        { name: 'Jane Smith', role: 'Researcher', activity: 32, status: 'online' },
+                        { name: 'Mike Johnson', role: 'Analyst', activity: 28, status: 'away' },
+                        { name: 'Sarah Wilson', role: 'Manager', activity: 24, status: 'offline' },
+                        { name: 'David Brown', role: 'Developer', activity: 19, status: 'online' }
+                      ].map((user, index) => (
+                        <ListItem key={index} sx={{ px: 0 }}>
+                          <ListItemIcon>
+                            <Avatar sx={{ width: 32, height: 32, bgcolor: user.status === 'online' ? '#43e97b' : user.status === 'away' ? '#ffa726' : '#9e9e9e' }}>
+                              {user.name.split(' ').map(n => n[0]).join('')}
+                            </Avatar>
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={user.name}
+                            secondary={`${user.role} • ${user.activity} activities`}
+                          />
+                          <Chip 
+                            label={user.status} 
+                            size="small" 
+                            sx={{ 
+                              backgroundColor: user.status === 'online' ? '#43e97b' : user.status === 'away' ? '#ffa726' : '#9e9e9e',
+                              color: 'white',
+                              textTransform: 'capitalize'
+                            }} 
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+                      Recent Security Events
+                    </Typography>
+                    <List>
+                      {[
+                        { event: 'Successful MFA login', user: 'admin@company.com', time: '2 min ago', type: 'success' },
+                        { event: 'Document access granted', user: 'researcher@company.com', time: '5 min ago', type: 'info' },
+                        { event: 'Failed login attempt', user: 'unknown@external.com', time: '8 min ago', type: 'warning' },
+                        { event: 'Password changed', user: 'manager@company.com', time: '12 min ago', type: 'info' },
+                        { event: 'Suspicious download', user: 'analyst@company.com', time: '15 min ago', type: 'warning' }
+                      ].map((event, index) => (
+                        <ListItem key={index} sx={{ px: 0 }}>
+                          <ListItemIcon>
+                            {event.type === 'success' && <CheckCircleIcon sx={{ color: '#43e97b' }} />}
+                            {event.type === 'info' && <InfoIcon sx={{ color: '#4facfe' }} />}
+                            {event.type === 'warning' && <WarningIcon sx={{ color: '#ff6b35' }} />}
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={event.event}
+                            secondary={`${event.user} • ${event.time}`}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
           </Grid>
         </Grid>
       )}

@@ -26,7 +26,7 @@ ELASTICSEARCH_URL = "http://localhost:9200"
 CLASSIFICATION_URL = "http://localhost:8012/api/v1/classify/ensemble"
 OUTPUT_DIR = "rl_optimization/real_pubmed_data"
 
-class RealPubMedDataCollector:
+class  tea:
     """
     Collects real PubMed data for RL training
     """
