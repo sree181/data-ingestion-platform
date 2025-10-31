@@ -46,12 +46,12 @@ const menuItems = [
     icon: <DashboardIcon />,
     description: 'Overview & insights',
   },
-  {
-    path: '/unified-search',
-    label: 'Unified Search',
-    icon: <UnifiedSearchIcon />,
-    description: 'Search across all sources',
-  },
+  // {
+  //   path: '/unified-search',
+  //   label: 'Unified Search',
+  //   icon: <UnifiedSearchIcon />,
+  //   description: 'Search across all sources',
+  // },
   {
     path: '/documents',
     label: 'Document Library',
@@ -106,12 +106,12 @@ const menuItems = [
     icon: <ICSRReviewIcon />,
     description: 'Review & approve extracted ICSRs',
   },
-  {
-    path: '/rl-dashboard',
-    label: 'RL Dashboard',
-    icon: <PsychologyIcon />,
-    description: 'Reinforcement Learning Intelligence',
-  },
+  // {
+  //   path: '/rl-dashboard',
+  //   label: 'RL Dashboard',
+  //   icon: <PsychologyIcon />,
+  //   description: 'Reinforcement Learning Intelligence',
+  // },
   {
     path: '/rl-intelligence',
     label: 'RL Intelligence',
