@@ -203,17 +203,57 @@ class Neo4jService:
     ) -> bool:
         """Create an entity node in the knowledge graph"""
         
-        # Determine label based on entity type
+        # Enhanced label mapping for pharmacovigilance domain
         label_mapping = {
-            "PERSON": "Person",
-            "ORG": "Organization", 
+            # Medical/Pharmacovigilance Entities (GREEN in UI)
+            "DRUG": "Drug",
+            "MEDICATION": "Drug",
+            "PHARMACEUTICAL": "Drug",
+            "CHEMICAL": "Drug",
+            "SUBSTANCE": "Drug",
+            "COMPOUND": "Drug",
+            
+            # Diseases & Conditions (RED in UI)
+            "DISEASE": "Disease",
+            "CONDITION": "Disease",
+            "DISORDER": "Disease",
+            "SYNDROME": "Disease",
+            "SYMPTOM": "Disease",
+            "ADVERSE_EVENT": "Disease",
+            "SIDE_EFFECT": "Disease",
+            "ADVERSE EVENT": "Disease",
+            
+            # Medical Procedures (CYAN in UI)
+            "PROCEDURE": "Procedure",
+            "TREATMENT": "Procedure",
+            "THERAPY": "Procedure",
+            "INTERVENTION": "Procedure",
+            "SURGERY": "Procedure",
+            "TEST": "Procedure",
+            "EXAM": "Procedure",
+            
+            # Organizations (ORANGE in UI)
+            "ORG": "Organization",
             "ORGANIZATION": "Organization",
-            "GPE": "Location",
-            "LOCATION": "Location",
-            "DATE": "Date",
-            "MONEY": "Money",
-            "LAW": "Law",
-            "LEGAL": "Legal"
+            "COMPANY": "Organization",
+            "MANUFACTURER": "Organization",
+            "HOSPITAL": "Organization",
+            "INSTITUTION": "Organization",
+            
+            # People (PURPLE in UI)
+            "PERSON": "Person",
+            "PATIENT": "Person",
+            "DOCTOR": "Person",
+            "PHYSICIAN": "Person",
+            "RESEARCHER": "Person",
+            
+            # Generic fallback (GRAY in UI)
+            "GPE": "Entity",
+            "LOCATION": "Entity",
+            "DATE": "Entity",
+            "MONEY": "Entity",
+            "LAW": "Entity",
+            "LEGAL": "Entity",
         }
         
         label = label_mapping.get(entity_type.upper(), "Entity")
