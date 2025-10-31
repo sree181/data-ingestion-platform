@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ForceGraph2D from 'react-force-graph-2d';
 import {
@@ -185,6 +185,34 @@ const KnowledgeHub = () => {
     }
   }, [location.state]);
 
+  // Keyboard shortcuts for better UX
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      // ESC to deselect node and close drawer
+      if (e.key === 'Escape') {
+        setSelectedEntity(null);
+        setEntityDetails(null);
+        setHighlightNodes(new Set());
+        setHighlightLinks(new Set());
+        setDrawerOpen(false);
+        setSearchResults([]);
+        setError(null);
+      }
+      
+      // Ctrl+K or Cmd+K to focus search box
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.querySelector('input[placeholder*="Search entities"]');
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
+
   const handleSearchFromNavigation = async (entityName) => {
     setLoading(true);
     setError(null);
@@ -239,38 +267,51 @@ const KnowledgeHub = () => {
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
-      setError('Please enter a search query');
+      // Reset highlight if search is empty
+      setHighlightNodes(new Set());
+      setSearchResults([]);
+      setError(null);
       return;
     }
 
-    setLoading(true);
+    const query = searchQuery.toLowerCase();
+    
+    // Search in FILTERED graph data
+    const matchingNodes = filteredGraphData.nodes.filter(node => 
+      (node.name || '').toLowerCase().includes(query) ||
+      (node.description || '').toLowerCase().includes(query) ||
+      (node.id || '').toLowerCase().includes(query)
+    );
+
+    if (matchingNodes.length === 0) {
+      setError(`No entities found matching "${searchQuery}" in current graph`);
+      setSearchResults([]);
+      setHighlightNodes(new Set());
+      return;
+    }
+
+    // Highlight matching nodes
+    const matchingIds = new Set(matchingNodes.map(n => n.id));
+    setHighlightNodes(matchingIds);
+    setSearchResults(matchingNodes);
     setError(null);
-    setSearchResults([]);
 
-    try {
-      // Search for entities
-      const searchResponse = await apiService.searchKnowledgeHubEntities(
-        searchQuery,
-        selectedTypes.length > 0 ? selectedTypes : null,
-        20
-      );
-
-      if (searchResponse.success && searchResponse.entities && searchResponse.entities.length > 0) {
-        setSearchResults(searchResponse.entities);
-        
-        // Auto-select first result if only one
-        if (searchResponse.entities.length === 1) {
-          await loadEntityGraph(searchResponse.entities[0].name);
+    // Zoom to first match
+    if (matchingNodes.length > 0 && graphRef.current) {
+      const firstMatch = matchingNodes[0];
+      
+      // Wait a bit for the graph to render highlights
+      setTimeout(() => {
+        if (graphRef.current && firstMatch.x !== undefined && firstMatch.y !== undefined) {
+          graphRef.current.centerAt(firstMatch.x, firstMatch.y, 1000);
+          graphRef.current.zoom(2, 1000);
         }
-      } else {
-        setError('No entities found matching your search.');
-        setSearchResults([]);
-      }
-    } catch (err) {
-      setError(`Search failed: ${err.message}`);
-      console.error('Search error:', err);
-    } finally {
-      setLoading(false);
+        
+        // Auto-select if only one match
+        if (matchingNodes.length === 1) {
+          handleNodeClick(firstMatch);
+        }
+      }, 100);
     }
   };
 
@@ -423,14 +464,46 @@ const KnowledgeHub = () => {
     }
   };
 
-  // Reload graph when source filter changes
-  useEffect(() => {
-    if (graphData.nodes.length > 0) {
-      loadFullGraph();
+  // Filtered graph data based on source filter
+  const filteredGraphData = useMemo(() => {
+    if (sourceFilter === 'all') {
+      return graphData;
     }
-  }, [sourceFilter]);
+    
+    // Filter nodes by source
+    const filteredNodes = graphData.nodes.filter(node => {
+      if (sourceFilter === 'pdf') return node.has_pdf;
+      if (sourceFilter === 'external') return node.has_external;
+      if (sourceFilter === 'cross-source') return node.has_pdf && node.has_external;
+      return true;
+    });
+    
+    const filteredNodeIds = new Set(filteredNodes.map(n => n.id));
+    
+    // Filter links to only include filtered nodes
+    const filteredLinks = graphData.links.filter(link => {
+      const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+      const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+      return filteredNodeIds.has(sourceId) && filteredNodeIds.has(targetId);
+    });
+    
+    return {
+      nodes: filteredNodes,
+      links: filteredLinks
+    };
+  }, [graphData, sourceFilter]);
 
   const handleNodeClick = useCallback(async (node) => {
+    // If clicking the same node, deselect it
+    if (selectedEntity && selectedEntity.id === node.id) {
+      setSelectedEntity(null);
+      setEntityDetails(null);
+      setHighlightNodes(new Set());
+      setHighlightLinks(new Set());
+      setDrawerOpen(false);
+      return;
+    }
+    
     // Highlight this node and its connections
     const connectedNodes = new Set();
     const connectedLinks = new Set();
@@ -490,6 +563,14 @@ const KnowledgeHub = () => {
 
   const handleNodeHover = useCallback((node) => {
     setHoverNode(node || null);
+  }, []);
+
+  const handleBackgroundClick = useCallback(() => {
+    setSelectedEntity(null);
+    setEntityDetails(null);
+    setHighlightNodes(new Set());
+    setHighlightLinks(new Set());
+    setDrawerOpen(false);
   }, []);
 
   const handleRefresh = () => {
@@ -628,41 +709,62 @@ const KnowledgeHub = () => {
 
   // Render statistics cards
   const renderStatisticsCards = () => {
+    // Calculate stats dynamically from FILTERED graph data
+    const typeCounts = filteredGraphData.nodes.reduce((acc, node) => {
+      const type = node.type || 'Entity';
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {});
+    
     const statsCards = [
       {
         icon: <HubIcon />,
-        value: statistics.total_entities || 0,
+        value: filteredGraphData.nodes.length,
         label: 'Total Entities',
         color: '#667eea',
         gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
       },
       {
         icon: <TreeIcon />,
-        value: statistics.total_relationships || 0,
+        value: filteredGraphData.links.length,
         label: 'Relationships',
         color: '#10b981',
         gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
       },
       {
         icon: <DrugIcon />,
-        value: statistics.node_counts?.Drug || 0,
+        value: typeCounts.Drug || 0,
         label: 'Drugs',
-        color: '#f59e0b',
-        gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+        color: '#10b981',
+        gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
       },
       {
         icon: <DiseaseIcon />,
-        value: statistics.node_counts?.Disease || 0,
+        value: typeCounts.Disease || 0,
         label: 'Diseases',
         color: '#ef4444',
         gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
       },
+      {
+        icon: <PersonIcon />,
+        value: typeCounts.Person || 0,
+        label: 'People',
+        color: '#8b5cf6',
+        gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
+      },
+      {
+        icon: <OrgIcon />,
+        value: typeCounts.Organization || 0,
+        label: 'Organizations',
+        color: '#f59e0b',
+        gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+      },
     ];
 
     return (
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={2} sx={{ mb: 4 }}>
         {statsCards.map((stat, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
+          <Grid item xs={12} sm={6} md={4} lg={2} key={index}>
             <Card 
               elevation={0}
               sx={{
@@ -936,7 +1038,7 @@ const KnowledgeHub = () => {
             <>
               <ForceGraph2D
                 ref={graphRef}
-                graphData={graphData}
+                graphData={filteredGraphData}
                 nodeLabel={node => `
                   <div style="background: rgba(0,0,0,0.85); color: white; padding: 12px; border-radius: 8px; font-family: Arial; max-width: 250px;">
                     <div style="font-weight: 700; font-size: 14px; margin-bottom: 8px; color: ${node.color};">${node.name}</div>
@@ -1134,6 +1236,7 @@ const KnowledgeHub = () => {
                 }}
                 onNodeClick={handleNodeClick}
                 onNodeHover={handleNodeHover}
+                onBackgroundClick={handleBackgroundClick}
                 backgroundColor="transparent"
                 d3VelocityDecay={0.3}
                 cooldownTicks={200}
