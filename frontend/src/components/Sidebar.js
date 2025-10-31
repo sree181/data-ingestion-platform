@@ -113,6 +113,13 @@ const menuItems = [
     description: 'Reinforcement Learning Intelligence',
   },
   {
+    path: '/rl-intelligence',
+    label: 'RL Intelligence',
+    icon: <PsychologyIcon />,
+    description: 'AI-Powered Adaptive Classification',
+    badge: 'NEW',
+  },
+  {
     path: '/security',
     label: 'Security Dashboard',
     icon: <SecurityIcon />,

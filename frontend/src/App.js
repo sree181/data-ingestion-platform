@@ -47,6 +47,7 @@ import LiteratureAutomation from './pages/LiteratureAutomation';
 import ICSRAutomation from './pages/ICSRAutomation';
 import ICSRReviewer from './pages/ICSRReviewer';
 import RLDashboard from './pages/RLDashboard';
+import RLIntelligenceDashboard from './pages/RLIntelligenceDashboard';
 import Login from './pages/Login';
 import { SecurityProvider } from './contexts/SecurityContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -119,6 +120,7 @@ function AppContent() {
                         <Route path="icsr-automation" element={<ICSRAutomation />} />
                         <Route path="icsr-reviewer" element={<ICSRReviewer />} />
                         <Route path="rl-dashboard" element={<RLDashboard />} />
+                        <Route path="rl-intelligence" element={<RLIntelligenceDashboard />} />
                         <Route path="security" element={<ProtectedRoute requiredLevel="admin"><SecurityDashboard /></ProtectedRoute>} />
                         <Route path="security-testing" element={<ProtectedRoute requiredLevel="admin"><SecurityTesting /></ProtectedRoute>} />
                       </Routes>

@@ -401,6 +401,25 @@ services:
     networks:
       - default
 
+  # RL Intelligence Service (NEW - Reinforcement Learning Intelligence Layer)
+  rl-intelligence-service:
+    build:
+      context: .
+      dockerfile: services/rl-intelligence-service/Dockerfile
+    container_name: rl-intelligence-service
+    ports:
+      - "8013:8013"
+    volumes:
+      - ./rl_optimization:/app/rl_optimization
+    restart: unless-stopped
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8013/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 volumes:
   minio_data:
   postgres_data:
