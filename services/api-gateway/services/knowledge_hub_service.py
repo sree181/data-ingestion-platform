@@ -108,14 +108,30 @@ class KnowledgeHubService:
         try:
             logger.info(f"Getting full knowledge graph, limit: {limit}")
             
-            # Query to get all nodes and relationships
+            # Query to get all nodes and relationships (excluding system and document nodes)
             cypher = """
             MATCH (n)
-            WHERE NOT n:User AND NOT n:InvestigationBoard AND NOT n:PinnedEntity AND NOT n:Finding
+            WHERE NOT n:User 
+              AND NOT n:InvestigationBoard 
+              AND NOT n:PinnedEntity 
+              AND NOT n:Finding
+              AND NOT n:Document
+              AND NOT n:ClinicalTrial
+              AND NOT n:FDADocument
             WITH n LIMIT $limit
-            OPTIONAL MATCH (n)-[r]->(m)
-            WHERE NOT m:User AND NOT m:InvestigationBoard AND NOT m:PinnedEntity AND NOT m:Finding
-            RETURN collect(DISTINCT n) as nodes, 
+            OPTIONAL MATCH (n)-[r]-(m)
+            WHERE NOT m:User 
+              AND NOT m:InvestigationBoard 
+              AND NOT m:PinnedEntity 
+              AND NOT m:Finding
+              AND NOT m:Document
+              AND NOT m:ClinicalTrial
+              AND NOT m:FDADocument
+            RETURN collect(DISTINCT {
+                     node: n,
+                     labels: labels(n),
+                     internal_id: id(n)
+                   }) as nodes, 
                    collect(DISTINCT {
                      source: id(startNode(r)), 
                      target: id(endNode(r)), 
@@ -128,6 +144,10 @@ class KnowledgeHubService:
             # Add space_id filter if provided
             if space_id:
                 cypher = cypher.replace("MATCH (n)", "MATCH (n) WHERE n.space_id = $space_id")
+            
+            # Log the actual query being executed
+            logger.info(f"Executing Cypher query:\n{cypher}")
+            logger.info(f"With parameters: limit={limit}, space_id={space_id}")
             
             # Execute query
             result = await self._execute_cypher(cypher, {
@@ -152,21 +172,30 @@ class KnowledgeHubService:
                 nodes = []
                 node_ids = {}  # Map Neo4j internal IDs to our node IDs
                 
-                for i, node_obj in enumerate(nodes_data):
+                for i, node_data in enumerate(nodes_data):
                     try:
+                        # Debug: log raw node_data structure for first few nodes
+                        if i < 3:
+                            logger.info(f"Raw node_data[{i}]: {str(node_data)[:200]}")
+                        
+                        # Extract node properties and labels
+                        node_obj = node_data.get('node', {}) if isinstance(node_data, dict) else {}
+                        node_labels = node_data.get('labels', []) if isinstance(node_data, dict) else []
+                        neo4j_id = node_data.get('internal_id', i) if isinstance(node_data, dict) else i
+                        
+                        # Get node label/type (use first label, or 'Entity' as fallback)
+                        node_type = node_labels[0] if node_labels else 'Entity'
+                        
                         # Extract node ID (from 'id' property or generate one)
                         node_id = str(node_obj.get('id', f'node_{i}'))
-                        neo4j_id = node_obj.get('_neo4j_internal_id', i)
                         node_ids[neo4j_id] = node_id
                         
-                        # Get node label/type
-                        node_type = 'Entity'
-                        if hasattr(node_obj, 'labels') and node_obj.labels:
-                            node_type = list(node_obj.labels)[0]
+                        if i < 3:
+                            logger.info(f"Parsed node[{i}]: type={node_type}, labels={node_labels}, id={node_id[:30]}")
                         
                         nodes.append({
                             'id': node_id,
-                            'name': node_obj.get('normalized_name', node_obj.get('title', node_id)),
+                            'name': node_obj.get('normalized_name', node_obj.get('name', node_obj.get('title', node_id))),
                             'type': node_type,
                             'confidence': float(node_obj.get('confidence', 0.8)),
                             'description': node_obj.get('description', ''),
@@ -176,7 +205,7 @@ class KnowledgeHubService:
                             'has_external': bool(node_obj.get('external_source', False))
                         })
                     except Exception as e:
-                        logger.warning(f"Failed to parse node: {e}")
+                        logger.warning(f"Failed to parse node[{i}]: {e}")
                         continue
                 
                 # Format edges
