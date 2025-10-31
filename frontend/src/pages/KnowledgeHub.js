@@ -106,14 +106,62 @@ const KnowledgeHub = () => {
   const [loadingBoards, setLoadingBoards] = useState(false);
   const [pinning, setPinning] = useState(false);
 
-  // Entity type configuration
+  // Enhanced Entity type configuration with gradients and depth
   const entityConfig = {
-    Drug: { color: '#10b981', label: 'Drugs', icon: <DrugIcon /> },
-    Disease: { color: '#ef4444', label: 'Diseases', icon: <DiseaseIcon /> },
-    Person: { color: '#8b5cf6', label: 'People', icon: <PersonIcon /> },
-    Organization: { color: '#f59e0b', label: 'Organizations', icon: <OrgIcon /> },
-    Procedure: { color: '#06b6d4', label: 'Procedures', icon: <EntityIcon /> },
-    Entity: { color: '#6b7280', label: 'Other Entities', icon: <EntityIcon /> },
+    Drug: { 
+      color: '#10b981', 
+      gradient: ['#10b981', '#059669'],
+      shadow: 'rgba(16, 185, 129, 0.4)',
+      hover: '#34d399',
+      glow: 'rgba(16, 185, 129, 0.6)',
+      label: 'Drugs', 
+      icon: <DrugIcon /> 
+    },
+    Disease: { 
+      color: '#ef4444', 
+      gradient: ['#ef4444', '#dc2626'],
+      shadow: 'rgba(239, 68, 68, 0.4)',
+      hover: '#f87171',
+      glow: 'rgba(239, 68, 68, 0.6)',
+      label: 'Diseases', 
+      icon: <DiseaseIcon /> 
+    },
+    Person: { 
+      color: '#8b5cf6', 
+      gradient: ['#8b5cf6', '#7c3aed'],
+      shadow: 'rgba(139, 92, 246, 0.4)',
+      hover: '#a78bfa',
+      glow: 'rgba(139, 92, 246, 0.6)',
+      label: 'People', 
+      icon: <PersonIcon /> 
+    },
+    Organization: { 
+      color: '#f59e0b', 
+      gradient: ['#f59e0b', '#d97706'],
+      shadow: 'rgba(245, 158, 11, 0.4)',
+      hover: '#fbbf24',
+      glow: 'rgba(245, 158, 11, 0.6)',
+      label: 'Organizations', 
+      icon: <OrgIcon /> 
+    },
+    Procedure: { 
+      color: '#06b6d4', 
+      gradient: ['#06b6d4', '#0891b2'],
+      shadow: 'rgba(6, 182, 212, 0.4)',
+      hover: '#22d3ee',
+      glow: 'rgba(6, 182, 212, 0.6)',
+      label: 'Procedures', 
+      icon: <EntityIcon /> 
+    },
+    Entity: { 
+      color: '#6b7280', 
+      gradient: ['#6b7280', '#4b5563'],
+      shadow: 'rgba(107, 114, 128, 0.4)',
+      hover: '#9ca3af',
+      glow: 'rgba(107, 114, 128, 0.6)',
+      label: 'Other Entities', 
+      icon: <EntityIcon /> 
+    },
   };
 
   // Load initial statistics and FULL GRAPH on mount
@@ -861,12 +909,21 @@ const KnowledgeHub = () => {
         <Card 
           elevation={0}
           sx={{
-            background: 'rgba(255, 255, 255, 0.98)',
+            background: `
+              radial-gradient(at 0% 0%, rgba(56, 178, 172, 0.08) 0px, transparent 50%),
+              radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
+              radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.08) 0px, transparent 50%),
+              radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+              linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%)
+            `,
             backdropFilter: 'blur(10px)',
             borderRadius: 3,
             overflow: 'hidden',
             height: '70vh',
-            position: 'relative'
+            position: 'relative',
+            border: '1px solid',
+            borderColor: 'divider',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.08)'
           }}
         >
           {loading ? (
@@ -912,71 +969,184 @@ const KnowledgeHub = () => {
                     return;
                   }
                   
-                  const label = node.name;
-                  const fontSize = 12/globalScale;
-                  ctx.font = `${fontSize}px Sans-Serif`;
-                  
-                  // Determine if highlighted
+                  const config = entityConfig[node.type] || entityConfig.Entity;
+                  const radius = Math.max(4, (node.val || 5) / globalScale * 3);
                   const isHighlighted = highlightNodes.size === 0 || highlightNodes.has(node.id);
                   const isHovered = hoverNode && hoverNode.id === node.id;
+                  const isSelected = selectedEntity && selectedEntity.id === node.id;
                   
-                  // Draw node circle with glow
-                  const radius = node.val || 5;
+                  // Save context
+                  ctx.save();
                   
-                  if (isHighlighted) {
-                    // Glow effect - with additional safety checks
-                    try {
-                      const gradient = ctx.createRadialGradient(node.x, node.y, radius * 0.5, node.x, node.y, radius * 2);
-                      gradient.addColorStop(0, node.color + '60');
-                      gradient.addColorStop(1, node.color + '00');
-                      ctx.fillStyle = gradient;
-                      ctx.beginPath();
-                      ctx.arc(node.x, node.y, radius * 2, 0, 2 * Math.PI);
-                      ctx.fill();
-                    } catch (e) {
-                      // Fallback: skip glow if gradient fails
-                      console.debug('Glow effect skipped for node:', node.id);
+                  try {
+                    // OUTER GLOW for selected/important nodes
+                    if (isSelected || isHovered) {
+                      ctx.shadowColor = config.glow;
+                      ctx.shadowBlur = isSelected ? 20 : 15;
                     }
+                    
+                    // GRADIENT FILL (radial gradient for depth)
+                    const gradient = ctx.createRadialGradient(
+                      node.x - radius * 0.3, 
+                      node.y - radius * 0.3, 
+                      radius * 0.1,
+                      node.x, 
+                      node.y, 
+                      radius
+                    );
+                    gradient.addColorStop(0, config.gradient[0]);
+                    gradient.addColorStop(1, config.gradient[1]);
+                    
+                    // Main circle
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
+                    ctx.fillStyle = isHighlighted ? gradient : '#e5e7eb';
+                    ctx.fill();
+                    
+                    // INNER HIGHLIGHT (3D effect)
+                    if (isHighlighted) {
+                      const highlightGradient = ctx.createRadialGradient(
+                        node.x - radius * 0.4,
+                        node.y - radius * 0.4,
+                        0,
+                        node.x - radius * 0.3,
+                        node.y - radius * 0.3,
+                        radius * 0.6
+                      );
+                      highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                      highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                      
+                      ctx.beginPath();
+                      ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
+                      ctx.fillStyle = highlightGradient;
+                      ctx.fill();
+                    }
+                    
+                    // Reset shadow
+                    ctx.shadowBlur = 0;
+                    
+                    // BORDER with state-based styling
+                    ctx.strokeStyle = isSelected ? '#ffffff' : 
+                                      isHovered ? config.hover : 
+                                      isHighlighted ? 'rgba(255, 255, 255, 0.5)' : 
+                                      '#d1d5db';
+                    ctx.lineWidth = isSelected ? 4/globalScale : 
+                                    isHovered ? 3/globalScale : 
+                                    2/globalScale;
+                    ctx.stroke();
+                    
+                    // LABEL - Visible for important or hovered nodes
+                    const label = node.name;
+                    const shouldShowLabel = isSelected || isHovered || 
+                                           (node.val > 8 && globalScale >= 1.2);
+                    
+                    if (shouldShowLabel && isHighlighted) {
+                      const fontSize = Math.max(10, 13 / globalScale);
+                      ctx.font = `600 ${fontSize}px "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+                      ctx.textAlign = 'center';
+                      ctx.textBaseline = 'middle';
+                      
+                      // Label background for readability
+                      const textMetrics = ctx.measureText(label);
+                      const textWidth = Math.min(textMetrics.width, 150 / globalScale);
+                      const padding = 6 / globalScale;
+                      const labelY = node.y + radius + fontSize + 4 / globalScale;
+                      
+                      // Background with rounded corners
+                      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                      ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+                      ctx.shadowBlur = 4;
+                      
+                      // Rounded rectangle for label background
+                      const rectX = node.x - textWidth/2 - padding;
+                      const rectY = labelY - fontSize/2 - padding/2;
+                      const rectWidth = textWidth + padding * 2;
+                      const rectHeight = fontSize + padding;
+                      const cornerRadius = padding;
+                      
+                      ctx.beginPath();
+                      ctx.moveTo(rectX + cornerRadius, rectY);
+                      ctx.lineTo(rectX + rectWidth - cornerRadius, rectY);
+                      ctx.quadraticCurveTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + cornerRadius);
+                      ctx.lineTo(rectX + rectWidth, rectY + rectHeight - cornerRadius);
+                      ctx.quadraticCurveTo(rectX + rectWidth, rectY + rectHeight, rectX + rectWidth - cornerRadius, rectY + rectHeight);
+                      ctx.lineTo(rectX + cornerRadius, rectY + rectHeight);
+                      ctx.quadraticCurveTo(rectX, rectY + rectHeight, rectX, rectY + rectHeight - cornerRadius);
+                      ctx.lineTo(rectX, rectY + cornerRadius);
+                      ctx.quadraticCurveTo(rectX, rectY, rectX + cornerRadius, rectY);
+                      ctx.closePath();
+                      ctx.fill();
+                      
+                      ctx.shadowBlur = 0;
+                      
+                      // Text
+                      ctx.fillStyle = '#1f2937';
+                      // Truncate label if too long
+                      const truncatedLabel = label.length > 20 ? label.substring(0, 18) + '...' : label;
+                      ctx.fillText(truncatedLabel, node.x, labelY);
+                    }
+                  } catch (e) {
+                    // Fallback to simple rendering
+                    console.debug('Enhanced rendering failed for node:', node.id, e);
+                    ctx.fillStyle = config.color;
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
+                    ctx.fill();
                   }
                   
-                  // Main circle
-                  ctx.fillStyle = isHighlighted ? node.color : '#e5e7eb';
-                  ctx.beginPath();
-                  ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
-                  ctx.fill();
-                  
-                  // Border
-                  ctx.strokeStyle = isHovered ? '#ffffff' : (isHighlighted ? node.color : '#d1d5db');
-                  ctx.lineWidth = isHovered ? 3/globalScale : 2/globalScale;
-                  ctx.stroke();
-                  
-                  // Draw label only if highlighted or hovered, and scale is sufficient
-                  if ((isHighlighted || isHovered) && globalScale >= 1.5) {
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillStyle = isHighlighted ? '#1f2937' : '#9ca3af';
-                    ctx.fillText(label, node.x, node.y + radius + fontSize + 2);
-                  }
+                  // Restore context
+                  ctx.restore();
                 }}
                 linkLabel={link => link.label || link.type}
-                linkColor={link => {
-                  // Highlight logic
-                  if (highlightLinks.size === 0) return '#cbd5e140';
-                  return highlightLinks.has(link) ? '#667eea80' : '#e5e7eb40';
+                linkCanvasObjectMode={() => 'after'}
+                linkCanvasObject={(link, ctx, globalScale) => {
+                  const start = link.source;
+                  const end = link.target;
+                  
+                  if (typeof start !== 'object' || typeof end !== 'object') return;
+                  
+                  const isHighlighted = highlightLinks.size === 0 || highlightLinks.has(link);
+                  const opacity = isHighlighted ? 0.6 : 0.2;
+                  
+                  // Get source and target node configs
+                  const sourceConfig = entityConfig[start.type] || entityConfig.Entity;
+                  const targetConfig = entityConfig[end.type] || entityConfig.Entity;
+                  
+                  // GRADIENT LINK (from source color to target color)
+                  const gradient = ctx.createLinearGradient(start.x, start.y, end.x, end.y);
+                  gradient.addColorStop(0, `${sourceConfig.color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`);
+                  gradient.addColorStop(1, `${targetConfig.color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`);
+                  
+                  ctx.strokeStyle = gradient;
+                  ctx.lineWidth = isHighlighted ? 2.5 : 1;
+                  ctx.lineCap = 'round';
+                  
+                  // DASHED for certain relationship types
+                  const linkType = (link.label || link.type || '').toUpperCase();
+                  if (linkType.includes('RELATED') || linkType.includes('ASSOCIATED')) {
+                    ctx.setLineDash([5, 3]);
+                  } else {
+                    ctx.setLineDash([]);
+                  }
+                  
+                  ctx.beginPath();
+                  ctx.moveTo(start.x, start.y);
+                  ctx.lineTo(end.x, end.y);
+                  ctx.stroke();
+                  ctx.setLineDash([]);
                 }}
-                linkWidth={link => {
-                  if (highlightLinks.size === 0) return 1;
-                  return highlightLinks.has(link) ? 3 : 0.5;
+                linkDirectionalParticles={link => (highlightLinks.size === 0 || highlightLinks.has(link)) ? 4 : 0}
+                linkDirectionalParticleWidth={4}
+                linkDirectionalParticleSpeed={0.008}
+                linkDirectionalParticleColor={(link) => {
+                  const sourceConfig = entityConfig[link.source?.type] || entityConfig.Entity;
+                  return sourceConfig.color;
                 }}
-                linkDirectionalParticles={link => highlightLinks.has(link) ? 4 : 0}
-                linkDirectionalParticleWidth={3}
-                linkDirectionalParticleSpeed={0.006}
-                linkDirectionalParticleColor={() => '#667eea'}
                 onNodeClick={handleNodeClick}
                 onNodeHover={handleNodeHover}
-                backgroundColor="#fafafa"
+                backgroundColor="transparent"
                 d3VelocityDecay={0.3}
-                cooldownTicks={100}
+                cooldownTicks={200}
                 onEngineStop={() => {
                   if (graphRef.current) {
                     graphRef.current.zoomToFit(400);

@@ -50,12 +50,13 @@ const RLIntelligenceDashboard = () => {
       setLoading(true);
       setError(null);
 
-      // Fetch all RL data
+      // Fetch all RL data (via API Gateway proxy)
+      const apiBase = process.env.REACT_APP_API_URL || 'http://localhost:8000';
       const [statusRes, metricsRes, historyRes, weightsRes] = await Promise.all([
-        fetch('http://localhost:8013/api/v1/rl/status'),
-        fetch('http://localhost:8013/api/v1/rl/metrics'),
-        fetch('http://localhost:8013/api/v1/rl/training-history'),
-        fetch('http://localhost:8013/api/v1/rl/model-weights')
+        fetch(`${apiBase}/api/rl/status`),
+        fetch(`${apiBase}/api/rl/metrics`),
+        fetch(`${apiBase}/api/rl/training-history`),
+        fetch(`${apiBase}/api/rl/model-weights`)
       ]);
 
       if (statusRes.ok) setRLStatus(await statusRes.json());
