@@ -335,21 +335,11 @@ const KnowledgeHub = () => {
     return entityConfig[type]?.color || entityConfig.Entity.color;
   };
 
-  // Color by source mix (PDF, external, or both)
+  // Color by entity type (Drug, Disease, Person, etc.) - ENHANCED
   const getNodeColorBySource = (node) => {
-    const hasPdf = node.has_pdf || (node.source_types && node.source_types.includes('pdf'));
-    const hasExternal = node.has_external || (node.source_types && node.source_types.some(st => st !== 'pdf'));
-    
-    if (hasPdf && hasExternal) {
-      // Cross-source (mentioned in both PDFs and external sources)
-      return '#9333ea'; // Purple
-    } else if (hasExternal) {
-      // External source only (Clinical Trials, FDA, etc.)
-      return '#f97316'; // Orange
-    } else {
-      // PDF only
-      return '#3b82f6'; // Blue
-    }
+    // Use entity type for color (matching our enhanced color palette)
+    const config = entityConfig[node.type] || entityConfig.Entity;
+    return config.color;
   };
 
   const loadFullGraph = async () => {
