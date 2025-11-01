@@ -1,0 +1,719 @@
+% ============================================================================
+% CHAPTER 8: SECURITY FEATURES & ROADMAP
+% ============================================================================
+
+\chapter{Security Features \& Roadmap}
+
+\section{Current Security Implementation}
+
+\subsection{Authentication \& Authorization}
+
+\subsubsection{JWT Token-Based Authentication}
+
+The platform implements secure, stateless authentication using JSON Web Tokens (JWT).
+
+\textbf{Token Architecture:}
+\begin{lstlisting}[style=pythonstyle]
+# services/api-gateway/middleware/auth.py
+from jose import JWTError, jwt
+from datetime import datetime, timedelta
+
+class JWTAuthentication:
+    def __init__(self):
+        self.secret_key = os.getenv("JWT_SECRET_KEY")
+        self.algorithm = "HS256"
+        self.access_token_expire = 1800  # 30 minutes
+        self.refresh_token_expire = 604800  # 7 days
+    
+    def create_access_token(self, user_id: str, role: str) -> str:
+        """Generate short-lived access token"""
+        payload = {
+            "sub": user_id,
+            "role": role,
+            "type": "access",
+            "exp": datetime.utcnow() + timedelta(seconds=self.access_token_expire),
+            "iat": datetime.utcnow()
+        }
+        return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
+    
+    def create_refresh_token(self, user_id: str) -> str:
+        """Generate long-lived refresh token"""
+        payload = {
+            "sub": user_id,
+            "type": "refresh",
+            "exp": datetime.utcnow() + timedelta(seconds=self.refresh_token_expire),
+            "iat": datetime.utcnow()
+        }
+        return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
+    
+    def verify_token(self, token: str) -> dict:
+        """Verify and decode JWT token"""
+        try:
+            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            return payload
+        except JWTError:
+            raise HTTPException(status_code=401, detail="Invalid token")
+\end{lstlisting}
+
+\textbf{Token Security Features:}
+\begin{itemize}
+    \item \textbf{Short Expiry}: Access tokens expire in 30 minutes
+    \item \textbf{Refresh Mechanism}: Refresh tokens valid for 7 days
+    \item \textbf{Secure Storage}: HTTP-only cookies (not accessible to JavaScript)
+    \item \textbf{CSRF Protection}: SameSite cookie attribute set to 'Lax'
+    \item \textbf{Token Blacklisting}: Revoked tokens stored in Redis
+\end{itemize}
+
+\subsubsection{Role-Based Access Control (RBAC)}
+
+Comprehensive permission system with 5 predefined roles.
+
+\begin{table}[h]
+\centering
+\caption{RBAC Permission Matrix}
+\begin{tabularx}{\textwidth}{lXXXXX}
+\toprule
+\textbf{Resource} & \textbf{Admin} & \textbf{Data Mgr} & \textbf{Reviewer} & \textbf{Analyst} & \textbf{Guest} \\
+\midrule
+Upload Documents & ✓ & ✓ & ✗ & ✗ & ✗ \\
+View Documents & ✓ & ✓ & ✓ & ✓ & ✓ \\
+Classify Documents & ✓ & ✓ & ✗ & ✗ & ✗ \\
+Review ICSRs & ✓ & ✓ & ✓ & ✗ & ✗ \\
+Approve ICSRs & ✓ & ✗ & ✓ & ✗ & ✗ \\
+Manage Users & ✓ & ✗ & ✗ & ✗ & ✗ \\
+View Knowledge Hub & ✓ & ✓ & ✓ & ✓ & ✓ \\
+Investigation Boards & ✓ & ✓ & ✓ & ✓ (read) & ✗ \\
+System Settings & ✓ & ✗ & ✗ & ✗ & ✗ \\
+API Access & ✓ & ✓ & ✓ & ✓ (read) & ✗ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Implementation:}
+\begin{lstlisting}[style=pythonstyle]
+# services/api-gateway/middleware/rbac.py
+from functools import wraps
+from fastapi import HTTPException, Depends
+
+def require_role(allowed_roles: list):
+    """Decorator to enforce role-based access"""
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, current_user: dict = Depends(get_current_user), **kwargs):
+            if current_user['role'] not in allowed_roles:
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Access denied. Required roles: {allowed_roles}"
+                )
+            return await func(*args, current_user=current_user, **kwargs)
+        return wrapper
+    return decorator
+
+# Usage example
+@router.post("/api/v1/upload")
+@require_role(['admin', 'data_manager'])
+async def upload_documents(current_user: dict = Depends(get_current_user)):
+    # Only admin and data_manager can upload
+    pass
+\end{lstlisting}
+
+\subsection{Data Security}
+
+\subsubsection{Encryption at Rest}
+
+All sensitive data encrypted using industry-standard algorithms.
+
+\begin{table}[h]
+\centering
+\caption{Encryption Standards by Data Type}
+\begin{tabularx}{\textwidth}{lXl}
+\toprule
+\textbf{Data Type} & \textbf{Encryption Method} & \textbf{Key Length} \\
+\midrule
+PostgreSQL Database & AES-256-GCM & 256-bit \\
+Document Content & AES-256-CTR & 256-bit \\
+User Passwords & Argon2id (PHC winner) & N/A \\
+API Keys & AES-256-GCM + Key Derivation & 256-bit \\
+Session Data (Redis) & TLS 1.3 in transit & N/A \\
+Elasticsearch Indices & XPack Security + TLS & 256-bit \\
+Neo4j Graph Data & Enterprise Encryption & 256-bit \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Password Hashing Implementation:}
+\begin{lstlisting}[style=pythonstyle]
+# services/api-gateway/services/auth_service.py
+from passlib.context import CryptContext
+
+# Argon2id configuration (winner of Password Hashing Competition)
+pwd_context = CryptContext(
+    schemes=["argon2"],
+    argon2__memory_cost=65536,  # 64 MB
+    argon2__time_cost=3,        # 3 iterations
+    argon2__parallelism=4       # 4 parallel threads
+)
+
+def hash_password(password: str) -> str:
+    """Hash password using Argon2id"""
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify password against hash"""
+    return pwd_context.verify(plain_password, hashed_password)
+\end{lstlisting}
+
+\subsubsection{Encryption in Transit}
+
+\textbf{TLS/SSL Configuration:}
+\begin{lstlisting}[style=pythonstyle]
+# frontend/nginx-ssl.conf
+server {
+    listen 443 ssl http2;
+    server_name yourdomain.com;
+    
+    # SSL certificates
+    ssl_certificate /etc/ssl/certs/fullchain.pem;
+    ssl_certificate_key /etc/ssl/private/privkey.pem;
+    
+    # Strong TLS configuration
+    ssl_protocols TLSv1.3 TLSv1.2;
+    ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305';
+    ssl_prefer_server_ciphers on;
+    
+    # Perfect Forward Secrecy
+    ssl_ecdh_curve secp384r1;
+    ssl_dhparam /etc/ssl/certs/dhparam.pem;
+    
+    # HSTS (HTTP Strict Transport Security)
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" always;
+}
+\end{lstlisting}
+
+\textbf{Inter-Service Communication:}
+\begin{itemize}
+    \item All microservice communication encrypted with mutual TLS (mTLS)
+    \item Certificate-based authentication between services
+    \item Automatic certificate rotation (Let's Encrypt)
+    \item Service mesh ready (Istio/Linkerd compatible)
+\end{itemize}
+
+\subsection{Access Control Features}
+
+\subsubsection{Multi-Factor Authentication (MFA)}
+
+Optional 2FA using Time-based One-Time Passwords (TOTP).
+
+\textbf{Implementation:}
+\begin{lstlisting}[style=pythonstyle]
+# services/api-gateway/services/mfa_service.py
+import pyotp
+import qrcode
+from io import BytesIO
+
+class MFAService:
+    def generate_secret(self, user_email: str) -> dict:
+        """Generate TOTP secret for user"""
+        secret = pyotp.random_base32()
+        totp = pyotp.TOTP(secret)
+        
+        # Generate provisioning URI for QR code
+        provisioning_uri = totp.provisioning_uri(
+            name=user_email,
+            issuer_name="Data Ingestion Platform"
+        )
+        
+        # Generate QR code
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(provisioning_uri)
+        qr.make(fit=True)
+        
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = BytesIO()
+        img.save(buffer, format='PNG')
+        qr_code_base64 = base64.b64encode(buffer.getvalue()).decode()
+        
+        return {
+            "secret": secret,
+            "qr_code": qr_code_base64,
+            "provisioning_uri": provisioning_uri
+        }
+    
+    def verify_totp(self, secret: str, token: str) -> bool:
+        """Verify TOTP token"""
+        totp = pyotp.TOTP(secret)
+        return totp.verify(token, valid_window=1)  # Allow 30s drift
+\end{lstlisting}
+
+\textbf{MFA Features:}
+\begin{itemize}
+    \item Compatible with Google Authenticator, Authy, Microsoft Authenticator
+    \item Backup codes generated during setup (10 one-time use codes)
+    \item Account recovery via admin intervention
+    \item Optional enforcement per role (mandatory for admins)
+    \item Device trust (remember device for 30 days)
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: MFA Setup - QR Code \& Verification]}}
+\caption{Multi-Factor Authentication Setup Screen}
+\label{fig:mfa-setup}
+\end{figure}
+
+\subsubsection{Session Management}
+
+\begin{lstlisting}[style=pythonstyle]
+# services/api-gateway/middleware/session.py
+from redis import Redis
+import hashlib
+
+class SessionManager:
+    def __init__(self, redis_client: Redis):
+        self.redis = redis_client
+        self.session_timeout = 1800  # 30 minutes
+        self.max_sessions_per_user = 3  # Concurrent session limit
+    
+    def create_session(self, user_id: str, device_info: dict) -> str:
+        """Create new session for user"""
+        session_id = self._generate_session_id(user_id, device_info)
+        
+        # Check concurrent session limit
+        active_sessions = self.get_active_sessions(user_id)
+        if len(active_sessions) >= self.max_sessions_per_user:
+            # Revoke oldest session
+            self.revoke_session(active_sessions[0])
+        
+        # Store session data
+        session_data = {
+            "user_id": user_id,
+            "created_at": datetime.utcnow().isoformat(),
+            "device": device_info,
+            "ip_address": device_info.get("ip"),
+            "user_agent": device_info.get("user_agent")
+        }
+        
+        self.redis.setex(
+            f"session:{session_id}",
+            self.session_timeout,
+            json.dumps(session_data)
+        )
+        
+        # Track active sessions for user
+        self.redis.sadd(f"user_sessions:{user_id}", session_id)
+        
+        return session_id
+    
+    def validate_session(self, session_id: str) -> dict:
+        """Validate and refresh session"""
+        session_data = self.redis.get(f"session:{session_id}")
+        if not session_data:
+            raise HTTPException(status_code=401, detail="Session expired")
+        
+        # Refresh session timeout (sliding expiration)
+        self.redis.expire(f"session:{session_id}", self.session_timeout)
+        
+        return json.loads(session_data)
+    
+    def revoke_session(self, session_id: str):
+        """Revoke specific session"""
+        session_data = self.redis.get(f"session:{session_id}")
+        if session_data:
+            user_id = json.loads(session_data)["user_id"]
+            self.redis.srem(f"user_sessions:{user_id}", session_id)
+        self.redis.delete(f"session:{session_id}")
+\end{lstlisting}
+
+\subsection{Audit \& Compliance}
+
+\subsubsection{Comprehensive Audit Logging}
+
+All user actions logged to PostgreSQL with immutable records.
+
+\textbf{Audit Log Schema:}
+\begin{lstlisting}[style=pythonstyle]
+# services/api-gateway/models/audit_log.py
+from sqlalchemy import Column, String, DateTime, JSON, Index
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+    
+    id = Column(String, primary_key=True)
+    timestamp = Column(DateTime(timezone=True), nullable=False, index=True)
+    user_id = Column(String, nullable=False, index=True)
+    user_email = Column(String, nullable=False)
+    action_type = Column(String, nullable=False, index=True)  # LOGIN, UPLOAD, CLASSIFY, etc.
+    resource_type = Column(String, nullable=True)  # document, user, space
+    resource_id = Column(String, nullable=True, index=True)
+    action_details = Column(JSON, nullable=True)
+    ip_address = Column(String, nullable=False)
+    user_agent = Column(String, nullable=True)
+    session_id = Column(String, nullable=False)
+    status = Column(String, nullable=False)  # success, failure
+    error_message = Column(String, nullable=True)
+    
+    __table_args__ = (
+        Index('idx_audit_user_timestamp', 'user_id', 'timestamp'),
+        Index('idx_audit_action_timestamp', 'action_type', 'timestamp'),
+    )
+\end{lstlisting}
+
+\textbf{Logged Actions:}
+\begin{itemize}
+    \item \textbf{Authentication}: Login, logout, failed attempts, MFA verification
+    \item \textbf{Document Operations}: Upload, download, delete, classify
+    \item \textbf{User Management}: Create, update, delete users, role changes
+    \item \textbf{Access Control}: Permission grants/revokes, ICSR approvals
+    \item \textbf{Configuration}: System settings changes, API key generation
+    \item \textbf{Data Access}: Document views, entity queries, API calls
+\end{itemize}
+
+\textbf{Compliance Features:}
+\begin{table}[h]
+\centering
+\caption{Regulatory Compliance Standards}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Standard} & \textbf{Compliance Status} \\
+\midrule
+\textbf{21 CFR Part 11} & ✓ Electronic signatures, audit trails, access control \\
+\textbf{GDPR} & ✓ Data encryption, right to erasure, audit logs \\
+\textbf{HIPAA} & ✓ PHI encryption, access controls, audit logs \\
+\textbf{ISO 27001} & ✓ Information security management \\
+\textbf{SOC 2 Type II} & ⏳ Planned Q2 2026 certification \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Data Privacy Features}
+
+\begin{lstlisting}[style=pythonstyle]
+# services/api-gateway/services/privacy_service.py
+class PrivacyService:
+    def anonymize_patient_data(self, text: str) -> str:
+        """Redact PII from document text"""
+        # Regex patterns for PII
+        patterns = {
+            'ssn': r'\b\d{3}-\d{2}-\d{4}\b',
+            'email': r'\b[\w\.-]+@[\w\.-]+\.\w+\b',
+            'phone': r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b',
+            'mrn': r'\bMRN:\s*\d+\b',
+            'dob': r'\b\d{1,2}/\d{1,2}/\d{2,4}\b'
+        }
+        
+        for pii_type, pattern in patterns.items():
+            text = re.sub(pattern, f'[{pii_type.upper()}_REDACTED]', text)
+        
+        return text
+    
+    def export_user_data(self, user_id: str) -> dict:
+        """GDPR Article 15: Right to Access"""
+        # Collect all user data from all systems
+        user_data = {
+            "profile": self.get_user_profile(user_id),
+            "documents": self.get_user_documents(user_id),
+            "audit_logs": self.get_user_audit_logs(user_id),
+            "sessions": self.get_user_sessions(user_id)
+        }
+        return user_data
+    
+    def delete_user_data(self, user_id: str):
+        """GDPR Article 17: Right to Erasure"""
+        # Cascade delete user data (keeping audit trail)
+        with transaction():
+            # Anonymize user in audit logs (keep logs for compliance)
+            self.anonymize_audit_logs(user_id)
+            # Delete user documents
+            self.delete_user_documents(user_id)
+            # Delete user profile
+            self.delete_user_profile(user_id)
+            # Revoke all sessions
+            self.revoke_all_sessions(user_id)
+\end{lstlisting}
+
+\subsection{API Security}
+
+\subsubsection{Rate Limiting \& Throttling}
+
+Multi-tier rate limiting to prevent abuse.
+
+\begin{lstlisting}[style=pythonstyle]
+# services/api-gateway/middleware/rate_limiter.py
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+limiter = Limiter(key_func=get_remote_address)
+
+# Tier 1: Per-IP rate limiting (anonymous)
+@limiter.limit("100/hour")
+@router.get("/api/v1/public/search")
+async def public_search(request: Request):
+    pass
+
+# Tier 2: Per-user rate limiting (authenticated)
+@limiter.limit("1000/hour")
+@router.get("/api/v1/documents")
+async def get_documents(current_user: dict = Depends(get_current_user)):
+    pass
+
+# Tier 3: Cost-based limiting (for expensive operations)
+@limiter.limit("10/minute")
+@router.post("/api/v1/pv-classification/classify/batch")
+async def classify_batch(current_user: dict = Depends(get_current_user)):
+    pass
+
+# Tier 4: Dynamic throttling based on system load
+class AdaptiveRateLimiter:
+    def __init__(self):
+        self.redis = Redis()
+    
+    def get_current_limit(self, user_id: str) -> int:
+        """Adjust rate limit based on system load"""
+        cpu_usage = psutil.cpu_percent()
+        
+        if cpu_usage > 90:
+            return 100  # Strict limit under high load
+        elif cpu_usage > 70:
+            return 500  # Moderate limit
+        else:
+            return 1000  # Normal limit
+\end{lstlisting}
+
+\subsubsection{Input Validation \& Sanitization}
+
+\begin{lstlisting}[style=pythonstyle]
+# services/api-gateway/validators/input_validator.py
+from pydantic import BaseModel, validator, constr
+import bleach
+
+class DocumentUploadRequest(BaseModel):
+    """Validate document upload request"""
+    title: constr(min_length=1, max_length=500)
+    space_id: constr(regex=r'^space_[a-zA-Z0-9]+$')
+    
+    @validator('title')
+    def sanitize_title(cls, v):
+        """Remove HTML/JS to prevent XSS"""
+        return bleach.clean(v, tags=[], strip=True)
+
+class UserCreateRequest(BaseModel):
+    """Validate user creation"""
+    email: EmailStr
+    password: constr(min_length=12, max_length=128)
+    role: str
+    
+    @validator('password')
+    def validate_password_strength(cls, v):
+        """Enforce strong password policy"""
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('Password must contain uppercase')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('Password must contain lowercase')
+        if not re.search(r'[0-9]', v):
+            raise ValueError('Password must contain digit')
+        if not re.search(r'[!@#$%^&*]', v):
+            raise ValueError('Password must contain special char')
+        return v
+    
+    @validator('role')
+    def validate_role(cls, v):
+        """Ensure role is valid"""
+        valid_roles = ['admin', 'data_manager', 'reviewer', 'analyst', 'guest']
+        if v not in valid_roles:
+            raise ValueError(f'Invalid role. Must be one of: {valid_roles}')
+        return v
+\end{lstlisting}
+
+\section{Security Roadmap (2026-2027)}
+
+\subsection{Q1 2026: Enhanced Authentication}
+
+\textbf{Planned Features:}
+\begin{enumerate}
+    \item \textbf{Single Sign-On (SSO)}
+    \begin{itemize}
+        \item SAML 2.0 integration with corporate IdPs
+        \item OAuth 2.0 / OpenID Connect support
+        \item Microsoft Azure AD, Okta, Google Workspace
+        \item Automatic user provisioning via SCIM
+    \end{itemize}
+    
+    \item \textbf{Biometric Authentication}
+    \begin{itemize}
+        \item WebAuthn / FIDO2 support
+        \item Fingerprint, Face ID for mobile devices
+        \item Hardware security keys (YubiKey, Titan)
+    \end{itemize}
+    
+    \item \textbf{Adaptive Authentication}
+    \begin{itemize}
+        \item Risk-based authentication (IP, device, behavior)
+        \item Step-up authentication for sensitive actions
+        \item Geo-location based access restrictions
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Q2 2026: Data Loss Prevention (DLP)}
+
+\textbf{Planned Features:}
+\begin{enumerate}
+    \item \textbf{Content Inspection}
+    \begin{itemize}
+        \item Automatic PII detection in uploaded documents
+        \item Configurable DLP policies (block, redact, alert)
+        \item Integration with cloud DLP services (AWS Macie, Google DLP)
+    \end{itemize}
+    
+    \item \textbf{Data Exfiltration Prevention}
+    \begin{itemize}
+        \item Document watermarking (visible \& invisible)
+        \item Download restrictions per role
+        \item Email gateway integration (prevent unauthorized sharing)
+    \end{itemize}
+    
+    \item \textbf{Insider Threat Detection}
+    \begin{itemize}
+        \item ML-based anomaly detection (unusual access patterns)
+        \item User behavior analytics (UEBA)
+        \item Automated alerts to security team
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Q3 2026: Advanced Threat Protection}
+
+\textbf{Planned Features:}
+\begin{enumerate}
+    \item \textbf{Intrusion Detection System (IDS)}
+    \begin{itemize}
+        \item Real-time network traffic analysis
+        \item Signature-based + anomaly-based detection
+        \item Integration with Suricata or Snort
+    \end{itemize}
+    
+    \item \textbf{Malware Scanning}
+    \begin{itemize}
+        \item PDF malware analysis (macros, embedded scripts)
+        \item Integration with VirusTotal API
+        \item Sandbox execution for suspicious files
+    \end{itemize}
+    
+    \item \textbf{Web Application Firewall (WAF)}
+    \begin{itemize}
+        \item OWASP Top 10 protection
+        \item SQL injection, XSS, CSRF prevention
+        \item Bot detection \& mitigation
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Q4 2026: Compliance \& Governance}
+
+\textbf{Planned Features:}
+\begin{enumerate}
+    \item \textbf{SOC 2 Type II Certification}
+    \begin{itemize}
+        \item Full audit trail implementation
+        \item Continuous monitoring dashboard
+        \item Third-party audit preparation
+    \end{itemize}
+    
+    \item \textbf{HIPAA Compliance}
+    \begin{itemize}
+        \item PHI encryption at rest \& in transit
+        \item Business Associate Agreements (BAA)
+        \item HIPAA audit logs \& reports
+    \end{itemize}
+    
+    \item \textbf{Data Residency Controls}
+    \begin{itemize}
+        \item Multi-region deployment options
+        \item Data sovereignty compliance (GDPR, CCPA)
+        \item Configurable data retention policies
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Q1 2027: Zero Trust Architecture}
+
+\textbf{Planned Features:}
+\begin{enumerate}
+    \item \textbf{Service Mesh Integration}
+    \begin{itemize}
+        \item Mutual TLS (mTLS) for all inter-service communication
+        \item Service-to-service authentication
+        \item Traffic encryption \& policy enforcement (Istio/Linkerd)
+    \end{itemize}
+    
+    \item \textbf{Microsegmentation}
+    \begin{itemize}
+        \item Network isolation per microservice
+        \item Fine-grained firewall rules
+        \item Prevent lateral movement in case of breach
+    \end{itemize}
+    
+    \item \textbf{Continuous Verification}
+    \begin{itemize}
+        \item Device posture checks before access
+        \item Continuous authentication (not just login)
+        \item Context-aware access decisions
+    \end{itemize}
+\end{enumerate}
+
+\section{Security Best Practices}
+
+\subsection{For Administrators}
+
+\begin{infobox}
+\textbf{Security Hardening Checklist:}
+\begin{itemize}[noitemsep]
+    \item Change all default passwords immediately
+    \item Enable MFA for all admin accounts
+    \item Rotate JWT secret keys quarterly
+    \item Review audit logs weekly
+    \item Keep all services updated (security patches)
+    \item Restrict database access to localhost only
+    \item Use strong TLS ciphers (disable TLS 1.0, 1.1)
+    \item Enable firewall rules (only open required ports)
+    \item Implement IP whitelisting for admin access
+    \item Regularly backup encryption keys securely
+\end{itemize}
+\end{infobox}
+
+\subsection{For End Users}
+
+\begin{itemize}
+    \item Use strong, unique passwords (16+ characters)
+    \item Enable MFA if available
+    \item Never share account credentials
+    \item Log out from shared devices
+    \item Report suspicious activity immediately
+    \item Be cautious of phishing emails
+    \item Verify document sources before uploading
+    \item Don't bypass security warnings
+\end{itemize}
+
+\subsection{Security Incident Response}
+
+\textbf{Incident Response Plan:}
+\begin{enumerate}
+    \item \textbf{Detection} - Automated alerts + user reports
+    \item \textbf{Containment} - Isolate affected services
+    \item \textbf{Eradication} - Remove threat, patch vulnerability
+    \item \textbf{Recovery} - Restore services from backup
+    \item \textbf{Post-Incident} - Root cause analysis, update procedures
+\end{enumerate}
+
+\textbf{Emergency Contacts:}
+\begin{itemize}
+    \item Security Team: security@auburn.edu
+    \item On-Call Engineer: +1-555-SECURITY
+    \item Incident Hotline: incidents@auburn.edu
+\end{itemize}
+
+\end{document}
+
