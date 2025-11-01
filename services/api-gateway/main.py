@@ -3180,6 +3180,40 @@ async def shutdown_event():
     else:
         print("ℹ️  No database connections to close")
 
+# ============================================================================
+# RL Intelligence Proxy Routes (Non-Invasive)
+# ============================================================================
+
+RL_SERVICE_URL = os.getenv("RL_SERVICE_URL", "http://rl-intelligence-service:8013")
+
+@app.get("/api/v1/rl/status")
+async def rl_status_proxy():
+    """Proxy RL status endpoint"""
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.get(f"{RL_SERVICE_URL}/api/v1/rl/status")
+        return response.json()
+
+@app.get("/api/v1/rl/metrics")
+async def rl_metrics_proxy():
+    """Proxy RL metrics endpoint"""
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.get(f"{RL_SERVICE_URL}/api/v1/rl/metrics")
+        return response.json()
+
+@app.get("/api/v1/rl/training-history")
+async def rl_training_history_proxy():
+    """Proxy RL training history endpoint"""
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.get(f"{RL_SERVICE_URL}/api/v1/rl/training-history")
+        return response.json()
+
+@app.get("/api/v1/rl/model-weights")
+async def rl_model_weights_proxy():
+    """Proxy RL model weights endpoint"""
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.get(f"{RL_SERVICE_URL}/api/v1/rl/model-weights")
+        return response.json()
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(

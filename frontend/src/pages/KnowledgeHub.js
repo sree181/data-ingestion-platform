@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ForceGraph2D from 'react-force-graph-2d';
+import WebGLKnowledgeGraph from '../components/WebGLKnowledgeGraph';
 import {
   Box,
   Container,
@@ -36,6 +37,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Switch,
+  FormControlLabel,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -58,6 +63,8 @@ import {
   Chat as ChatIcon,
   PushPin as PinIcon,
   Dashboard as BoardIcon,
+  ViewInAr as View3DIcon,
+  ViewQuilt as View2DIcon,
 } from '@mui/icons-material';
 import apiService from '../services/api';
 
@@ -80,6 +87,9 @@ const KnowledgeHub = () => {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [graphDepth, setGraphDepth] = useState(2);
   const [activeTab, setActiveTab] = useState(0);
+  
+  // NEW: Rendering mode (2D Canvas vs 3D WebGL)
+  const [renderMode, setRenderMode] = useState('3d'); // '2d' or '3d'
   
   // NEW: Source filter state
   const [sourceFilter, setSourceFilter] = useState('all');
@@ -105,6 +115,30 @@ const KnowledgeHub = () => {
   const [selectedBoard, setSelectedBoard] = useState('');
   const [loadingBoards, setLoadingBoards] = useState(false);
   const [pinning, setPinning] = useState(false);
+
+  // PROGRESSIVE DISCLOSURE: State for visible nodes
+  const [visibleNodeIds, setVisibleNodeIds] = useState(new Set());
+  const [expandedNodes, setExpandedNodes] = useState(new Set());
+  const [showAllNodes, setShowAllNodes] = useState(false);
+  
+  // SMART FILTERING: State for advanced filters
+  const [minConnections, setMinConnections] = useState(0);
+  const [minConfidence, setMinConfidence] = useState(0);
+  const [domainFilter, setDomainFilter] = useState('all');
+  const [importanceFilter, setImportanceFilter] = useState('all');
+  
+  // COMMUNITY DETECTION: State for clustering
+  const [communities, setCommunities] = useState({});
+  const [showCommunities, setShowCommunities] = useState(false);
+  const [communityColors, setCommunityColors] = useState({});
+  
+  // EDGE TYPES: State for relationship filtering
+  const [relationshipTypes, setRelationshipTypes] = useState([]);
+  const [selectedRelationshipTypes, setSelectedRelationshipTypes] = useState([]);
+  const [showRelationshipLegend, setShowRelationshipLegend] = useState(true);
+  
+  // DOCUMENT NODES: State for progressive disclosure of documents
+  const [showDocuments, setShowDocuments] = useState(false);
 
   // Enhanced Entity type configuration with gradients and depth
   const entityConfig = {
@@ -153,6 +187,15 @@ const KnowledgeHub = () => {
       label: 'Procedures', 
       icon: <EntityIcon /> 
     },
+    Document: {
+      color: '#f472b6', // Pink
+      gradient: ['#f472b6', '#ec4899'],
+      shadow: 'rgba(244, 114, 182, 0.4)',
+      hover: '#f9a8d4',
+      glow: 'rgba(244, 114, 182, 0.6)',
+      label: 'Documents',
+      icon: <EntityIcon /> // Could use a document icon if available
+    },
     Entity: { 
       color: '#6b7280', 
       gradient: ['#6b7280', '#4b5563'],
@@ -162,6 +205,248 @@ const KnowledgeHub = () => {
       label: 'Other Entities', 
       icon: <EntityIcon /> 
     },
+  };
+
+  // RELATIONSHIP TYPE CONFIGURATION
+  const relationshipConfig = {
+    // Treatment & Prevention
+    TREATS: {
+      category: 'treatment',
+      color: '#10b981', // Green
+      lineStyle: 'solid',
+      lineWidth: 3,
+      particleColor: '#10b981',
+      label: 'Treats'
+    },
+    PREVENTS: {
+      category: 'treatment',
+      color: '#059669', // Dark green
+      lineStyle: 'solid',
+      lineWidth: 3,
+      particleColor: '#059669',
+      label: 'Prevents'
+    },
+    
+    // Adverse Events & Causality
+    CAUSES: {
+      category: 'adverse',
+      color: '#ef4444', // Red
+      lineStyle: 'dashed',
+      dash: [5, 5],
+      lineWidth: 2.5,
+      particleColor: '#ef4444',
+      label: 'Causes'
+    },
+    ASSOCIATED_WITH: {
+      category: 'adverse',
+      color: '#f87171', // Light red
+      lineStyle: 'dashed',
+      dash: [3, 2],
+      lineWidth: 2,
+      particleColor: '#f87171',
+      label: 'Associated With'
+    },
+    
+    // Drug Interactions
+    INTERACTS_WITH: {
+      category: 'interaction',
+      color: '#f59e0b', // Orange
+      lineStyle: 'dashed',
+      dash: [5, 3],
+      lineWidth: 2.5,
+      particleColor: '#f59e0b',
+      label: 'Interacts With'
+    },
+    COMBINED_WITH: {
+      category: 'interaction',
+      color: '#fbbf24', // Yellow
+      lineStyle: 'dotted',
+      dash: [2, 2],
+      lineWidth: 2,
+      particleColor: '#fbbf24',
+      label: 'Combined With'
+    },
+    CONTRAINDICATES: {
+      category: 'interaction',
+      color: '#dc2626', // Dark red
+      lineStyle: 'dashed',
+      dash: [8, 4],
+      lineWidth: 3,
+      particleColor: '#dc2626',
+      label: 'Contraindicates'
+    },
+    
+    // Research & Authorship
+    STUDIED_BY: {
+      category: 'research',
+      color: '#3b82f6', // Blue
+      lineStyle: 'dotted',
+      dash: [2, 4],
+      lineWidth: 2,
+      particleColor: '#3b82f6',
+      label: 'Studied By'
+    },
+    AUTHORED_BY: {
+      category: 'research',
+      color: '#60a5fa', // Light blue
+      lineStyle: 'dotted',
+      dash: [2, 3],
+      lineWidth: 1.5,
+      particleColor: '#60a5fa',
+      label: 'Authored By'
+    },
+    REPORTED_BY: {
+      category: 'research',
+      color: '#2563eb', // Dark blue
+      lineStyle: 'dotted',
+      dash: [2, 3],
+      lineWidth: 1.5,
+      particleColor: '#2563eb',
+      label: 'Reported By'
+    },
+    
+    // Manufacturing & Approval
+    MANUFACTURED_BY: {
+      category: 'regulatory',
+      color: '#8b5cf6', // Purple
+      lineStyle: 'solid',
+      lineWidth: 2,
+      particleColor: '#8b5cf6',
+      label: 'Manufactured By'
+    },
+    APPROVED_BY: {
+      category: 'regulatory',
+      color: '#a78bfa', // Light purple
+      lineStyle: 'solid',
+      lineWidth: 2,
+      particleColor: '#a78bfa',
+      label: 'Approved By'
+    },
+    INVESTIGATED_BY: {
+      category: 'regulatory',
+      color: '#7c3aed', // Dark purple
+      lineStyle: 'dotted',
+      dash: [3, 2],
+      lineWidth: 2,
+      particleColor: '#7c3aed',
+      label: 'Investigated By'
+    },
+    
+    // Disease Relationships
+    COMORBID_WITH: {
+      category: 'disease',
+      color: '#ec4899', // Pink
+      lineStyle: 'dashed',
+      dash: [4, 3],
+      lineWidth: 2,
+      particleColor: '#ec4899',
+      label: 'Comorbid With'
+    },
+    PROGRESSES_TO: {
+      category: 'disease',
+      color: '#db2777', // Dark pink
+      lineStyle: 'solid',
+      lineWidth: 2.5,
+      particleColor: '#db2777',
+      label: 'Progresses To'
+    },
+    
+    // Medical Procedures
+    DIAGNOSED_BY: {
+      category: 'procedure',
+      color: '#06b6d4', // Cyan
+      lineStyle: 'dotted',
+      dash: [2, 3],
+      lineWidth: 2,
+      particleColor: '#06b6d4',
+      label: 'Diagnosed By'
+    },
+    TREATED_WITH: {
+      category: 'procedure',
+      color: '#0891b2', // Dark cyan
+      lineStyle: 'solid',
+      lineWidth: 2.5,
+      particleColor: '#0891b2',
+      label: 'Treated With'
+    },
+    MONITORED_BY: {
+      category: 'procedure',
+      color: '#22d3ee', // Light cyan
+      lineStyle: 'dotted',
+      dash: [2, 2],
+      lineWidth: 1.5,
+      particleColor: '#22d3ee',
+      label: 'Monitored By'
+    },
+    
+    // Generic/Unknown
+    RELATED_TO: {
+      category: 'generic',
+      color: '#9ca3af', // Gray
+      lineStyle: 'dashed',
+      dash: [3, 2],
+      lineWidth: 1.5,
+      particleColor: '#9ca3af',
+      label: 'Related To'
+    },
+    CO_OCCURS_WITH: {
+      category: 'generic',
+      color: '#d1d5db', // Light gray
+      lineStyle: 'dotted',
+      dash: [2, 2],
+      lineWidth: 1,
+      particleColor: '#d1d5db',
+      label: 'Co-Occurs With'
+    },
+    MENTIONED_IN: {
+      category: 'generic',
+      color: '#6b7280', // Medium gray
+      lineStyle: 'dotted',
+      dash: [1, 2],
+      lineWidth: 1,
+      particleColor: '#6b7280',
+      label: 'Mentioned In'
+    },
+    
+    // Document relationships
+    CONTAINS: {
+      category: 'document',
+      color: '#f472b6', // Pink (matching Document node color)
+      lineStyle: 'solid',
+      lineWidth: 2,
+      particleColor: '#f472b6',
+      label: 'Contains'
+    },
+    HAS_ENTITY: {
+      category: 'document',
+      color: '#f9a8d4', // Light pink
+      lineStyle: 'dotted',
+      dash: [3, 2],
+      lineWidth: 1.5,
+      particleColor: '#f9a8d4',
+      label: 'Has Entity'
+    }
+  };
+
+  // Helper function to get relationship configuration
+  const getRelationshipConfig = (relationshipType) => {
+    const normalizedType = (relationshipType || 'RELATED_TO').toUpperCase().replace(/\s+/g, '_');
+    return relationshipConfig[normalizedType] || relationshipConfig.RELATED_TO;
+  };
+
+  // Helper function to get line style array
+  const getLineStyle = (relationshipType) => {
+    const config = getRelationshipConfig(relationshipType);
+    if (config.lineStyle === 'solid') return [];
+    if (config.lineStyle === 'dashed') return config.dash || [5, 3];
+    if (config.lineStyle === 'dotted') return config.dash || [2, 2];
+    return [];
+  };
+
+  // Helper function to categorize relationships
+  const categorizeRelationship = (relationshipType) => {
+    const config = getRelationshipConfig(relationshipType);
+    return config.category;
   };
 
   // Load initial statistics and FULL GRAPH on mount
@@ -212,6 +497,59 @@ const KnowledgeHub = () => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
+
+  // Load source documents when entity is selected
+  useEffect(() => {
+    const loadSourceDocuments = async () => {
+      if (!entityDetails || !entityDetails.id) {
+        setSourceDocuments([]);
+        return;
+      }
+
+      setLoadingSources(true);
+      try {
+        // Query for documents containing this entity
+        const response = await apiService.getEntitySourceDocuments(entityDetails.id);
+        
+        if (response && response.documents) {
+          setSourceDocuments(response.documents);
+          console.log('📄 Source Documents Loaded:', {
+            entityId: entityDetails.id,
+            entityName: entityDetails.name,
+            documentCount: response.documents.length
+          });
+        } else {
+          setSourceDocuments([]);
+        }
+      } catch (err) {
+        console.error('Failed to load source documents:', err);
+        // Fallback: try to get documents from relationships
+        try {
+          const docs = await getDocumentsFromRelationships(entityDetails.id);
+          setSourceDocuments(docs);
+        } catch (fallbackErr) {
+          console.error('Fallback also failed:', fallbackErr);
+          setSourceDocuments([]);
+        }
+      } finally {
+        setLoadingSources(false);
+      }
+    };
+
+    loadSourceDocuments();
+  }, [entityDetails]);
+
+  // Fallback: Get documents from Neo4j relationships
+  const getDocumentsFromRelationships = async (entityId) => {
+    try {
+      // This would query Neo4j for Document nodes connected to this entity
+      // For now, return empty array as this requires backend API
+      return [];
+    } catch (err) {
+      console.error('Failed to get documents from relationships:', err);
+      return [];
+    }
+  };
 
   const handleSearchFromNavigation = async (entityName) => {
     setLoading(true);
@@ -276,12 +614,26 @@ const KnowledgeHub = () => {
 
     const query = searchQuery.toLowerCase();
     
+    // DEBUG: Log search details
+    console.log('🔍 Search Debug:', {
+      query,
+      totalGraphNodes: graphData.nodes.length,
+      filteredGraphNodes: filteredGraphData.nodes.length,
+      sourceFilter,
+      sampleNodeNames: filteredGraphData.nodes.slice(0, 5).map(n => n.name)
+    });
+    
     // Search in FILTERED graph data
     const matchingNodes = filteredGraphData.nodes.filter(node => 
       (node.name || '').toLowerCase().includes(query) ||
       (node.description || '').toLowerCase().includes(query) ||
       (node.id || '').toLowerCase().includes(query)
     );
+
+    console.log('🔍 Search Results:', {
+      matchingCount: matchingNodes.length,
+      matches: matchingNodes.slice(0, 3).map(n => ({ name: n.name, type: n.type }))
+    });
 
     if (matchingNodes.length === 0) {
       setError(`No entities found matching "${searchQuery}" in current graph`);
@@ -437,8 +789,10 @@ const KnowledgeHub = () => {
         const formattedEdges = filteredEdges.map(edge => ({
           source: edge.source,
           target: edge.target,
-          type: edge.type,
-          label: edge.predicate,
+          // Use predicate as the primary type (contains semantic meaning like "TREATS", "CAUSES")
+          // Fallback to type (which is usually just "RELATES_TO")
+          type: edge.predicate || edge.type,
+          label: edge.predicate || edge.type,
           confidence: edge.confidence
         }));
 
@@ -446,6 +800,40 @@ const KnowledgeHub = () => {
           nodes: formattedNodes,
           links: formattedEdges
         });
+
+        // PROGRESSIVE DISCLOSURE: Initialize with top 50 most important nodes
+        if (!showAllNodes && formattedNodes.length > 50) {
+          // Calculate importance score for each node
+          const nodesWithImportance = formattedNodes.map(node => {
+            // Count connections
+            const connections = formattedEdges.filter(
+              edge => edge.source === node.id || edge.target === node.id
+            ).length;
+            
+            // Importance = connections * confidence * source_count
+            const importance = connections * (node.confidence || 0.5) * (node.source_count || 1);
+            
+            return { ...node, connections, importance };
+          });
+          
+          // Sort by importance and take top 50
+          const topNodes = nodesWithImportance
+            .sort((a, b) => b.importance - a.importance)
+            .slice(0, 50);
+          
+          const topNodeIds = new Set(topNodes.map(n => n.id));
+          setVisibleNodeIds(topNodeIds);
+          
+          console.log('📊 Progressive Disclosure:', {
+            totalNodes: formattedNodes.length,
+            visibleNodes: topNodes.length,
+            topNode: topNodes[0]?.name,
+            topImportance: topNodes[0]?.importance?.toFixed(2)
+          });
+        } else {
+          // Show all nodes
+          setVisibleNodeIds(new Set(formattedNodes.map(n => n.id)));
+        }
 
         // Center the graph
         setTimeout(() => {
@@ -464,19 +852,67 @@ const KnowledgeHub = () => {
     }
   };
 
-  // Filtered graph data based on source filter
+  // Filtered graph data based on source filter and other filters
   const filteredGraphData = useMemo(() => {
-    if (sourceFilter === 'all') {
-      return graphData;
+    console.log('🔄 filteredGraphData recalculating...', {
+      totalNodes: graphData.nodes.length,
+      showAllNodes,
+      showDocuments,
+      visibleNodeIds: visibleNodeIds.size,
+      minConnections,
+      minConfidence,
+      sourceFilter
+    });
+    
+    let filteredNodes = graphData.nodes;
+    
+    // 0. Filter out Document nodes unless showDocuments is true
+    if (!showDocuments) {
+      filteredNodes = filteredNodes.filter(node => node.type !== 'Document');
+      console.log(`  → Document filter (hidden):`, filteredNodes.length, 'nodes');
     }
     
-    // Filter nodes by source
-    const filteredNodes = graphData.nodes.filter(node => {
-      if (sourceFilter === 'pdf') return node.has_pdf;
-      if (sourceFilter === 'external') return node.has_external;
-      if (sourceFilter === 'cross-source') return node.has_pdf && node.has_external;
-      return true;
-    });
+    // 1. Apply source filter
+    if (sourceFilter !== 'all') {
+      filteredNodes = filteredNodes.filter(node => {
+        if (sourceFilter === 'pdf') return node.has_pdf;
+        if (sourceFilter === 'external') return node.has_external;
+        if (sourceFilter === 'cross-source') return node.has_pdf && node.has_external;
+        return true;
+      });
+      console.log(`  → Source filter (${sourceFilter}):`, filteredNodes.length, 'nodes');
+    }
+    
+    // 2. SMART FILTERING: Apply importance filters
+    if (minConnections > 0 || minConfidence > 0) {
+      filteredNodes = filteredNodes.filter(node => {
+        // Calculate connections
+        const connections = graphData.links.filter(
+          link => {
+            const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+            const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+            return sourceId === node.id || targetId === node.id;
+          }
+        ).length;
+        
+        // Filter by minimum connections
+        if (connections < minConnections) return false;
+        
+        // Filter by minimum confidence
+        if ((node.confidence || 0) < minConfidence) return false;
+        
+        return true;
+      });
+      console.log(`  → Smart filters (conn: ${minConnections}, conf: ${minConfidence}):`, filteredNodes.length, 'nodes');
+    }
+    
+    // 3. PROGRESSIVE DISCLOSURE: Apply visibility filter
+    if (!showAllNodes && visibleNodeIds.size > 0) {
+      filteredNodes = filteredNodes.filter(node => visibleNodeIds.has(node.id));
+      console.log(`  → Progressive disclosure (top 50):`, filteredNodes.length, 'nodes');
+    } else if (showAllNodes) {
+      console.log(`  → Showing all nodes:`, filteredNodes.length, 'nodes');
+    }
     
     const filteredNodeIds = new Set(filteredNodes.map(n => n.id));
     
@@ -487,13 +923,273 @@ const KnowledgeHub = () => {
       return filteredNodeIds.has(sourceId) && filteredNodeIds.has(targetId);
     });
     
+    console.log('✅ Final filtered graph:', {
+      nodes: filteredNodes.length,
+      links: filteredLinks.length
+    });
+    
     return {
       nodes: filteredNodes,
       links: filteredLinks
     };
-  }, [graphData, sourceFilter]);
+  }, [graphData, sourceFilter, minConnections, minConfidence, showAllNodes, showDocuments, visibleNodeIds]);
+
+  // PROGRESSIVE DISCLOSURE: Expand node to show neighbors
+  const expandNode = useCallback((nodeId) => {
+    // Find all neighbors of this node
+    const neighbors = new Set();
+    graphData.links.forEach(link => {
+      const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+      const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+      
+      if (sourceId === nodeId) neighbors.add(targetId);
+      if (targetId === nodeId) neighbors.add(sourceId);
+    });
+    
+    // Add neighbors to visible nodes
+    setVisibleNodeIds(prev => {
+      const newSet = new Set(prev);
+      neighbors.forEach(id => newSet.add(id));
+      newSet.add(nodeId); // Ensure the node itself is visible
+      return newSet;
+    });
+    
+    // Mark this node as expanded
+    setExpandedNodes(prev => new Set(prev).add(nodeId));
+    
+    console.log('🔍 Expanded node:', {
+      nodeId,
+      neighborsAdded: neighbors.size,
+      totalVisible: visibleNodeIds.size + neighbors.size
+    });
+  }, [graphData.links, visibleNodeIds]);
+  
+  // PROGRESSIVE DISCLOSURE: Collapse node (hide its unique neighbors)
+  const collapseNode = useCallback((nodeId) => {
+    // Mark as not expanded
+    setExpandedNodes(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(nodeId);
+      return newSet;
+    });
+    
+    // Note: We don't remove neighbors as they might be connected to other expanded nodes
+    // This is a simplified version - full implementation would track which nodes to hide
+  }, []);
+  
+  // COMMUNITY DETECTION: Enhanced algorithm with edge-type weighting
+  const detectCommunities = useCallback(() => {
+    console.log('🔍 Starting enhanced community detection with edge weights...');
+    
+    // Edge weight mapping based on relationship importance
+    const edgeWeights = {
+      treatment: 1.0,     // TREATS, PREVENTS
+      adverse: 0.9,       // CAUSES, ASSOCIATED_WITH
+      interaction: 0.8,   // INTERACTS_WITH, COMBINED_WITH
+      disease: 0.8,       // COMORBID_WITH, PROGRESSES_TO
+      regulatory: 0.7,    // MANUFACTURED_BY, APPROVED_BY
+      research: 0.6,      // STUDIED_BY, AUTHORED_BY
+      procedure: 0.7,     // DIAGNOSED_BY, TREATED_WITH
+      generic: 0.3        // RELATED_TO, CO_OCCURS_WITH
+    };
+    
+    // Build WEIGHTED adjacency list
+    const adjacency = {};
+    const edgeWeightMap = {};
+    
+    graphData.nodes.forEach(node => {
+      adjacency[node.id] = new Map(); // Map of neighbor -> weight
+      edgeWeightMap[node.id] = {};
+    });
+    
+    graphData.links.forEach(link => {
+      const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+      const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+      
+      // Get relationship category and weight
+      const relConfig = getRelationshipConfig(link.type || link.label);
+      const weight = edgeWeights[relConfig.category] || 0.5;
+      
+      // Multiply by confidence if available
+      const finalWeight = weight * (link.confidence || 0.8);
+      
+      if (adjacency[sourceId]) {
+        adjacency[sourceId].set(targetId, finalWeight);
+      }
+      if (adjacency[targetId]) {
+        adjacency[targetId].set(sourceId, finalWeight);
+      }
+      
+      // Store for logging
+      if (!edgeWeightMap[sourceId][relConfig.category]) {
+        edgeWeightMap[sourceId][relConfig.category] = 0;
+      }
+      edgeWeightMap[sourceId][relConfig.category] += finalWeight;
+    });
+    
+    console.log('  → Edge weights calculated:', {
+      totalEdges: graphData.links.length,
+      sampleWeights: Object.entries(edgeWeights).slice(0, 3)
+    });
+    
+    // Phase 1: Initial clustering by SEMANTIC SIMILARITY
+    // Group nodes by their dominant relationship category
+    const semanticGroups = {
+      treatment_focused: [],
+      adverse_focused: [],
+      research_focused: [],
+      regulatory_focused: [],
+      mixed: []
+    };
+    
+    graphData.nodes.forEach(node => {
+      const weights = edgeWeightMap[node.id] || {};
+      const categories = Object.keys(weights);
+      
+      if (categories.length === 0) {
+        semanticGroups.mixed.push(node.id);
+        return;
+      }
+      
+      // Find dominant category
+      const dominant = categories.reduce((a, b) => 
+        weights[a] > weights[b] ? a : b
+      );
+      
+      // Classify based on dominant category
+      if (dominant === 'treatment' || dominant === 'procedure') {
+        semanticGroups.treatment_focused.push(node.id);
+      } else if (dominant === 'adverse' || dominant === 'interaction') {
+        semanticGroups.adverse_focused.push(node.id);
+      } else if (dominant === 'research') {
+        semanticGroups.research_focused.push(node.id);
+      } else if (dominant === 'regulatory') {
+        semanticGroups.regulatory_focused.push(node.id);
+      } else {
+        semanticGroups.mixed.push(node.id);
+      }
+    });
+    
+    console.log('  → Semantic groups:', {
+      treatment: semanticGroups.treatment_focused.length,
+      adverse: semanticGroups.adverse_focused.length,
+      research: semanticGroups.research_focused.length,
+      regulatory: semanticGroups.regulatory_focused.length,
+      mixed: semanticGroups.mixed.length
+    });
+    
+    // Phase 2: Refine by entity type and connectivity within semantic groups
+    const nodeCommunities = {};
+    const communityMap = {};
+    let communityId = 0;
+    
+    Object.entries(semanticGroups).forEach(([groupName, nodeIds]) => {
+      if (nodeIds.length === 0) return;
+      
+      // Sub-group by entity type
+      const typeGroups = {};
+      nodeIds.forEach(nodeId => {
+        const node = graphData.nodes.find(n => n.id === nodeId);
+        const type = node?.type || 'Unknown';
+        if (!typeGroups[type]) {
+          typeGroups[type] = [];
+        }
+        typeGroups[type].push(nodeId);
+      });
+      
+      // For each type group, use weighted connected components
+      Object.entries(typeGroups).forEach(([type, nodes]) => {
+        if (nodes.length <= 15) {
+          // Small group - assign to single community
+          nodes.forEach(nodeId => {
+            nodeCommunities[nodeId] = communityId;
+          });
+          communityMap[communityId] = { 
+            type, 
+            semantic: groupName,
+            size: nodes.length 
+          };
+          communityId++;
+        } else {
+          // Large group - use weighted connected components
+          const visited = new Set();
+          
+          nodes.forEach(nodeId => {
+            if (!visited.has(nodeId)) {
+              const component = [];
+              const queue = [{ id: nodeId, weight: 1.0 }];
+              
+              while (queue.length > 0) {
+                const { id: current, weight: currentWeight } = queue.shift();
+                if (visited.has(current)) continue;
+                
+                visited.add(current);
+                component.push(current);
+                
+                // Add neighbors with strong connections (weight > 0.5)
+                const neighbors = adjacency[current] || new Map();
+                neighbors.forEach((weight, neighborId) => {
+                  const neighborNode = graphData.nodes.find(n => n.id === neighborId);
+                  if (neighborNode && 
+                      neighborNode.type === type && 
+                      !visited.has(neighborId) &&
+                      weight > 0.4) { // Threshold for strong connection
+                    queue.push({ id: neighborId, weight });
+                  }
+                });
+              }
+              
+              // Assign this component to a community
+              component.forEach(id => {
+                nodeCommunities[id] = communityId;
+              });
+              communityMap[communityId] = { 
+                type, 
+                semantic: groupName,
+                size: component.length 
+              };
+              communityId++;
+            }
+          });
+        }
+      });
+    });
+    
+    // Phase 3: Generate colors based on semantic groups
+    const colors = {};
+    const semanticColorPalettes = {
+      treatment_focused: ['#10b981', '#14b8a6', '#059669', '#0d9488'],
+      adverse_focused: ['#ef4444', '#f97316', '#dc2626', '#ea580c'],
+      research_focused: ['#3b82f6', '#8b5cf6', '#2563eb', '#7c3aed'],
+      regulatory_focused: ['#a78bfa', '#c084fc', '#8b5cf6', '#a855f7'],
+      mixed: ['#6b7280', '#9ca3af', '#4b5563', '#6b7280']
+    };
+    
+    Object.entries(communityMap).forEach(([cid, info]) => {
+      const palette = semanticColorPalettes[info.semantic] || semanticColorPalettes.mixed;
+      const colorIndex = parseInt(cid) % palette.length;
+      colors[cid] = palette[colorIndex];
+    });
+    
+    setCommunities(nodeCommunities);
+    setCommunityColors(colors);
+    
+    console.log('✅ Enhanced community detection complete:', {
+      totalCommunities: Object.keys(communityMap).length,
+      communityBreakdown: communityMap,
+      sampleAssignments: Object.entries(nodeCommunities).slice(0, 5)
+    });
+    
+    return { nodeCommunities, communityMap, colors };
+  }, [graphData]);
 
   const handleNodeClick = useCallback(async (node) => {
+    const isDocument = node.type === 'Document';
+    console.log('🖱️ Node clicked:', node.name, '| Type:', node.type, '| Connected nodes:', graphData.links.filter(link => 
+      (link.source.id === node.id || link.source === node.id) ||
+      (link.target.id === node.id || link.target === node.id)
+    ).length);
+    
     // If clicking the same node, deselect it
     if (selectedEntity && selectedEntity.id === node.id) {
       setSelectedEntity(null);
@@ -510,56 +1206,110 @@ const KnowledgeHub = () => {
     
     connectedNodes.add(node.id);
     
+    // For both entity and document nodes, find all connected nodes
     graphData.links.forEach(link => {
-      if (link.source.id === node.id || link.source === node.id) {
+      const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+      const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+      
+      if (sourceId === node.id) {
         connectedLinks.add(link);
-        connectedNodes.add(typeof link.target === 'object' ? link.target.id : link.target);
+        connectedNodes.add(targetId);
       }
-      if (link.target.id === node.id || link.target === node.id) {
+      if (targetId === node.id) {
         connectedLinks.add(link);
-        connectedNodes.add(typeof link.source === 'object' ? link.source.id : link.source);
+        connectedNodes.add(sourceId);
       }
     });
+    
+    console.log(`  → Highlighting ${connectedNodes.size} nodes and ${connectedLinks.size} links`);
+    console.log(`  → Node type: ${isDocument ? 'Document' : 'Entity'}`);
     
     setHighlightNodes(connectedNodes);
     setHighlightLinks(connectedLinks);
     setSelectedEntity(node.name);
     
-    // Clear chat when switching entities
+    // PROGRESSIVE DISCLOSURE: Auto-expand node on click (if not showing all)
+    if (!showAllNodes && !expandedNodes.has(node.id)) {
+      console.log(`  → Expanding node: ${node.name}`);
+      expandNode(node.id);
+    }
+    
+    // CENTER CAMERA on clicked node for better visibility
+    if (graphRef.current) {
+      graphRef.current.centerAt(node.x, node.y, 500);
+      // Zoom in a bit to see connections better
+      setTimeout(() => {
+        if (graphRef.current) {
+          const currentZoom = graphRef.current.zoom();
+          if (currentZoom < 2) {
+            graphRef.current.zoom(2, 500);
+          }
+        }
+      }, 300);
+    }
+    
+    // Clear chat when switching entities/documents
     setChatMessages([]);
     setChatInput('');
     
-    // Load entity details for drawer
-    setEntityDetails(node);
-    setDrawerOpen(true);
-
-    try {
-      const detailsResponse = await apiService.getKnowledgeHubEntityDetails(node.id);
-      if (detailsResponse.success) {
-        setEntityDetails({
-          ...node,
-          ...detailsResponse.entity
-        });
-      }
-    } catch (err) {
-      // Silently ignore - entity details are optional, basic node info is already displayed
-      // This is expected for entities that don't have extended metadata
-    }
-    
-    // NEW: Load source documents
-    setLoadingSources(true);
-    setSourceDocuments([]);
-    try {
-      const sourcesResponse = await apiService.getEntitySources(node.name);
-      if (sourcesResponse.success) {
-        setSourceDocuments(sourcesResponse.documents || []);
-      }
-    } catch (err) {
-      // Silently ignore - source documents are optional
-    } finally {
+    // Load details for drawer - Different handling for documents vs entities
+    if (isDocument) {
+      // For Document nodes, show document metadata
+      setEntityDetails({
+        ...node,
+        type: 'Document',
+        name: node.name,
+        description: node.description || 'Document in knowledge base',
+        confidence: node.confidence || 1.0,
+        // Document-specific metadata
+        doc_metadata: node.doc_metadata || {},
+        classification: node.classification || '',
+        source_types: node.source_types || []
+      });
+      setDrawerOpen(true);
+      
+      // For documents, don't try to load entity details or source documents
+      // Instead, we could load the entities that this document contains
       setLoadingSources(false);
+      setSourceDocuments([]);
+      
+      console.log('  → Document node selected, showing metadata');
+    } else {
+      // For Entity nodes, load entity details and source documents
+      setEntityDetails(node);
+      setDrawerOpen(true);
+
+      try {
+        const detailsResponse = await apiService.getKnowledgeHubEntityDetails(node.id);
+        if (detailsResponse.success) {
+          setEntityDetails({
+            ...node,
+            ...detailsResponse.entity
+          });
+        }
+      } catch (err) {
+        // Silently ignore - entity details are optional, basic node info is already displayed
+        // This is expected for entities that don't have extended metadata
+        console.log('  → Could not load extended entity details (using basic info)');
+      }
+      
+      // Load source documents for entities
+      setLoadingSources(true);
+      setSourceDocuments([]);
+      try {
+        const sourcesResponse = await apiService.getEntitySourceDocuments(node.id);
+        if (sourcesResponse.success) {
+          setSourceDocuments(sourcesResponse.documents || []);
+          console.log(`  → Loaded ${sourcesResponse.documents?.length || 0} source documents`);
+        }
+      } catch (err) {
+        // Silently ignore - source documents are optional
+        console.log('  → Could not load source documents');
+      } finally {
+        setLoadingSources(false);
+      }
     }
-  }, [graphData.links]);
+  }, [graphData.links, showAllNodes, expandedNodes, expandNode, selectedEntity]);
 
   const handleNodeHover = useCallback((node) => {
     setHoverNode(node || null);
@@ -872,6 +1622,34 @@ const KnowledgeHub = () => {
           </Typography>
         </Box>
 
+        {/* Interactive Graph Instructions */}
+        <Alert 
+          severity="info" 
+          icon={<InfoIcon />}
+          sx={{ 
+            mb: 3, 
+            borderRadius: 2,
+            background: 'linear-gradient(135deg, rgba(3, 169, 244, 0.08) 0%, rgba(33, 150, 243, 0.08) 100%)',
+            border: '1px solid rgba(3, 169, 244, 0.3)',
+            '& .MuiAlert-icon': {
+              color: '#03a9f4'
+            }
+          }}
+        >
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5, color: '#0277bd' }}>
+              🖱️ Interactive Graph Controls
+            </Typography>
+            <Box component="ul" sx={{ m: 0, pl: 2, '& li': { mb: 0.5, fontSize: '0.875rem' } }}>
+              <li><strong>Click</strong> any node to expand and see its connections</li>
+              <li><strong>Drag</strong> nodes to reposition them and organize the graph</li>
+              <li><strong>Scroll</strong> to zoom in/out (zoom in to see relationship labels)</li>
+              <li><strong>Pan</strong> by clicking and dragging the background</li>
+              <li><strong>Double-click</strong> background to reset view</li>
+            </Box>
+          </Box>
+        </Alert>
+
         {/* Statistics Cards */}
         {renderStatisticsCards()}
 
@@ -962,6 +1740,319 @@ const KnowledgeHub = () => {
             </Grid>
           </Grid>
 
+          {/* Rendering Mode Toggle */}
+          <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ToggleButtonGroup
+              value={renderMode}
+              exclusive
+              onChange={(e, newMode) => {
+                if (newMode !== null) {
+                  setRenderMode(newMode);
+                }
+              }}
+              sx={{
+                backgroundColor: 'white',
+                boxShadow: 1,
+                borderRadius: 2,
+                '& .MuiToggleButton-root': {
+                  py: 1,
+                  px: 3,
+                  border: 'none',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  '&.Mui-selected': {
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #5568d3 0%, #6a4293 100%)',
+                    }
+                  }
+                }
+              }}
+            >
+              <ToggleButton value="2d">
+                <View2DIcon sx={{ mr: 1 }} />
+                2D Canvas
+              </ToggleButton>
+              <ToggleButton value="3d">
+                <View3DIcon sx={{ mr: 1 }} />
+                3D WebGL
+                <Chip 
+                  label="PRO" 
+                  size="small" 
+                  sx={{ 
+                    ml: 1, 
+                    height: 20, 
+                    fontSize: '0.65rem',
+                    backgroundColor: renderMode === '3d' ? 'rgba(255,255,255,0.3)' : '#667eea',
+                    color: renderMode === '3d' ? 'white' : 'white',
+                    fontWeight: 700
+                  }} 
+                />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+
+          {/* SMART FILTERING & PROGRESSIVE DISCLOSURE Controls */}
+          <Card 
+            elevation={0}
+            sx={{
+              mt: 2,
+              p: 2,
+              background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%)',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 2
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: '#667eea' }}>
+              🎯 Advanced Filters
+            </Typography>
+            <Grid container spacing={2}>
+              {/* Progressive Disclosure Toggle */}
+              <Grid item xs={12} md={3}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={showAllNodes}
+                      onChange={(e) => {
+                        const newShowAll = e.target.checked;
+                        setShowAllNodes(newShowAll);
+                        
+                        if (newShowAll) {
+                          // Show all nodes
+                          console.log('🔓 Showing all nodes:', graphData.nodes.length);
+                          setVisibleNodeIds(new Set(graphData.nodes.map(n => n.id)));
+                        } else {
+                          // Reset to top 50 - recalculate importance
+                          console.log('🔒 Resetting to top 50 nodes...');
+                          
+                          const nodesWithImportance = graphData.nodes.map(node => {
+                            // Count connections
+                            const connections = graphData.links.filter(
+                              link => {
+                                const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+                                const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+                                return sourceId === node.id || targetId === node.id;
+                              }
+                            ).length;
+                            
+                            // Importance = connections * confidence * source_count
+                            const importance = connections * (node.confidence || 0.5) * (node.source_count || 1);
+                            
+                            return { ...node, connections, importance };
+                          });
+                          
+                          // Sort by importance and take top 50
+                          const topNodes = nodesWithImportance
+                            .sort((a, b) => b.importance - a.importance)
+                            .slice(0, 50);
+                          
+                          const topNodeIds = new Set(topNodes.map(n => n.id));
+                          setVisibleNodeIds(topNodeIds);
+                          
+                          console.log('✅ Top 50 calculated:', {
+                            totalNodes: graphData.nodes.length,
+                            visibleNodes: topNodes.length,
+                            topNode: topNodes[0]?.name
+                          });
+                        }
+                      }}
+                      color="primary"
+                    />
+                  }
+                  label={
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        Show All Nodes
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {showAllNodes ? `Showing ${graphData.nodes.length} nodes` : `Showing top ${Math.min(50, visibleNodeIds.size)} nodes`}
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </Grid>
+
+              {/* Community Detection Toggle */}
+              <Grid item xs={12} md={3}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={showCommunities}
+                      onChange={(e) => {
+                        const enabled = e.target.checked;
+                        setShowCommunities(enabled);
+                        if (enabled && Object.keys(communities).length === 0) {
+                          // Run community detection if not already done
+                          detectCommunities();
+                        }
+                      }}
+                      color="secondary"
+                    />
+                  }
+                  label={
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        Show Communities
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {showCommunities ? `${Object.keys(communityColors).length} clusters` : 'Color by entity type'}
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </Grid>
+
+              {/* Show Documents Toggle */}
+              <Grid item xs={12} md={3}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={showDocuments}
+                      onChange={(e) => setShowDocuments(e.target.checked)}
+                      color="primary"
+                    />
+                  }
+                  label={
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        Show Documents
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {showDocuments ? `Documents visible` : 'Only entities'}
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </Grid>
+
+              {/* Min Connections Slider */}
+              <Grid item xs={12} md={4}>
+                <Typography variant="caption" color="text.secondary" gutterBottom>
+                  Min Connections: {minConnections}
+                </Typography>
+                <Slider
+                  value={minConnections}
+                  onChange={(e, newValue) => {
+                    console.log('🔗 Min Connections changed:', newValue);
+                    setMinConnections(newValue);
+                  }}
+                  min={0}
+                  max={20}
+                  step={1}
+                  marks={[
+                    { value: 0, label: '0' },
+                    { value: 10, label: '10' },
+                    { value: 20, label: '20' }
+                  ]}
+                  sx={{
+                    color: '#667eea',
+                    '& .MuiSlider-thumb': {
+                      backgroundColor: '#667eea',
+                    }
+                  }}
+                />
+              </Grid>
+
+              {/* Min Confidence Slider */}
+              <Grid item xs={12} md={4}>
+                <Typography variant="caption" color="text.secondary" gutterBottom>
+                  Min Confidence: {(minConfidence * 100).toFixed(0)}%
+                </Typography>
+                <Slider
+                  value={minConfidence}
+                  onChange={(e, newValue) => {
+                    console.log('✅ Min Confidence changed:', newValue);
+                    setMinConfidence(newValue);
+                  }}
+                  min={0}
+                  max={1}
+                  step={0.1}
+                  marks={[
+                    { value: 0, label: '0%' },
+                    { value: 0.5, label: '50%' },
+                    { value: 1, label: '100%' }
+                  ]}
+                  sx={{
+                    color: '#764ba2',
+                    '& .MuiSlider-thumb': {
+                      backgroundColor: '#764ba2',
+                    }
+                  }}
+                />
+              </Grid>
+
+              {/* Reset Filters Button */}
+              <Grid item xs={12} md={4}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={() => {
+                    console.log('🔄 Resetting all filters...');
+                    setMinConnections(0);
+                    setMinConfidence(0);
+                    setShowCommunities(false);
+                    setSourceFilter('all');
+                    setShowAllNodes(false);
+                    
+                    // Recalculate top 50 nodes
+                    const nodesWithImportance = graphData.nodes.map(node => {
+                      const connections = graphData.links.filter(
+                        link => {
+                          const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+                          const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+                          return sourceId === node.id || targetId === node.id;
+                        }
+                      ).length;
+                      const importance = connections * (node.confidence || 0.5) * (node.source_count || 1);
+                      return { ...node, connections, importance };
+                    });
+                    
+                    const topNodes = nodesWithImportance
+                      .sort((a, b) => b.importance - a.importance)
+                      .slice(0, 50);
+                    
+                    setVisibleNodeIds(new Set(topNodes.map(n => n.id)));
+                    console.log('✅ Filters reset, showing top 50 nodes');
+                  }}
+                  sx={{
+                    mt: 2,
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    borderColor: '#667eea',
+                    color: '#667eea',
+                    '&:hover': {
+                      borderColor: '#764ba2',
+                      backgroundColor: 'rgba(102, 126, 234, 0.05)'
+                    }
+                  }}
+                >
+                  Reset All Filters
+                </Button>
+              </Grid>
+            </Grid>
+
+            {/* Filter Statistics */}
+            <Box sx={{ mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Chip 
+                label={`Total: ${graphData.nodes.length} nodes`} 
+                size="small"
+                sx={{ backgroundColor: 'rgba(102, 126, 234, 0.1)', color: '#667eea' }}
+              />
+              <Chip 
+                label={`Visible: ${filteredGraphData.nodes.length} nodes`} 
+                size="small"
+                sx={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}
+              />
+              <Chip 
+                label={`Expanded: ${expandedNodes.size} nodes`} 
+                size="small"
+                sx={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}
+              />
+            </Box>
+          </Card>
+
           {/* Search Results */}
           {searchResults.length > 0 && (
             <Box sx={{ mt: 3 }}>
@@ -1036,9 +2127,22 @@ const KnowledgeHub = () => {
             </Box>
           ) : graphData.nodes.length > 0 ? (
             <>
-              <ForceGraph2D
-                ref={graphRef}
-                graphData={filteredGraphData}
+              {renderMode === '3d' ? (
+                <WebGLKnowledgeGraph
+                  graphData={filteredGraphData}
+                  onNodeClick={handleNodeClick}
+                  onNodeHover={(node) => setHoverNode(node)}
+                  highlightNodes={highlightNodes}
+                  highlightLinks={highlightLinks}
+                  selectedEntity={selectedEntity}
+                  entityConfig={entityConfig}
+                  width="100%"
+                  height="70vh"
+                />
+              ) : (
+                <ForceGraph2D
+                  ref={graphRef}
+                  graphData={filteredGraphData}
                 nodeLabel={node => `
                   <div style="background: rgba(0,0,0,0.85); color: white; padding: 12px; border-radius: 8px; font-family: Arial; max-width: 250px;">
                     <div style="font-weight: 700; font-size: 14px; margin-bottom: 8px; color: ${node.color};">${node.name}</div>
@@ -1046,11 +2150,24 @@ const KnowledgeHub = () => {
                     <div style="font-size: 12px; margin-bottom: 4px;">Confidence: ${(node.confidence * 100).toFixed(0)}%</div>
                     <div style="font-size: 12px;">Sources: ${node.source_count} document${node.source_count !== 1 ? 's' : ''}</div>
                     ${node.source_types && node.source_types.length > 0 ? `<div style="margin-top: 6px; font-size: 11px; color: #aaa;">${node.source_types.join(', ')}</div>` : ''}
+                    <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 11px; opacity: 0.8;">
+                      💡 <strong>Click</strong> to expand connections<br/>
+                      🖱️ <strong>Drag</strong> to reposition
+                    </div>
                   </div>
                 `}
                 nodeVal={node => node.val}
                 nodeColor={node => {
-                  // Highlight logic
+                  // COMMUNITY DETECTION: Color by community if enabled
+                  if (showCommunities && communities[node.id] !== undefined) {
+                    const communityId = communities[node.id];
+                    const communityColor = communityColors[communityId] || node.color;
+                    // Apply highlight logic
+                    if (highlightNodes.size === 0) return communityColor;
+                    return highlightNodes.has(node.id) ? communityColor : '#e5e7eb';
+                  }
+                  
+                  // Default: Highlight logic
                   if (highlightNodes.size === 0) return node.color;
                   return highlightNodes.has(node.id) ? node.color : '#e5e7eb';
                 }}
@@ -1127,13 +2244,12 @@ const KnowledgeHub = () => {
                                     2/globalScale;
                     ctx.stroke();
                     
-                    // LABEL - Visible for important or hovered nodes
+                    // LABEL - Only show for selected or hovered nodes (prevents clutter)
                     const label = node.name;
-                    const shouldShowLabel = isSelected || isHovered || 
-                                           (node.val > 8 && globalScale >= 1.2);
+                    const shouldShowLabel = isSelected || isHovered;
                     
                     if (shouldShowLabel && isHighlighted) {
-                      const fontSize = Math.max(10, 13 / globalScale);
+                      const fontSize = Math.max(12, 14 / globalScale);
                       ctx.font = `600 ${fontSize}px "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
                       ctx.textAlign = 'center';
                       ctx.textBaseline = 'middle';
@@ -1145,9 +2261,9 @@ const KnowledgeHub = () => {
                       const labelY = node.y + radius + fontSize + 4 / globalScale;
                       
                       // Background with rounded corners
-                      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-                      ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
-                      ctx.shadowBlur = 4;
+                      ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
+                      ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+                      ctx.shadowBlur = 6;
                       
                       // Rounded rectangle for label background
                       const rectX = node.x - textWidth/2 - padding;
@@ -1171,8 +2287,8 @@ const KnowledgeHub = () => {
                       
                       ctx.shadowBlur = 0;
                       
-                      // Text
-                      ctx.fillStyle = '#1f2937';
+                      // Text with node type color
+                      ctx.fillStyle = config.color;
                       // Truncate label if too long
                       const truncatedLabel = label.length > 20 ? label.substring(0, 18) + '...' : label;
                       ctx.fillText(truncatedLabel, node.x, labelY);
@@ -1189,7 +2305,10 @@ const KnowledgeHub = () => {
                   // Restore context
                   ctx.restore();
                 }}
-                linkLabel={link => link.label || link.type}
+                linkLabel={link => {
+                  const config = getRelationshipConfig(link.type || link.label);
+                  return config.label || link.label || link.type;
+                }}
                 linkCanvasObjectMode={() => 'after'}
                 linkCanvasObject={(link, ctx, globalScale) => {
                   const start = link.source;
@@ -1197,57 +2316,225 @@ const KnowledgeHub = () => {
                   
                   if (typeof start !== 'object' || typeof end !== 'object') return;
                   
-                  const isHighlighted = highlightLinks.size === 0 || highlightLinks.has(link);
-                  const opacity = isHighlighted ? 0.6 : 0.2;
+                  // Save context
+                  ctx.save();
                   
-                  // Get source and target node configs
-                  const sourceConfig = entityConfig[start.type] || entityConfig.Entity;
-                  const targetConfig = entityConfig[end.type] || entityConfig.Entity;
-                  
-                  // GRADIENT LINK (from source color to target color)
-                  const gradient = ctx.createLinearGradient(start.x, start.y, end.x, end.y);
-                  gradient.addColorStop(0, `${sourceConfig.color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`);
-                  gradient.addColorStop(1, `${targetConfig.color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`);
-                  
-                  ctx.strokeStyle = gradient;
-                  ctx.lineWidth = isHighlighted ? 2.5 : 1;
-                  ctx.lineCap = 'round';
-                  
-                  // DASHED for certain relationship types
-                  const linkType = (link.label || link.type || '').toUpperCase();
-                  if (linkType.includes('RELATED') || linkType.includes('ASSOCIATED')) {
-                    ctx.setLineDash([5, 3]);
-                  } else {
-                    ctx.setLineDash([]);
+                  try {
+                    // Get relationship configuration
+                    const relConfig = getRelationshipConfig(link.type || link.label);
+                    
+                    // Check if this link is highlighted
+                    const isHighlighted = highlightLinks.size === 0 || highlightLinks.has(link);
+                    
+                    // Check if this relationship type is selected (if filter is active)
+                    const isFiltered = selectedRelationshipTypes.length > 0;
+                    const isSelected = !isFiltered || selectedRelationshipTypes.includes(relConfig.category);
+                    
+                    if (!isSelected) return; // Skip rendering if filtered out
+                    
+                    // Calculate line metrics
+                    const dx = end.x - start.x;
+                    const dy = end.y - start.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    // Calculate opacity and width based on state - SOFTER, MORE AESTHETIC
+                    const baseOpacity = isHighlighted ? 0.45 : 0.08; // Reduced from 0.85 to 0.45
+                    const lineWidth = isHighlighted ? relConfig.lineWidth * 1.2 : relConfig.lineWidth * 0.5; // Reduced from 1.8 to 1.2
+                    
+                    // AESTHETIC: Subtle shadow for depth (not too harsh)
+                    if (isHighlighted && globalScale > 1.5) {
+                      ctx.shadowColor = 'rgba(0, 0, 0, 0.1)'; // Soft black shadow instead of colored
+                      ctx.shadowBlur = 8 / globalScale; // Reduced from 15 to 8
+                      ctx.shadowOffsetX = 1 / globalScale; // Reduced from 2 to 1
+                      ctx.shadowOffsetY = 1 / globalScale;
+                    }
+                    
+                    // AESTHETIC: Soft, muted gradient (relationship color only, no entity colors)
+                    const sourceNode = typeof link.source === 'object' ? link.source : graphData.nodes.find(n => n.id === link.source);
+                    const targetNode = typeof link.target === 'object' ? link.target : graphData.nodes.find(n => n.id === link.target);
+                    
+                    if (isHighlighted && sourceNode && targetNode) {
+                      // Create subtle gradient using only relationship color (muted tones)
+                      const gradient = ctx.createLinearGradient(start.x, start.y, end.x, end.y);
+                      
+                      // Use relationship color with varying opacity for smooth gradient
+                      const hexOpacity1 = Math.round(baseOpacity * 0.6 * 255).toString(16).padStart(2, '0'); // Lighter at start
+                      const hexOpacity2 = Math.round(baseOpacity * 255).toString(16).padStart(2, '0'); // Full in middle
+                      const hexOpacity3 = Math.round(baseOpacity * 0.6 * 255).toString(16).padStart(2, '0'); // Lighter at end
+                      
+                      gradient.addColorStop(0, `${relConfig.color}${hexOpacity1}`);
+                      gradient.addColorStop(0.5, `${relConfig.color}${hexOpacity2}`);
+                      gradient.addColorStop(1, `${relConfig.color}${hexOpacity3}`);
+                      
+                      ctx.strokeStyle = gradient;
+                    } else {
+                      // Use solid color for non-highlighted links
+                      const hexOpacity = Math.round(baseOpacity * 255).toString(16).padStart(2, '0');
+                      ctx.strokeStyle = `${relConfig.color}${hexOpacity}`;
+                    }
+                    
+                    ctx.lineWidth = lineWidth;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    
+                    // Set dash pattern based on relationship type
+                    const dashPattern = getLineStyle(link.type || link.label);
+                    if (dashPattern.length > 0) {
+                      const scaledDash = dashPattern.map(d => d / globalScale);
+                      ctx.setLineDash(scaledDash);
+                    }
+                    
+                    // ENHANCED: Draw main line
+                    ctx.beginPath();
+                    ctx.moveTo(start.x, start.y);
+                    ctx.lineTo(end.x, end.y);
+                    ctx.stroke();
+                    
+                    // Reset shadow
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    
+                    // AESTHETIC: Subtle directional arrow (smaller, softer)
+                    if (isHighlighted && distance > 40 && globalScale > 1.2) {
+                      ctx.setLineDash([]); // Reset dash for arrow
+                      
+                      const arrowLength = Math.min(10 / globalScale, distance * 0.1); // Smaller arrow (10 instead of 15)
+                      
+                      // Calculate arrow position (slightly before the target node)
+                      const nodeRadius = (targetNode?.val || 5) / globalScale * 3;
+                      const arrowOffset = nodeRadius + arrowLength * 0.5;
+                      const arrowPos = {
+                        x: end.x - (dx / distance) * arrowOffset,
+                        y: end.y - (dy / distance) * arrowOffset
+                      };
+                      
+                      // Calculate arrow angle
+                      const angle = Math.atan2(dy, dx);
+                      
+                      // Draw subtle arrow with reduced opacity
+                      const arrowOpacity = Math.round(baseOpacity * 0.8 * 255).toString(16).padStart(2, '0');
+                      ctx.fillStyle = `${relConfig.color}${arrowOpacity}`;
+                      ctx.beginPath();
+                      ctx.moveTo(arrowPos.x, arrowPos.y);
+                      ctx.lineTo(
+                        arrowPos.x - arrowLength * Math.cos(angle - Math.PI / 7), // Narrower angle
+                        arrowPos.y - arrowLength * Math.sin(angle - Math.PI / 7)
+                      );
+                      ctx.lineTo(
+                        arrowPos.x - arrowLength * Math.cos(angle + Math.PI / 7), // Narrower angle
+                        arrowPos.y - arrowLength * Math.sin(angle + Math.PI / 7)
+                      );
+                      ctx.closePath();
+                      ctx.fill();
+                    }
+                    
+                    // ENHANCED: Draw label with improved styling
+                    if (globalScale > 1.8 && isHighlighted && distance > 40) {
+                      const midX = (start.x + end.x) / 2;
+                      const midY = (start.y + end.y) / 2;
+                      
+                      const label = relConfig.label;
+                      const fontSize = Math.max(10, 12 / globalScale);
+                      ctx.font = `600 ${fontSize}px "Inter", -apple-system, BlinkMacSystemFont, sans-serif`;
+                      ctx.textAlign = 'center';
+                      ctx.textBaseline = 'middle';
+                      
+                      const textMetrics = ctx.measureText(label);
+                      const textWidth = textMetrics.width;
+                      const padding = 6 / globalScale;
+                      const cornerRadius = 4 / globalScale;
+                      
+                      // Calculate label rotation (align with link)
+                      const labelAngle = Math.atan2(dy, dx);
+                      const shouldFlip = Math.abs(labelAngle) > Math.PI / 2;
+                      const finalAngle = shouldFlip ? labelAngle + Math.PI : labelAngle;
+                      
+                      // Save context for rotation
+                      ctx.save();
+                      ctx.translate(midX, midY);
+                      ctx.rotate(finalAngle);
+                      
+                      // Draw rounded rectangle background
+                      const rectX = -textWidth / 2 - padding;
+                      const rectY = -fontSize / 2 - padding / 2;
+                      const rectWidth = textWidth + padding * 2;
+                      const rectHeight = fontSize + padding;
+                      
+                      // Background with shadow
+                      ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+                      ctx.shadowBlur = 8;
+                      ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
+                      
+                      ctx.beginPath();
+                      ctx.moveTo(rectX + cornerRadius, rectY);
+                      ctx.lineTo(rectX + rectWidth - cornerRadius, rectY);
+                      ctx.quadraticCurveTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + cornerRadius);
+                      ctx.lineTo(rectX + rectWidth, rectY + rectHeight - cornerRadius);
+                      ctx.quadraticCurveTo(rectX + rectWidth, rectY + rectHeight, rectX + rectWidth - cornerRadius, rectY + rectHeight);
+                      ctx.lineTo(rectX + cornerRadius, rectY + rectHeight);
+                      ctx.quadraticCurveTo(rectX, rectY + rectHeight, rectX, rectY + rectHeight - cornerRadius);
+                      ctx.lineTo(rectX, rectY + cornerRadius);
+                      ctx.quadraticCurveTo(rectX, rectY, rectX + cornerRadius, rectY);
+                      ctx.closePath();
+                      ctx.fill();
+                      
+                      // Border
+                      ctx.shadowBlur = 0;
+                      ctx.strokeStyle = relConfig.color;
+                      ctx.lineWidth = 1.5 / globalScale;
+                      ctx.stroke();
+                      
+                      // Text
+                      ctx.fillStyle = relConfig.color;
+                      ctx.shadowBlur = 0;
+                      ctx.fillText(label, 0, 0);
+                      
+                      ctx.restore(); // Restore rotation
+                    }
+                    
+                  } catch (e) {
+                    console.debug('Enhanced link rendering failed:', e);
                   }
                   
-                  ctx.beginPath();
-                  ctx.moveTo(start.x, start.y);
-                  ctx.lineTo(end.x, end.y);
-                  ctx.stroke();
+                  // Reset context
                   ctx.setLineDash([]);
+                  ctx.restore();
                 }}
-                linkDirectionalParticles={link => (highlightLinks.size === 0 || highlightLinks.has(link)) ? 4 : 0}
-                linkDirectionalParticleWidth={4}
-                linkDirectionalParticleSpeed={0.008}
+                linkDirectionalParticles={link => (highlightLinks.size === 0 || highlightLinks.has(link)) ? 2 : 0}
+                linkDirectionalParticleWidth={2.5}
+                linkDirectionalParticleSpeed={0.006}
                 linkDirectionalParticleColor={(link) => {
-                  const sourceConfig = entityConfig[link.source?.type] || entityConfig.Entity;
-                  return sourceConfig.color;
+                  const relConfig = getRelationshipConfig(link.type || link.label);
+                  return relConfig.particleColor;
                 }}
                 onNodeClick={handleNodeClick}
                 onNodeHover={handleNodeHover}
                 onBackgroundClick={handleBackgroundClick}
                 backgroundColor="transparent"
+                enableNodeDrag={true}
+                enableZoomInteraction={true}
+                enablePanInteraction={true}
+                d3AlphaDecay={0.02}
                 d3VelocityDecay={0.3}
-                cooldownTicks={200}
+                cooldownTicks={100}
+                warmupTicks={50}
+                d3Force={{
+                  charge: { strength: -200, distanceMax: 300 },
+                  link: { distance: 50, iterations: 2 },
+                  center: null,
+                  collide: { radius: 20, strength: 0.8, iterations: 2 }
+                }}
                 onEngineStop={() => {
                   if (graphRef.current) {
                     graphRef.current.zoomToFit(400);
                   }
                 }}
               />
+              )}
 
-            {/* Floating Graph Controls */}
+            {/* Floating Graph Controls - Only show for 2D mode */}
+            {renderMode === '2d' && (
             <Box
               sx={{
                 position: 'absolute',
@@ -1323,6 +2610,7 @@ const KnowledgeHub = () => {
                 <CenterIcon />
               </IconButton>
             </Box>
+            )}
 
             {/* Legend - Source-based Colors */}
             <Paper

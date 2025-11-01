@@ -284,6 +284,34 @@ async def get_entity_sources(
         logger.error(f"Failed to get entity sources: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to retrieve entity sources: {str(e)}")
 
+@router.get("/entities/{entity_id}/source-documents")
+async def get_entity_source_documents_by_id(
+    entity_id: str,
+    space_id: Optional[str] = Query(default=None, description="Filter by space ID"),
+    limit: int = Query(default=20, ge=5, le=100, description="Maximum documents to return"),
+    current_user: dict = Depends(get_current_user),
+    kb_service: KnowledgeHubService = Depends(get_knowledge_hub_service)
+):
+    """
+    Get source documents for a specific entity (by ID)
+    
+    Returns list of documents that contain this entity
+    """
+    try:
+        logger.info(f"User {current_user.get('email')} requesting sources for entity ID: {entity_id}")
+        
+        result = await kb_service.get_entity_source_documents_by_id(
+            entity_id=entity_id,
+            space_id=space_id,
+            limit=limit
+        )
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Failed to get entity sources by ID: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve entity sources: {str(e)}")
+
 
 @router.post("/entity/{entity_name}/chat")
 async def chat_with_entity(

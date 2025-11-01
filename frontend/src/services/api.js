@@ -852,6 +852,17 @@ const extendedApiService = {
     }
   },
 
+  getEntitySourceDocuments: async (entityId) => {
+    try {
+      const response = await api.get(`/knowledge-hub/entities/${entityId}/source-documents`);
+      return response.data;
+    } catch (error) {
+      console.error('Get entity source documents API error:', error);
+      // Return empty result instead of throwing to allow graceful degradation
+      return { documents: [] };
+    }
+  },
+
   getKnowledgeHubEntity: async (entityName, depth = 2) => {
     try {
       const response = await api.get(`/knowledge-hub/entity/${encodeURIComponent(entityName)}`, {

@@ -108,37 +108,56 @@ class KnowledgeHubService:
         try:
             logger.info(f"Getting full knowledge graph, limit: {limit}")
             
-            # Query to get all nodes and relationships (excluding system and document nodes)
+            # Query to get all entity nodes + document nodes with their relationships
+            # Documents will be shown as special nodes that "CONTAIN" entities
             cypher = """
+            // Get entity nodes (excluding system nodes)
             MATCH (n)
             WHERE NOT n:User 
               AND NOT n:InvestigationBoard 
               AND NOT n:PinnedEntity 
               AND NOT n:Finding
-              AND NOT n:Document
               AND NOT n:ClinicalTrial
               AND NOT n:FDADocument
             WITH n LIMIT $limit
+            
+            // Get relationships between entities
             OPTIONAL MATCH (n)-[r]-(m)
             WHERE NOT m:User 
               AND NOT m:InvestigationBoard 
               AND NOT m:PinnedEntity 
               AND NOT m:Finding
-              AND NOT m:Document
               AND NOT m:ClinicalTrial
               AND NOT m:FDADocument
+            
+            // Also get documents that contain these entities
+            OPTIONAL MATCH (doc:Document)-[doc_rel:HAS_ENTITY]->(n)
+            WHERE doc.id IS NOT NULL
+            
             RETURN collect(DISTINCT {
                      node: n,
                      labels: labels(n),
                      internal_id: id(n)
-                   }) as nodes, 
+                   }) as entity_nodes,
+                   collect(DISTINCT {
+                     node: doc,
+                     labels: ['Document'],
+                     internal_id: id(doc)
+                   }) as document_nodes,
                    collect(DISTINCT {
                      source: id(startNode(r)), 
                      target: id(endNode(r)), 
                      type: type(r), 
                      predicate: coalesce(r.predicate, type(r)),
                      confidence: coalesce(r.confidence, 0.8)
-                   }) as relationships
+                   }) as entity_relationships,
+                   collect(DISTINCT {
+                     source: id(doc),
+                     target: id(n),
+                     type: 'CONTAINS',
+                     predicate: 'CONTAINS',
+                     confidence: 1.0
+                   }) as document_relationships
             """
             
             # Add space_id filter if provided
@@ -165,14 +184,20 @@ class KnowledgeHubService:
             if result and result.get('results') and result['results'][0].get('data'):
                 data_row = result['results'][0]['data'][0]['row']
                 
-                nodes_data = data_row[0] if len(data_row) > 0 else []
-                rels_data = data_row[1] if len(data_row) > 1 else []
+                # Extract entity nodes, document nodes, and relationships
+                entity_nodes_data = data_row[0] if len(data_row) > 0 else []
+                document_nodes_data = data_row[1] if len(data_row) > 1 else []
+                entity_rels_data = data_row[2] if len(data_row) > 2 else []
+                document_rels_data = data_row[3] if len(data_row) > 3 else []
+                
+                # Combine all nodes
+                all_nodes_data = entity_nodes_data + [doc for doc in document_nodes_data if doc and doc.get('node')]
                 
                 # Format nodes - Neo4j returns node objects, not dicts
                 nodes = []
                 node_ids = {}  # Map Neo4j internal IDs to our node IDs
                 
-                for i, node_data in enumerate(nodes_data):
+                for i, node_data in enumerate(all_nodes_data):
                     try:
                         # Debug: log raw node_data structure for first few nodes
                         if i < 3:
@@ -193,24 +218,46 @@ class KnowledgeHubService:
                         if i < 3:
                             logger.info(f"Parsed node[{i}]: type={node_type}, labels={node_labels}, id={node_id[:30]}")
                         
-                        nodes.append({
-                            'id': node_id,
-                            'name': node_obj.get('normalized_name', node_obj.get('name', node_obj.get('title', node_id))),
-                            'type': node_type,
-                            'confidence': float(node_obj.get('confidence', 0.8)),
-                            'description': node_obj.get('description', ''),
-                            'source_types': node_obj.get('source_types', []),
-                            'source_count': int(node_obj.get('source_count', 1)),
-                            'has_pdf': bool(node_obj.get('has_pdf', False)),
-                            'has_external': bool(node_obj.get('external_source', False))
-                        })
+                        # Special handling for Document nodes
+                        if node_type == 'Document':
+                            nodes.append({
+                                'id': node_id,
+                                'name': node_obj.get('title', node_obj.get('filename', f'Document {node_id[:8]}')),
+                                'type': 'Document',
+                                'confidence': 1.0,
+                                'description': node_obj.get('abstract', '')[:200] if node_obj.get('abstract') else '',
+                                'source_types': [node_obj.get('source', 'unknown')],
+                                'source_count': 1,
+                                'has_pdf': node_obj.get('source') == 'pdf',
+                                'has_external': node_obj.get('source') != 'pdf',
+                                'classification': node_obj.get('classification', ''),
+                                'doc_metadata': {
+                                    'source': node_obj.get('source', ''),
+                                    'authors': node_obj.get('authors', []),
+                                    'publication_date': node_obj.get('publication_date', '')
+                                }
+                            })
+                        else:
+                            # Regular entity node
+                            nodes.append({
+                                'id': node_id,
+                                'name': node_obj.get('normalized_name', node_obj.get('name', node_obj.get('title', node_id))),
+                                'type': node_type,
+                                'confidence': float(node_obj.get('confidence', 0.8)),
+                                'description': node_obj.get('description', ''),
+                                'source_types': node_obj.get('source_types', []),
+                                'source_count': int(node_obj.get('source_count', 1)),
+                                'has_pdf': bool(node_obj.get('has_pdf', False)),
+                                'has_external': bool(node_obj.get('external_source', False))
+                            })
                     except Exception as e:
                         logger.warning(f"Failed to parse node[{i}]: {e}")
                         continue
                 
-                # Format edges
+                # Combine and format edges
+                all_rels_data = entity_rels_data + document_rels_data
                 edges = []
-                for rel in rels_data:
+                for rel in all_rels_data:
                     if isinstance(rel, dict) and rel.get('source') is not None and rel.get('target') is not None:
                         source_id = node_ids.get(rel['source'], str(rel['source']))
                         target_id = node_ids.get(rel['target'], str(rel['target']))
@@ -223,7 +270,7 @@ class KnowledgeHubService:
                             'confidence': float(rel.get('confidence', 0.8))
                         })
                 
-                logger.info(f"Full graph retrieved: {len(nodes)} nodes, {len(edges)} edges")
+                logger.info(f"Full graph retrieved: {len(nodes)} nodes ({sum(1 for n in nodes if n['type'] == 'Document')} documents), {len(edges)} edges")
                 
                 return {
                     'nodes': nodes,
@@ -316,11 +363,16 @@ class KnowledgeHubService:
             Entity details with connections
         """
         try:
-            # Search by normalized_name (case-insensitive) or name for documents
+            # Search by ID first, then fall back to name search
             cypher = """
             MATCH (e)
-            WHERE toLower(e.normalized_name) = toLower($entity_name) OR toLower(e.name) = toLower($entity_name)
+            WHERE e.id = $entity_id 
+               OR toLower(e.normalized_name) = toLower($entity_id) 
+               OR toLower(e.name) = toLower($entity_id)
             OPTIONAL MATCH (e)-[r]-(connected)
+            WHERE NOT connected:Document 
+              AND NOT connected:ClinicalTrial 
+              AND NOT connected:FDADocument
             RETURN e, 
                    labels(e) as labels,
                    collect(DISTINCT {type: type(r), direction: CASE WHEN startNode(r) = e THEN 'outgoing' ELSE 'incoming' END, target: coalesce(connected.normalized_name, connected.name, 'Unknown')}) as connections,
@@ -328,8 +380,8 @@ class KnowledgeHubService:
             LIMIT 1
             """
             
-            logger.info(f"Searching for entity: {entity_id}")
-            result = await self._execute_cypher(cypher, {"entity_name": entity_id})
+            logger.info(f"Searching for entity by ID or name: {entity_id}")
+            result = await self._execute_cypher(cypher, {"entity_id": entity_id})
             logger.info(f"Neo4j result: {result}")
             
             if result and result.get("results") and len(result["results"]) > 0 and result["results"][0].get("data") and len(result["results"][0]["data"]) > 0:
@@ -695,5 +747,219 @@ class KnowledgeHubService:
                 "success": False,
                 "documents": [],
                 "error": str(e)
+            }
+    
+    async def get_entity_source_documents_by_id(self, entity_id: str, space_id: Optional[str] = None, limit: int = 20) -> Dict[str, Any]:
+        """
+        Get source documents for an entity by its ID
+        
+        Uses a two-tier approach:
+        1. Try Elasticsearch search (fast, requires openai_entities field)
+        2. Fallback to Neo4j relationships (reliable, works even if ES field missing)
+        
+        Args:
+            entity_id: ID of the entity (e.g., "Drug_aspirin_13ce41e9")
+            space_id: Optional filter by space_id
+            limit: Maximum number of documents to return
+        
+        Returns:
+            Dictionary with source documents
+        """
+        try:
+            # First, get the entity name from Neo4j
+            cypher = """
+            MATCH (e {id: $entity_id})
+            RETURN coalesce(e.normalized_name, e.name) as name, e.type as type
+            LIMIT 1
+            """
+            
+            result = await self._execute_cypher(cypher, {"entity_id": entity_id})
+            
+            if not result or not result.get('results') or not result['results'][0].get('data'):
+                logger.warning(f"Entity not found with ID: {entity_id}")
+                return {"success": False, "documents": [], "error": "Entity not found"}
+            
+            entity_name = result['results'][0]['data'][0]['row'][0]
+            entity_type = result['results'][0]['data'][0]['row'][1] if len(result['results'][0]['data'][0]['row']) > 1 else "Entity"
+            
+            # TIER 1: Try Elasticsearch search (existing method - fast!)
+            logger.info(f"Tier 1: Searching Elasticsearch for entity '{entity_name}'")
+            es_results = await self.get_entity_source_documents(entity_name, space_id, limit)
+            
+            if es_results.get("document_count", 0) > 0:
+                logger.info(f"✅ Tier 1 SUCCESS: Found {es_results['document_count']} documents via Elasticsearch")
+                return es_results
+            
+            # TIER 2: Fallback to Neo4j relationships
+            logger.info(f"Tier 1 returned 0 results. Trying Tier 2: Neo4j relationships for entity '{entity_name}'")
+            neo4j_results = await self._get_documents_from_neo4j_relationships(entity_id, entity_name, entity_type, limit)
+            
+            if neo4j_results.get("document_count", 0) > 0:
+                logger.info(f"✅ Tier 2 SUCCESS: Found {neo4j_results['document_count']} documents via Neo4j relationships")
+                return neo4j_results
+            
+            # No results from either method
+            logger.warning(f"⚠️  No source documents found for entity '{entity_name}' (ID: {entity_id}) via either method")
+            return {
+                "success": True,
+                "entity_name": entity_name,
+                "document_count": 0,
+                "documents": [],
+                "method": "none"
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to get source documents for entity ID {entity_id}: {e}")
+            return {
+                "success": False,
+                "documents": [],
+                "error": str(e)
+            }
+    
+    async def _get_documents_from_neo4j_relationships(self, entity_id: str, entity_name: str, entity_type: str, limit: int = 20) -> Dict[str, Any]:
+        """
+        Get source documents by traversing Neo4j relationships
+        
+        This method finds documents that have relationships to the entity:
+        - (Document)-[:HAS_ENTITY]->(Entity)
+        - (Document)-[:CONTAINS]->(Entity)
+        
+        Args:
+            entity_id: ID of the entity
+            entity_name: Name of the entity (for display)
+            entity_type: Type of the entity (for display)
+            limit: Maximum number of documents
+        
+        Returns:
+            Dictionary with source documents
+        """
+        try:
+            # Query Neo4j to find documents connected to this entity
+            cypher = """
+            MATCH (doc:Document)-[r]->(e {id: $entity_id})
+            WHERE type(r) IN ['HAS_ENTITY', 'CONTAINS', 'MENTIONS']
+            RETURN DISTINCT doc.id as doc_id, 
+                   doc.title as title,
+                   doc.source as source_type,
+                   doc.abstract as abstract,
+                   doc.filename as filename,
+                   r.confidence as rel_confidence,
+                   type(r) as rel_type
+            LIMIT $limit
+            """
+            
+            result = await self._execute_cypher(cypher, {"entity_id": entity_id, "limit": limit})
+            
+            if not result or not result.get('results') or not result['results'][0].get('data'):
+                logger.info(f"No Neo4j relationships found for entity {entity_id}")
+                return {"success": True, "documents": [], "document_count": 0, "method": "neo4j"}
+            
+            # Extract document IDs and metadata from Neo4j
+            neo4j_docs = []
+            doc_ids = []
+            
+            for row_data in result['results'][0]['data']:
+                row = row_data['row']
+                doc_id = row[0]
+                if doc_id:
+                    doc_ids.append(doc_id)
+                    neo4j_docs.append({
+                        "doc_id": doc_id,
+                        "title": row[1] or "Untitled",
+                        "source_type": row[2] or "unknown",
+                        "abstract": row[3] or "",
+                        "filename": row[4] or "",
+                        "rel_confidence": row[5] or 0.8,
+                        "rel_type": row[6] or "HAS_ENTITY"
+                    })
+            
+            if not doc_ids:
+                logger.info(f"Neo4j returned relationships but no valid document IDs for entity {entity_id}")
+                return {"success": True, "documents": [], "document_count": 0, "method": "neo4j"}
+            
+            # Fetch full document details from Elasticsearch
+            logger.info(f"Fetching {len(doc_ids)} documents from Elasticsearch by doc_id")
+            
+            if not self.elasticsearch_service.client:
+                await self.elasticsearch_service.connect()
+            
+            # Query Elasticsearch for these specific document IDs
+            es_query = {
+                "query": {
+                    "terms": {
+                        "doc_id.keyword": doc_ids
+                    }
+                },
+                "size": limit,
+                "_source": [
+                    "doc_id", "title", "content", "doc_type", "source_type", 
+                    "is_external", "created_at", "openai_summary", "abstract"
+                ]
+            }
+            
+            es_result = await self.elasticsearch_service.client.search(
+                index="documents",
+                body=es_query
+            )
+            
+            # Merge Neo4j metadata with Elasticsearch content
+            documents = []
+            for hit in es_result.get("hits", {}).get("hits", []):
+                source = hit.get("_source", {})
+                doc_id = source.get("doc_id")
+                
+                # Find corresponding Neo4j metadata
+                neo4j_meta = next((d for d in neo4j_docs if d["doc_id"] == doc_id), {})
+                
+                # Extract snippet around entity mention (if content exists)
+                snippets = []
+                content = source.get("content", "")
+                if content and entity_name:
+                    # Simple snippet extraction: find entity mentions
+                    import re
+                    pattern = re.compile(re.escape(entity_name), re.IGNORECASE)
+                    matches = list(pattern.finditer(content))
+                    for match in matches[:3]:  # Max 3 snippets
+                        start = max(0, match.start() - 75)
+                        end = min(len(content), match.end() + 75)
+                        snippet = content[start:end]
+                        # Highlight the entity
+                        snippet = pattern.sub(f"<mark>{match.group()}</mark>", snippet)
+                        snippets.append(f"...{snippet}...")
+                
+                documents.append({
+                    "doc_id": doc_id,
+                    "title": source.get("title") or neo4j_meta.get("title", "Untitled"),
+                    "doc_type": source.get("doc_type", "unknown"),
+                    "source_type": source.get("source_type") or neo4j_meta.get("source_type", "unknown"),
+                    "is_external": source.get("is_external", False),
+                    "created_at": source.get("created_at"),
+                    "snippets": snippets,
+                    "summary": (source.get("openai_summary") or source.get("abstract") or neo4j_meta.get("abstract", ""))[:200] + "...",
+                    "entity_confidence": neo4j_meta.get("rel_confidence", 0.8),
+                    "entity_type": entity_type,
+                    "score": hit.get("_score", 0),
+                    "relationship_type": neo4j_meta.get("rel_type", "HAS_ENTITY")
+                })
+            
+            logger.info(f"Successfully fetched {len(documents)} documents from Elasticsearch for entity {entity_name}")
+            
+            return {
+                "success": True,
+                "entity_name": entity_name,
+                "document_count": len(documents),
+                "documents": documents,
+                "method": "neo4j"
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to get documents from Neo4j relationships: {e}")
+            import traceback
+            traceback.print_exc()
+            return {
+                "success": False,
+                "documents": [],
+                "error": str(e),
+                "method": "neo4j"
             }
 
