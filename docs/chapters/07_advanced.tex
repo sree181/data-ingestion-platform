@@ -1,0 +1,771 @@
+% ============================================================================
+% CHAPTER 7: ADVANCED TOPICS
+% ============================================================================
+
+\chapter{Advanced Topics}
+
+\section{Custom Model Training}
+
+\subsection{Training Custom BERT Classifier}
+
+For domain-specific performance improvements, you can train a custom BERT model.
+
+\textbf{Prepare Training Data:}
+\begin{lstlisting}[style=pythonstyle]
+# Format: CSV with columns: text, label
+# ml_training/data/training_data.csv
+
+text,label
+"55-year-old male developed rash after aspirin",ICSR
+"Clinical trial showed 30% response rate",Safety_Information
+"Aspirin inhibits COX-2 enzyme",Non-ICSR
+"FDA approves new cancer drug",Rejected
+\end{lstlisting}
+
+\textbf{Training Script:}
+\begin{lstlisting}[style=pythonstyle]
+# ml_training/train_bert.py
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import Trainer, TrainingArguments
+import pandas as pd
+
+# Load data
+df = pd.read_csv('data/training_data.csv')
+texts = df['text'].tolist()
+labels = df['label'].map({
+    'ICSR': 0,
+    'Safety_Information': 1,
+    'Non-ICSR': 2,
+    'Rejected': 3
+}).tolist()
+
+# Load pre-trained model
+model_name = "facebook/bart-large-mnli"
+model = AutoModelForSequenceClassification.from_pretrained(
+    model_name,
+    num_labels=4
+)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+# Training arguments
+training_args = TrainingArguments(
+    output_dir='./results',
+    num_train_epochs=3,
+    per_device_train_batch_size=8,
+    save_steps=500,
+    logging_steps=100,
+    evaluation_strategy="steps",
+    learning_rate=2e-5
+)
+
+# Train
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset
+)
+trainer.train()
+
+# Save model
+model.save_pretrained('./custom_bert_model')
+tokenizer.save_pretrained('./custom_bert_model')
+\end{lstlisting}
+
+\textbf{Deploy Custom Model:}
+\begin{lstlisting}[style=pythonstyle]
+# Update services/pv-classification-service/bert_classifier.py
+MODEL_NAME = "/app/models/custom_bert_model"
+
+# Copy model to container
+# docker-compose.yml
+volumes:
+  - ./ml_training/custom_bert_model:/app/models/custom_bert_model
+\end{lstlisting}
+
+\subsection{Reinforcement Learning Model Retraining}
+
+\textbf{Collect New Training Data:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Collect 500 recent documents with classification results
+python rl_optimization/data_collection/collect_real_pubmed_data.py \
+  --max-results 500 \
+  --output rl_optimization/real_pubmed_data
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Retrain RL Agent:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Train with new data
+python rl_optimization/rl_training/training_engine.py \
+  --episodes 1000 \
+  --data-path rl_optimization/real_pubmed_data \
+  --checkpoint-dir rl_optimization/checkpoints
+
+# Results saved to: rl_optimization/training_results/
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Deploy Updated Model:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Copy new model to RL Intelligence Service
+docker-compose exec rl-intelligence-service cp \
+  /app/rl_optimization/checkpoints/best_model.pt \
+  /app/models/rl_agent.pt
+
+# Restart service
+docker-compose restart rl-intelligence-service
+\end{lstlisting}
+\end{commandbox}
+
+\section{API Integration Examples}
+
+\subsection{Python SDK Example}
+
+\begin{lstlisting}[style=pythonstyle]
+# example_client.py
+import requests
+from typing import List, Dict
+
+class DataIngestionClient:
+    def __init__(self, base_url: str, email: str, password: str):
+        self.base_url = base_url
+        self.token = self._authenticate(email, password)
+    
+    def _authenticate(self, email: str, password: str) -> str:
+        """Authenticate and get access token"""
+        response = requests.post(
+            f"{self.base_url}/api/v1/auth/login",
+            json={"email": email, "password": password}
+        )
+        response.raise_for_status()
+        return response.json()["access_token"]
+    
+    def _headers(self) -> Dict:
+        """Get authorization headers"""
+        return {
+            "Authorization": f"Bearer {self.token}",
+            "Content-Type": "application/json"
+        }
+    
+    def upload_document(self, file_path: str, space_id: str) -> Dict:
+        """Upload and process document"""
+        with open(file_path, 'rb') as f:
+            files = {'files': f}
+            data = {
+                'space_id': space_id,
+                'processing_options': {
+                    'enable_classification': True,
+                    'enable_entity_extraction': True
+                }
+            }
+            response = requests.post(
+                f"{self.base_url}/api/v1/upload",
+                headers={"Authorization": f"Bearer {self.token}"},
+                files=files,
+                data={'processing_options': str(data['processing_options'])}
+            )
+            response.raise_for_status()
+            return response.json()
+    
+    def get_document(self, doc_id: str) -> Dict:
+        """Retrieve document details"""
+        response = requests.get(
+            f"{self.base_url}/api/v1/documents/{doc_id}",
+            headers=self._headers()
+        )
+        response.raise_for_status()
+        return response.json()
+    
+    def classify_text(self, title: str, abstract: str) -> Dict:
+        """Classify document text"""
+        response = requests.post(
+            f"{self.base_url}/api/v1/pv-classification/classify",
+            headers=self._headers(),
+            json={
+                "title": title,
+                "abstract": abstract,
+                "force_ensemble": False
+            }
+        )
+        response.raise_for_status()
+        return response.json()
+    
+    def get_knowledge_graph(self, limit: int = 500) -> Dict:
+        """Retrieve knowledge graph data"""
+        response = requests.get(
+            f"{self.base_url}/api/v1/knowledge-hub/graph?limit={limit}",
+            headers=self._headers()
+        )
+        response.raise_for_status()
+        return response.json()
+
+# Usage example
+if __name__ == "__main__":
+    client = DataIngestionClient(
+        base_url="http://localhost:8000",
+        email="admin@example.com",
+        password="admin123"
+    )
+    
+    # Upload document
+    result = client.upload_document(
+        file_path="./study_report.pdf",
+        space_id="space_abc123"
+    )
+    print(f"Document uploaded: {result['documents'][0]['doc_id']}")
+    
+    # Classify text
+    classification = client.classify_text(
+        title="Adverse Event Case Report",
+        abstract="Patient developed severe rash after aspirin administration"
+    )
+    print(f"Classification: {classification['classification']}")
+    print(f"Confidence: {classification['classification_confidence']}")
+\end{lstlisting}
+
+\subsection{JavaScript/Node.js Example}
+
+\begin{lstlisting}[style=pythonstyle]
+// example_client.js
+const axios = require('axios');
+const FormData = require('form-data');
+const fs = require('fs');
+
+class DataIngestionClient {
+    constructor(baseURL, email, password) {
+        this.baseURL = baseURL;
+        this.client = axios.create({ baseURL });
+        this.authenticate(email, password);
+    }
+
+    async authenticate(email, password) {
+        const response = await this.client.post('/api/v1/auth/login', {
+            email,
+            password
+        });
+        this.token = response.data.access_token;
+        this.client.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
+    }
+
+    async uploadDocument(filePath, spaceId) {
+        const form = new FormData();
+        form.append('files', fs.createReadStream(filePath));
+        form.append('space_id', spaceId);
+        form.append('processing_options', JSON.stringify({
+            enable_classification: true,
+            enable_entity_extraction: true
+        }));
+
+        const response = await this.client.post('/api/v1/upload', form, {
+            headers: form.getHeaders()
+        });
+        return response.data;
+    }
+
+    async getDocument(docId) {
+        const response = await this.client.get(`/api/v1/documents/${docId}`);
+        return response.data;
+    }
+
+    async classifyText(title, abstract) {
+        const response = await this.client.post('/api/v1/pv-classification/classify', {
+            title,
+            abstract,
+            force_ensemble: false
+        });
+        return response.data;
+    }
+
+    async getKnowledgeGraph(limit = 500) {
+        const response = await this.client.get(`/api/v1/knowledge-hub/graph?limit=${limit}`);
+        return response.data;
+    }
+}
+
+// Usage
+(async () => {
+    const client = new DataIngestionClient(
+        'http://localhost:8000',
+        'admin@example.com',
+        'admin123'
+    );
+
+    // Classify text
+    const result = await client.classifyText(
+        'Adverse Event Report',
+        'Patient developed rash after aspirin'
+    );
+    console.log(`Classification: ${result.classification}`);
+    console.log(`Confidence: ${result.classification_confidence}`);
+})();
+\end{lstlisting}
+
+\section{Custom Workflows}
+
+\subsection{Automated Daily PubMed Ingestion}
+
+\textbf{Cron Job Script:}
+\begin{lstlisting}[style=bashstyle]
+#!/bin/bash
+# daily_pubmed_ingestion.sh
+
+API_URL="http://localhost:8000"
+TOKEN="<your_long_lived_token>"
+SPACE_ID="space_abc123"
+
+# Define queries
+QUERIES=(
+    "COVID-19 adverse events"
+    "vaccine safety pharmacovigilance"
+    "drug safety case reports"
+)
+
+# Start ingestion for each query
+for QUERY in "${QUERIES[@]}"; do
+    echo "Starting ingestion for: $QUERY"
+    curl -X POST "$API_URL/api/v1/ingestion/pubmed/start" \
+        -H "Authorization: Bearer $TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{
+            \"space_id\": \"$SPACE_ID\",
+            \"queries\": [\"$QUERY\"],
+            \"max_results_per_query\": 50,
+            \"date_range\": {
+                \"start\": \"$(date -d '1 day ago' +%Y-%m-%d)\",
+                \"end\": \"$(date +%Y-%m-%d)\"
+            },
+            \"processing_options\": {
+                \"enable_classification\": true,
+                \"enable_entity_extraction\": true
+            }
+        }"
+    
+    # Wait 5 minutes between queries
+    sleep 300
+done
+
+echo "Daily ingestion completed"
+\end{lstlisting}
+
+\textbf{Schedule with Cron:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Run daily at 3 AM
+0 3 * * * /path/to/daily_pubmed_ingestion.sh >> /var/log/ingestion.log 2>&1
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Automated ICSR Export to Regulatory System}
+
+\begin{lstlisting}[style=pythonstyle]
+# export_icsrs_to_regulatory.py
+import requests
+import xml.etree.ElementTree as ET
+from datetime import datetime, timedelta
+
+API_URL = "http://localhost:8000"
+TOKEN = "<your_token>"
+
+def get_new_icsrs(days=1):
+    """Fetch ICSRs approved in last N days"""
+    since = (datetime.now() - timedelta(days=days)).isoformat()
+    response = requests.get(
+        f"{API_URL}/api/v1/documents",
+        headers={"Authorization": f"Bearer {TOKEN}"},
+        params={
+            "classification": "ICSR",
+            "approved": True,
+            "created_after": since,
+            "limit": 100
+        }
+    )
+    return response.json()["documents"]
+
+def convert_to_e2b_xml(icsr):
+    """Convert ICSR to ICH E2B XML format"""
+    root = ET.Element("ichicsr", lang="en")
+    
+    # Safety report
+    safety_report = ET.SubElement(root, "safetyreport")
+    
+    # Patient information
+    patient = ET.SubElement(safety_report, "patient")
+    ET.SubElement(patient, "patientinitial").text = icsr["patient"]["initials"]
+    ET.SubElement(patient, "patientage").text = str(icsr["patient"]["age"])
+    
+    # Drug information
+    drug = ET.SubElement(safety_report, "drug")
+    ET.SubElement(drug, "medicinalproduct").text = icsr["drug"]["name"]
+    ET.SubElement(drug, "drugdosagetext").text = icsr["drug"]["dosage"]
+    
+    # Adverse event
+    reaction = ET.SubElement(safety_report, "reaction")
+    ET.SubElement(reaction, "primarysourcereaction").text = icsr["event"]["description"]
+    
+    return ET.tostring(root, encoding='unicode')
+
+def submit_to_regulatory_system(xml_data):
+    """Submit E2B XML to regulatory system (mock)"""
+    # Replace with actual regulatory system API
+    response = requests.post(
+        "https://regulatory-system.gov/api/submit",
+        headers={"Content-Type": "application/xml"},
+        data=xml_data
+    )
+    return response.json()
+
+if __name__ == "__main__":
+    # Get new ICSRs
+    icsrs = get_new_icsrs(days=1)
+    print(f"Found {len(icsrs)} new ICSRs")
+    
+    # Export each ICSR
+    for icsr in icsrs:
+        xml_data = convert_to_e2b_xml(icsr)
+        result = submit_to_regulatory_system(xml_data)
+        print(f"Submitted ICSR {icsr['doc_id']}: {result['status']}")
+\end{lstlisting}
+
+\section{Deployment Strategies}
+
+\subsection{Production Deployment on AWS}
+
+\textbf{Infrastructure as Code (Terraform):}
+\begin{lstlisting}[style=pythonstyle]
+# terraform/main.tf
+provider "aws" {
+  region = "us-east-1"
+}
+
+# ECS Cluster
+resource "aws_ecs_cluster" "main" {
+  name = "data-ingestion-cluster"
+}
+
+# RDS PostgreSQL
+resource "aws_rds_instance" "postgres" {
+  identifier           = "data-ingestion-postgres"
+  engine              = "postgres"
+  engine_version      = "15.4"
+  instance_class      = "db.t3.large"
+  allocated_storage   = 100
+  username            = "postgres"
+  password            = var.db_password
+  
+  vpc_security_group_ids = [aws_security_group.rds.id]
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+}
+
+# Elasticsearch (OpenSearch Service)
+resource "aws_elasticsearch_domain" "main" {
+  domain_name           = "data-ingestion-es"
+  elasticsearch_version = "8.0"
+  
+  cluster_config {
+    instance_type  = "r6g.large.elasticsearch"
+    instance_count = 3
+  }
+  
+  ebs_options {
+    ebs_enabled = true
+    volume_size = 100
+  }
+}
+
+# Application Load Balancer
+resource "aws_lb" "main" {
+  name               = "data-ingestion-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb.id]
+  subnets            = aws_subnet.public[*].id
+}
+
+# ECS Task Definitions (services)
+resource "aws_ecs_task_definition" "frontend" {
+  family                   = "frontend"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "512"
+  memory                   = "1024"
+  
+  container_definitions = jsonencode([{
+    name  = "frontend"
+    image = "your-ecr-repo/frontend:latest"
+    portMappings = [{
+      containerPort = 80
+      protocol      = "tcp"
+    }]
+  }])
+}
+
+# Similar task definitions for other services...
+\end{lstlisting}
+
+\textbf{Deploy:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Initialize Terraform
+terraform init
+
+# Plan deployment
+terraform plan -out=plan.tfplan
+
+# Apply
+terraform apply plan.tfplan
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Kubernetes Deployment}
+
+\textbf{Kubernetes Manifests:}
+\begin{lstlisting}[style=pythonstyle]
+# k8s/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+      - name: api-gateway
+        image: your-registry/api-gateway:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: POSTGRES_HOST
+          value: postgres-service
+        - name: ELASTICSEARCH_URL
+          value: http://elasticsearch-service:9200
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8000
+  selector:
+    app: api-gateway
+\end{lstlisting}
+
+\textbf{Deploy to Kubernetes:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Apply all manifests
+kubectl apply -f k8s/
+
+# Check deployment status
+kubectl get deployments
+kubectl get pods
+kubectl get services
+
+# Scale deployment
+kubectl scale deployment api-gateway --replicas=5
+
+# Update deployment (rolling update)
+kubectl set image deployment/api-gateway \
+  api-gateway=your-registry/api-gateway:v2.0
+\end{lstlisting}
+\end{commandbox}
+
+\section{Security Hardening}
+
+\subsection{Enable HTTPS/TLS}
+
+\textbf{Production Nginx Configuration:}
+\begin{lstlisting}[style=pythonstyle]
+# frontend/nginx-prod.conf
+server {
+    listen 80;
+    server_name yourdomain.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name yourdomain.com;
+    
+    # SSL certificates (Let's Encrypt)
+    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    
+    # SSL configuration
+    ssl_protocols TLSv1.3 TLSv1.2;
+    ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384';
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    
+    # Security headers
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    
+    location / {
+        root /usr/share/nginx/html;
+        try_files $uri /index.html;
+    }
+    
+    location /api/ {
+        proxy_pass http://api-gateway:8000;
+        proxy_ssl_verify off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+\end{lstlisting}
+
+\subsection{API Rate Limiting (Advanced)}
+
+\begin{lstlisting}[style=pythonstyle]
+# services/api-gateway/middleware/rate_limiter.py
+from fastapi import Request, HTTPException
+from fastapi.middleware.base import BaseHTTPMiddleware
+import redis
+from datetime import datetime
+
+class RateLimiter(BaseHTTPMiddleware):
+    def __init__(self, app, redis_client: redis.Redis):
+        super().__init__(app)
+        self.redis = redis_client
+    
+    async def dispatch(self, request: Request, call_next):
+        # Get user identifier (IP or user ID)
+        user_id = request.state.user.id if hasattr(request.state, 'user') else request.client.host
+        
+        # Rate limit key
+        key = f"rate_limit:{user_id}:{datetime.now().minute}"
+        
+        # Increment counter
+        count = self.redis.incr(key)
+        
+        # Set expiry on first request
+        if count == 1:
+            self.redis.expire(key, 60)  # 1 minute window
+        
+        # Check limit
+        limit = 1000  # 1000 requests per minute
+        if count > limit:
+            raise HTTPException(
+                status_code=429,
+                detail="Rate limit exceeded",
+                headers={"Retry-After": "60"}
+            )
+        
+        # Add headers
+        response = await call_next(request)
+        response.headers["X-RateLimit-Limit"] = str(limit)
+        response.headers["X-RateLimit-Remaining"] = str(max(0, limit - count))
+        
+        return response
+
+# Usage in main.py
+app.add_middleware(RateLimiter, redis_client=redis_client)
+\end{lstlisting}
+
+\section{Appendix}
+
+\subsection{Complete Service Port Reference}
+
+\begin{table}[h]
+\centering
+\caption{Complete Port Mapping Reference}
+\begin{tabularx}{\textwidth}{lXll}
+\toprule
+\textbf{Service} & \textbf{Description} & \textbf{Internal} & \textbf{External} \\
+\midrule
+Frontend & React application (Nginx) & 80 & 3000 \\
+API Gateway & FastAPI main API & 8000 & 8000 \\
+PV Classification & Classification service & 8002 & 8012 \\
+RL Intelligence & RL service & 8013 & 8013 \\
+PostgreSQL & Primary database & 5432 & 5432 \\
+Elasticsearch & Document storage & 9200 & 9200 \\
+Elasticsearch (Transport) & Node communication & 9300 & 9300 \\
+Neo4j HTTP & Graph database browser & 7474 & 7474 \\
+Neo4j Bolt & Graph database protocol & 7687 & 7687 \\
+Redis & Cache & 6379 & 6379 \\
+Prometheus & Metrics collection & 9090 & 9090 \\
+Grafana & Metrics visualization & 3000 & 3001 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Environment Variables Reference}
+
+\begin{table}[h]
+\centering
+\caption{Complete Environment Variables}
+\begin{longtable}{p{0.3\textwidth}p{0.3\textwidth}p{0.35\textwidth}}
+\toprule
+\textbf{Variable} & \textbf{Default} & \textbf{Description} \\
+\midrule
+POSTGRES\_USER & postgres & PostgreSQL username \\
+POSTGRES\_PASSWORD & (required) & PostgreSQL password \\
+POSTGRES\_DB & document\_intelligence & Database name \\
+POSTGRES\_HOST & postgres & Database host \\
+POSTGRES\_PORT & 5432 & Database port \\
+\addlinespace
+ELASTICSEARCH\_URL & http://elasticsearch:9200 & ES connection URL \\
+ELASTIC\_PASSWORD & (required) & ES password \\
+\addlinespace
+NEO4J\_AUTH & neo4j/password & Neo4j credentials \\
+NEO4J\_URL & bolt://neo4j:7687 & Neo4j Bolt URL \\
+\addlinespace
+REDIS\_HOST & redis & Redis host \\
+REDIS\_PORT & 6379 & Redis port \\
+\addlinespace
+JWT\_SECRET\_KEY & (required) & JWT signing secret \\
+JWT\_ALGORITHM & HS256 & JWT algorithm \\
+JWT\_EXPIRATION & 1800 & Token expiry (seconds) \\
+\addlinespace
+OPENAI\_API\_KEY & (optional) & OpenAI API key \\
+OPENAI\_MODEL & gpt-4o-mini & OpenAI model name \\
+\addlinespace
+REACT\_APP\_API\_URL & http://localhost:8000 & Frontend API URL \\
+\bottomrule
+\end{longtable}
+\end{table}
+
+\subsection{Glossary of Terms}
+
+\begin{description}
+    \item[ICSR] Individual Case Safety Report - A detailed report of a suspected adverse reaction to a drug.
+    \item[Pharmacovigilance (PV)] The science of detecting, assessing, understanding, and preventing adverse effects of medications.
+    \item[Ensemble Classification] Machine learning technique combining multiple models for improved accuracy.
+    \item[Zero-Shot Learning] ML approach where model classifies data without task-specific training.
+    \item[MeSH Terms] Medical Subject Headings - Standardized medical vocabulary by NLM.
+    \item[E2B] Electronic transmission of Individual Case Safety Reports (ICH standard).
+    \item[NER] Named Entity Recognition - Identifying entities (drugs, diseases) in text.
+    \item[Reinforcement Learning (RL)] ML paradigm where agent learns through trial and error with rewards.
+    \item[Knowledge Graph] Network representation of entities and their relationships.
+    \item[WebGL] Web Graphics Library - JavaScript API for rendering 3D graphics in browsers.
+    \item[JWT] JSON Web Token - Secure authentication token format.
+    \item[RBAC] Role-Based Access Control - Permission system based on user roles.
+\end{description}
+
+\end{document}
+

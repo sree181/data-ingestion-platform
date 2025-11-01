@@ -1,0 +1,596 @@
+% ============================================================================
+% CHAPTER 6: TROUBLESHOOTING
+% ============================================================================
+
+\chapter{Troubleshooting Guide}
+
+\section{Common Issues \& Solutions}
+
+\subsection{Services Won't Start}
+
+\textbf{Problem:} Docker services fail to start or show "unhealthy" status.
+
+\textbf{Diagnosis:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Check service status
+docker-compose ps
+
+# View specific service logs
+docker-compose logs <service-name>
+
+# Check resource usage
+docker stats
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Common Causes \& Solutions:}
+
+\begin{enumerate}
+    \item \textbf{Port Already in Use}
+    \begin{lstlisting}[style=bashstyle]
+# Find process using port 3000
+lsof -i :3000  # macOS/Linux
+netstat -ano | findstr :3000  # Windows
+
+# Kill process or change port in docker-compose.yml
+\end{lstlisting}
+
+    \item \textbf{Insufficient Memory}
+    \begin{itemize}
+        \item Increase Docker Desktop memory limit (Settings → Resources)
+        \item Recommended: 8 GB minimum, 16 GB ideal
+    \end{itemize}
+
+    \item \textbf{Network Conflicts}
+    \begin{lstlisting}[style=bashstyle]
+# Remove old networks
+docker network prune
+
+# Recreate with clean network
+docker-compose down
+docker-compose up -d
+\end{lstlisting}
+
+    \item \textbf{Database Not Ready}
+    \begin{lstlisting}[style=bashstyle]
+# Wait for database health check
+docker-compose up -d postgres elasticsearch neo4j
+sleep 30  # Wait for initialization
+
+# Then start application services
+docker-compose up -d api-gateway frontend
+\end{lstlisting}
+\end{enumerate}
+
+\subsection{Classification Not Working}
+
+\textbf{Problem:} Documents uploaded but not classified, or classification fails.
+
+\textbf{Diagnosis Steps:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# 1. Check PV Classification Service logs
+docker-compose logs pv-classification-service | tail -50
+
+# 2. Verify service is accessible
+curl http://localhost:8012/health
+
+# 3. Test classification endpoint directly
+curl -X POST http://localhost:8012/api/v1/classify \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test","abstract":"Patient developed rash"}'
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Common Causes:}
+
+\begin{enumerate}
+    \item \textbf{Missing OpenAI API Key}
+    \begin{itemize}
+        \item LLM tier will fail without API key
+        \item Solution: Set \texttt{OPENAI\_API\_KEY} in \texttt{.env}
+        \item Alternative: Use Ollama local LLM (no API key needed)
+    \end{itemize}
+
+    \item \textbf{BERT Model Not Loaded}
+    \begin{lstlisting}[style=bashstyle]
+# Check if model is downloading
+docker-compose logs pv-classification-service | grep "Downloading"
+
+# Model downloads on first run (~1.5 GB)
+# Wait 5-10 minutes for initial download
+\end{lstlisting}
+
+    \item \textbf{Ensemble Configuration Error}
+    \begin{lstlisting}[style=pythonstyle]
+# Verify ensemble initialization in logs
+docker-compose logs pv-classification-service | grep "Ensemble"
+
+# Expected:
+# "Ensemble classifier initialized successfully"
+# "Models loaded: ['rule_based', 'bert', 'llm']"
+\end{lstlisting}
+
+    \item \textbf{Port Mapping Mismatch}
+    \begin{itemize}
+        \item Verify \texttt{docker-compose.yml} port mapping: \texttt{"8012:8002"}
+        \item Internal service runs on port 8002
+        \item External access on port 8012
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Knowledge Graph Not Displaying}
+
+\textbf{Problem:} Knowledge Hub shows empty graph or fails to load.
+
+\textbf{Diagnosis:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# 1. Check Neo4j is running
+curl http://localhost:7474
+
+# 2. Verify node count
+docker-compose exec neo4j cypher-shell -u neo4j -p password \
+  "MATCH (n) RETURN count(n) as NodeCount;"
+
+# 3. Check API Gateway logs
+docker-compose logs api-gateway | grep "knowledge-hub"
+
+# 4. Test API endpoint
+curl -H "Authorization: Bearer <token>" \
+  http://localhost:8000/api/v1/knowledge-hub/graph
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Common Causes:}
+
+\begin{enumerate}
+    \item \textbf{No Documents Processed}
+    \begin{itemize}
+        \item Upload and classify at least 10 documents first
+        \item Entity extraction must be enabled
+    \end{itemize}
+
+    \item \textbf{Neo4j Not Populated}
+    \begin{lstlisting}[style=bashstyle]
+# Check if entities were synced to Neo4j
+docker-compose logs api-gateway | grep "Neo4j sync"
+
+# Manually trigger sync (if available)
+curl -X POST http://localhost:8000/api/v1/sync-neo4j
+\end{lstlisting}
+
+    \item \textbf{Browser Cache Issue}
+    \begin{itemize}
+        \item Force refresh: Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (macOS)
+        \item Clear browser cache completely
+        \item Try incognito/private mode
+    \end{itemize}
+
+    \item \textbf{WebGL Not Supported}
+    \begin{itemize}
+        \item Check browser WebGL support: \texttt{https://get.webgl.org/}
+        \item Update graphics drivers
+        \item Switch to 2D Canvas mode in UI
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Frontend Not Loading}
+
+\textbf{Problem:} Blank page, "502 Bad Gateway", or React errors.
+
+\textbf{Diagnosis:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# 1. Check frontend service
+docker-compose logs frontend
+
+# 2. Check nginx errors
+docker-compose exec frontend cat /var/log/nginx/error.log
+
+# 3. Verify build completed successfully
+docker-compose logs frontend | grep "Compiled successfully"
+
+# 4. Test direct access to API Gateway
+curl http://localhost:8000/health
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Solutions:}
+
+\begin{enumerate}
+    \item \textbf{Rebuild Frontend}
+    \begin{lstlisting}[style=bashstyle]
+# Rebuild with no cache
+docker-compose build --no-cache frontend
+docker-compose up -d frontend
+
+# Force browser refresh
+# Press Ctrl+Shift+R (hard reload)
+\end{lstlisting}
+
+    \item \textbf{Fix API Gateway Connection}
+    \begin{itemize}
+        \item Check \texttt{REACT\_APP\_API\_URL} in \texttt{.env}
+        \item Should be: \texttt{http://localhost:8000}
+        \item Restart frontend after changing environment variables
+    \end{itemize}
+
+    \item \textbf{Clear Browser Cache}
+    \begin{lstlisting}[style=bashstyle]
+# Chrome DevTools → Application → Clear Storage → Clear site data
+# Or use Incognito mode to test
+\end{lstlisting}
+
+    \item \textbf{Check Console Errors}
+    \begin{itemize}
+        \item Open browser DevTools (F12)
+        \item Check Console tab for JavaScript errors
+        \item Check Network tab for failed API calls
+    \end{itemize}
+\end{enumerate}
+
+\subsection{High Memory Usage}
+
+\textbf{Problem:} System becomes slow, services crash due to OOM (Out of Memory).
+
+\textbf{Diagnosis:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Check container memory usage
+docker stats --no-stream
+
+# Expected output:
+# NAME                 MEM USAGE / LIMIT     MEM %
+# elasticsearch        3.8GB / 4GB           95%   <-- High!
+# postgres             450MB / 2GB           22%
+# pv-classification    2.1GB / 4GB           52%
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Solutions:}
+
+\begin{enumerate}
+    \item \textbf{Increase Docker Memory Limit}
+    \begin{itemize}
+        \item Docker Desktop → Settings → Resources
+        \item Increase memory to 16 GB minimum
+        \item Restart Docker Desktop
+    \end{itemize}
+
+    \item \textbf{Optimize Elasticsearch}
+    \begin{lstlisting}[style=bashstyle]
+# Reduce heap size if limited memory
+# Edit docker-compose.yml:
+environment:
+  - "ES_JAVA_OPTS=-Xms1g -Xmx1g"  # Reduce from 2g
+
+# Restart Elasticsearch
+docker-compose restart elasticsearch
+\end{lstlisting}
+
+    \item \textbf{Clear Unused Data}
+    \begin{lstlisting}[style=bashstyle]
+# Remove old indices
+curl -X DELETE "http://localhost:9200/old_index_name"
+
+# Vacuum PostgreSQL
+docker-compose exec postgres psql -U postgres -d document_intelligence -c "VACUUM FULL;"
+
+# Clean Docker system
+docker system prune -a --volumes
+\end{lstlisting}
+
+    \item \textbf{Scale Down Services}
+    \begin{itemize}
+        \item Stop non-essential services during peak processing
+        \item Example: Stop Grafana/Prometheus during batch ingestion
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Slow Classification Performance}
+
+\textbf{Problem:} Classification takes too long (>10 seconds per document).
+
+\textbf{Expected Performance:}
+\begin{itemize}
+    \item Rule-based only: 50-100ms
+    \item Rule + BERT: 800-1200ms
+    \item Full ensemble (with LLM): 2-4 seconds
+\end{itemize}
+
+\textbf{Optimization Steps:}
+
+\begin{enumerate}
+    \item \textbf{Use GPU Acceleration (BERT)}
+    \begin{lstlisting}[style=pythonstyle]
+# docker-compose.yml - Add GPU support
+services:
+  pv-classification-service:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+\end{lstlisting}
+
+    \item \textbf{Increase Confidence Thresholds}
+    \begin{itemize}
+        \item Higher thresholds = fewer LLM invocations
+        \item Edit: \texttt{services/pv-classification-service/config.py}
+        \item Increase \texttt{RULE\_CONFIDENCE\_THRESHOLD} from 0.85 to 0.90
+    \end{itemize}
+
+    \item \textbf{Use Ollama Instead of OpenAI}
+    \begin{itemize}
+        \item Local LLM = no API latency
+        \item Requires more CPU/Memory but faster
+        \item Install Ollama: \texttt{curl https://ollama.ai/install.sh | sh}
+    \end{itemize}
+
+    \item \textbf{Batch Processing}
+    \begin{lstlisting}[style=pythonstyle]
+# Use batch classification endpoint
+POST /api/v1/pv-classification/classify/batch
+{
+  "documents": [doc1, doc2, ..., doc100]
+}
+# Processes 100 documents in parallel
+\end{lstlisting}
+
+    \item \textbf{Enable Caching}
+    \begin{itemize}
+        \item Classification results cached in Redis (30 min)
+        \item Duplicate documents return cached result
+        \item No re-classification needed
+    \end{itemize}
+\end{enumerate}
+
+\section{Error Messages \& Meanings}
+
+\subsection{Backend Errors}
+
+\begin{table}[h]
+\centering
+\caption{Common Backend Error Messages}
+\begin{longtable}{p{0.35\textwidth}p{0.6\textwidth}}
+\toprule
+\textbf{Error Message} & \textbf{Cause \& Solution} \\
+\midrule
+\texttt{Elasticsearch connection failed} & 
+Elasticsearch not running or wrong URL. Check \texttt{ELASTICSEARCH\_URL} in \texttt{.env}. \\
+\addlinespace
+\texttt{Neo4j authentication failed} & 
+Wrong password in \texttt{NEO4J\_AUTH}. Verify credentials match. \\
+\addlinespace
+\texttt{OpenAI API key not found} & 
+Missing \texttt{OPENAI\_API\_KEY} in \texttt{.env}. Set key or use Ollama. \\
+\addlinespace
+\texttt{Model not found: bert} & 
+BERT model not downloaded. Wait for download or check disk space. \\
+\addlinespace
+\texttt{Classification timeout} & 
+Document too large or LLM slow. Increase timeout or split document. \\
+\addlinespace
+\texttt{JWT token expired} & 
+Access token expired (30 min). Refresh token or re-login. \\
+\addlinespace
+\texttt{Insufficient permissions} & 
+User role lacks permission. Check RBAC settings. \\
+\addlinespace
+\texttt{Database connection pool exhausted} & 
+Too many concurrent connections. Increase pool size or scale database. \\
+\bottomrule
+\end{longtable}
+\end{table}
+
+\subsection{Frontend Errors}
+
+\begin{table}[h]
+\centering
+\caption{Common Frontend Error Messages}
+\begin{longtable}{p{0.35\textwidth}p{0.6\textwidth}}
+\toprule
+\textbf{Error Message} & \textbf{Cause \& Solution} \\
+\midrule
+\texttt{Network Error: Failed to fetch} & 
+API Gateway not reachable. Check if backend is running. \\
+\addlinespace
+\texttt{Unexpected token '<' in JSON} & 
+Receiving HTML instead of JSON. Check API endpoint URL. \\
+\addlinespace
+\texttt{WebGL not supported} & 
+Browser/GPU doesn't support WebGL. Update drivers or use 2D mode. \\
+\addlinespace
+\texttt{Cannot read property 'map' of undefined} & 
+API returned unexpected data structure. Check API response format. \\
+\addlinespace
+\texttt{401 Unauthorized} & 
+Token missing or invalid. Re-login to get fresh token. \\
+\addlinespace
+\texttt{CORS policy blocked} & 
+API Gateway CORS not configured. Add frontend origin to allowed list. \\
+\bottomrule
+\end{longtable}
+\end{table}
+
+\section{Debugging Techniques}
+
+\subsection{Enable Debug Logging}
+
+\textbf{API Gateway:}
+\begin{lstlisting}[style=pythonstyle]
+# Edit services/api-gateway/main.py
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Or set environment variable
+LOG_LEVEL=DEBUG docker-compose up -d api-gateway
+\end{lstlisting}
+
+\textbf{PV Classification Service:}
+\begin{lstlisting}[style=pythonstyle]
+# Edit services/pv-classification-service/main.py
+import logging
+logging.getLogger("uvicorn").setLevel(logging.DEBUG)
+logging.getLogger("pv_classification").setLevel(logging.DEBUG)
+\end{lstlisting}
+
+\subsection{Interactive Debugging}
+
+\textbf{Attach to Running Container:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Open shell in container
+docker-compose exec api-gateway /bin/bash
+
+# Install debugging tools (temporary)
+apt-get update && apt-get install -y curl jq
+
+# Test internal service connections
+curl http://elasticsearch:9200/_cluster/health
+curl http://pv-classification-service:8002/health
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Python Debugger (pdb):}
+\begin{lstlisting}[style=pythonstyle]
+# Add breakpoint in code
+import pdb; pdb.set_trace()
+
+# Attach to container with stdin
+docker-compose run --service-ports api-gateway python main.py
+\end{lstlisting}
+
+\subsection{Network Diagnostics}
+
+\textbf{Test Service Connectivity:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Check if service is listening
+docker-compose exec api-gateway netstat -tuln | grep 8000
+
+# Test DNS resolution
+docker-compose exec api-gateway nslookup elasticsearch
+
+# Trace network path
+docker-compose exec api-gateway traceroute elasticsearch
+\end{lstlisting}
+\end{commandbox}
+
+\section{Performance Profiling}
+
+\subsection{API Response Time Profiling}
+
+\textbf{Using cURL with Timing:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Measure API response time
+curl -w "\nTime Total: %{time_total}s\nTime Connect: %{time_connect}s\n" \
+  -o /dev/null -s \
+  http://localhost:8000/api/v1/documents
+
+# Output:
+# Time Total: 0.234s
+# Time Connect: 0.012s
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Python Profiling:}
+\begin{lstlisting}[style=pythonstyle]
+# Add profiling to endpoint
+from fastapi import Request
+import time
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
+\end{lstlisting}
+
+\subsection{Database Query Profiling}
+
+\textbf{PostgreSQL Query Analysis:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Enable query logging
+docker-compose exec postgres psql -U postgres -d document_intelligence -c \
+  "ALTER SYSTEM SET log_min_duration_statement = 100;"  # Log queries > 100ms
+
+# Explain query plan
+docker-compose exec postgres psql -U postgres -d document_intelligence -c \
+  "EXPLAIN ANALYZE SELECT * FROM documents WHERE space_id = 'abc123';"
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Elasticsearch Slow Query Log:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Enable slow query logging (>1s)
+curl -X PUT "http://localhost:9200/documents/_settings" -H 'Content-Type: application/json' -d'
+{
+  "index.search.slowlog.threshold.query.warn": "1s",
+  "index.search.slowlog.threshold.fetch.warn": "1s"
+}'
+
+# View slow logs
+docker-compose logs elasticsearch | grep "took_millis"
+\end{lstlisting}
+\end{commandbox}
+
+\section{Getting Help}
+
+\subsection{Support Channels}
+
+\begin{itemize}
+    \item \textbf{Technical Documentation:} This manual
+    \item \textbf{GitHub Issues:} \texttt{https://github.com/sree181/data-ingestion-platform/issues}
+    \item \textbf{Email Support:} \texttt{support@auburn.edu}
+    \item \textbf{Community Forum:} (TBD)
+\end{itemize}
+
+\subsection{Reporting Bugs}
+
+When reporting bugs, include:
+\begin{enumerate}
+    \item System environment (OS, Docker version)
+    \item Steps to reproduce
+    \item Expected vs. actual behavior
+    \item Relevant log excerpts
+    \item Screenshots (if UI issue)
+    \item Error stack traces
+\end{enumerate}
+
+\textbf{Example Bug Report:}
+\begin{lstlisting}[style=pythonstyle]
+Title: Classification fails for documents > 10 pages
+
+Environment:
+- OS: Ubuntu 22.04
+- Docker: 24.0.6
+- Docker Compose: 2.20.0
+- RAM: 16 GB
+
+Steps to Reproduce:
+1. Upload PDF with 15 pages
+2. Enable ICSR classification
+3. Monitor processing status
+
+Expected: Document classified within 5 seconds
+Actual: Timeout error after 30 seconds
+
+Logs:
+[2024-11-01 10:30:15] ERROR: Classification timeout
+[2024-11-01 10:30:15] Stack trace: ...
+
+Screenshot: (attached)
+\end{lstlisting}
+
+\end{document}
+

@@ -1,0 +1,581 @@
+% ============================================================================
+% CHAPTER 2: USER GUIDE - COMPREHENSIVE USAGE INSTRUCTIONS
+% ============================================================================
+
+\chapter{User Guide - End-to-End Workflows}
+
+\section{Getting Started}
+
+\subsection{Initial Login}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: Login Page with Username/Password Fields]}}
+\caption{Enterprise Login Screen}
+\label{fig:login}
+\end{figure}
+
+\textbf{Default Credentials:}
+\begin{itemize}
+    \item Username: \texttt{admin@example.com}
+    \item Password: \texttt{admin123} (Change immediately!)
+\end{itemize}
+
+\begin{warningbox}
+\textbf{Security Alert:} Default credentials must be changed on first login. Navigate to Settings → Security → Change Password.
+\end{warningbox}
+
+\subsection{Dashboard Overview}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: Main Dashboard with Key Metrics]}}
+\caption{Dashboard - Home View}
+\label{fig:dashboard}
+\end{figure}
+
+The dashboard provides real-time insights:
+\begin{itemize}
+    \item \textbf{Document Statistics} - Total, processed, pending
+    \item \textbf{Classification Breakdown} - ICSR, Safety Info, Non-ICSR
+    \item \textbf{Processing Queue} - Current workload
+    \item \textbf{System Health} - Service status indicators
+\end{itemize}
+
+\section{Document Ingestion Workflow}
+
+\subsection{Upload Local Documents (PDF)}
+
+\textbf{Step-by-Step Process:}
+
+\begin{enumerate}
+    \item Navigate to \textbf{Project Spaces} from the sidebar
+    \item Click \textbf{Create New Space} or select existing project
+    \item Click \textbf{Upload Documents} button
+    \item Configure ingestion options:
+    \begin{itemize}
+        \item Enable/Disable ICSR Classification
+        \item Select Classification Model (Rule + BERT + LLM)
+        \item Enable Entity Extraction
+        \item Force Full Ensemble (optional)
+    \end{itemize}
+    \item Drag \& drop PDF files or click to browse
+    \item Monitor upload progress
+    \item View processed documents in Document Library
+\end{enumerate}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: Project Spaces - Document Upload Interface]}}
+\caption{Document Upload Interface}
+\label{fig:upload}
+\end{figure}
+
+\begin{commandbox}
+\textbf{Supported File Types:}
+\begin{itemize}[noitemsep]
+    \item PDF (up to 50 MB per file)
+    \item Maximum 100 files per batch
+    \item Text-based PDFs (OCR for scanned documents)
+\end{itemize}
+\end{commandbox}
+
+\subsection{Ingest from PubMed}
+
+\textbf{Configuration:}
+
+\begin{lstlisting}[style=pythonstyle]
+# Navigate to: Project Spaces → Configure Source → PubMed
+source_config = {
+    "source": "pubmed",
+    "queries": [
+        "COVID-19 adverse events",
+        "vaccine safety pharmacovigilance"
+    ],
+    "max_results_per_query": 50,
+    "date_range": {
+        "start": "2024-01-01",
+        "end": "2024-12-31"
+    },
+    "filters": {
+        "article_types": ["Clinical Trial", "Case Reports"],
+        "languages": ["eng"]
+    }
+}
+\end{lstlisting}
+
+\textbf{Execution Steps:}
+
+\begin{enumerate}
+    \item Click \textbf{Configure External Sources}
+    \item Select \textbf{PubMed} from dropdown
+    \item Enter search queries (one per line)
+    \item Set maximum results per query (default: 50)
+    \item Enable \textbf{ICSR Classification}
+    \item Click \textbf{Start Ingestion}
+    \item Monitor progress in real-time
+\end{enumerate}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: PubMed Ingestion Configuration Panel]}}
+\caption{PubMed Source Configuration}
+\label{fig:pubmed-config}
+\end{figure}
+
+\textbf{Ingestion Status Tracking:}
+
+\begin{table}[h]
+\centering
+\caption{Ingestion Status Indicators}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Status} & \textbf{Description} \\
+\midrule
+\textcolor{warningyellow}{Pending} & Queued for processing \\
+\textcolor{primaryblue}{Processing} & Currently being ingested \\
+\textcolor{successgreen}{Completed} & Successfully processed \\
+\textcolor{errorred}{Failed} & Error occurred (check logs) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Batch Processing via Command Line}
+
+For automated workflows or large-scale ingestion:
+
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Navigate to project directory
+cd /path/to/data-ingestion-platform
+
+# Run batch ingestion script
+docker-compose exec api-gateway python scripts/batch_ingest.py \
+    --source pubmed \
+    --query "drug safety adverse events" \
+    --max-results 500 \
+    --enable-classification \
+    --space-id <project_space_id>
+
+# Monitor progress
+docker-compose logs -f api-gateway | grep "Ingestion"
+\end{lstlisting}
+\end{commandbox}
+
+\section{Document Classification}
+
+\subsection{Classification System Overview}
+
+The platform uses a \textbf{3-tier ensemble classification system}:
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=2cm,
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=primaryblue!30},
+    process/.style={rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=successgreen!30},
+    decision/.style={diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=warningyellow!30},
+]
+    \node (start) [startstop] {Document Input};
+    \node (tier1) [process, below of=start] {Tier 1: Rule-Based};
+    \node (check1) [decision, below of=tier1] {Confidence > 0.85?};
+    \node (tier2) [process, right of=check1, xshift=3cm] {Tier 2: BERT};
+    \node (check2) [decision, below of=tier2] {Confidence > 0.75?};
+    \node (tier3) [process, below of=check2] {Tier 3: LLM (GPT-4)};
+    \node (ensemble) [process, left of=tier3, xshift=-3cm] {Ensemble Voting};
+    \node (output) [startstop, below of=ensemble] {Final Classification};
+    
+    \draw [->] (start) -- (tier1);
+    \draw [->] (tier1) -- (check1);
+    \draw [->] (check1) -- node[anchor=south] {No} (tier2);
+    \draw [->] (check1) -- node[anchor=east] {Yes} (ensemble);
+    \draw [->] (tier2) -- (check2);
+    \draw [->] (check2) -- node[anchor=east] {No} (tier3);
+    \draw [->] (check2) -- node[anchor=south] {Yes} (ensemble);
+    \draw [->] (tier3) -- (ensemble);
+    \draw [->] (ensemble) -- (output);
+\end{tikzpicture}
+\caption{3-Tier Ensemble Classification Flow}
+\label{fig:classification-flow}
+\end{figure}
+
+\subsection{Classification Categories}
+
+\begin{table}[h]
+\centering
+\caption{Classification Categories \& Definitions}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Category} & \textbf{Definition \& Criteria} \\
+\midrule
+\textbf{ICSR} & Individual Case Safety Report - contains specific patient case with adverse event, drug, and temporal relationship \\
+\textbf{Safety\_Information} & General safety information, aggregate data, clinical trial results without individual patient details \\
+\textbf{Non-ICSR} & Medical literature without safety relevance (e.g., efficacy studies, mechanism of action) \\
+\textbf{Rejected} & Not relevant to pharmacovigilance (e.g., financial reports, opinion pieces) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Viewing Classification Results}
+
+\textbf{Document Library View:}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: Document Library with Classification Badges]}}
+\caption{Document Library - Classification Results}
+\label{fig:doc-library}
+\end{figure}
+
+Each document displays:
+\begin{itemize}
+    \item \textbf{Classification Badge} - Color-coded by category
+    \item \textbf{Confidence Score} - 0-100\% reliability
+    \item \textbf{Model Attribution} - Which model made the decision
+    \item \textbf{Processing Time} - Milliseconds taken
+    \item \textbf{Cost} - API cost (for LLM tier)
+\end{itemize}
+
+\subsection{Force Full Ensemble Mode}
+
+To run all three models for comparison or validation:
+
+\begin{enumerate}
+    \item In Project Spaces, enable \textbf{"Force Full Ensemble"}
+    \item This bypasses confidence thresholds
+    \item All models (Rule + BERT + LLM) run in parallel
+    \item Final result determined by weighted voting
+    \item Useful for: Quality assurance, model comparison, edge cases
+\end{enumerate}
+
+\begin{infobox}
+\textbf{Cost Consideration:} Force Full Ensemble mode increases API costs due to LLM invocation for every document. Use judiciously for critical documents only.
+\end{infobox}
+
+\section{Knowledge Hub - 3D Graph Visualization}
+
+\subsection{Accessing the Knowledge Hub}
+
+Navigate to \textbf{Knowledge Hub} from the main sidebar.
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: Knowledge Hub - 3D WebGL Graph View]}}
+\caption{Knowledge Hub - Interactive 3D Graph}
+\label{fig:knowledge-hub}
+\end{figure}
+
+\subsection{Graph Rendering Modes}
+
+\textbf{Toggle Between Modes:}
+
+\begin{table}[h]
+\centering
+\caption{Graph Rendering Modes Comparison}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Mode} & \textbf{2D Canvas} & \textbf{3D WebGL} \\
+\midrule
+Rendering & HTML5 Canvas & Three.js WebGL \\
+Performance & 30-45 FPS & 60 FPS \\
+Max Nodes & 500 & 5000+ \\
+Interactions & Drag, Zoom & Drag, Zoom, Rotate \\
+Lighting & None & PBR Lighting \\
+Best For & Quick overview & Deep exploration \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{3D WebGL Controls}
+
+\textbf{Mouse/Trackpad Controls:}
+\begin{itemize}
+    \item \textbf{Left-Click + Drag} - Rotate graph in 3D space
+    \item \textbf{Scroll Wheel} - Zoom in/out
+    \item \textbf{Right-Click + Drag} - Pan camera
+    \item \textbf{Click Node} - Select and highlight connections
+    \item \textbf{Double-Click Node} - Center and zoom to node
+\end{itemize}
+
+\textbf{Button Controls:}
+\begin{itemize}
+    \item \faSearchPlus\ \textbf{Zoom In} - Reduce camera distance by 30\%
+    \item \faSearchMinus\ \textbf{Zoom Out} - Increase camera distance by 30\%
+    \item \faBullseye\ \textbf{Center \& Fit} - Auto-fit all nodes with animation
+    \item \faRedo\ \textbf{Restart Layout} - Reheat physics simulation
+    \item \faExpand\ \textbf{Fullscreen} - Toggle fullscreen mode
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: 3D Graph Controls Panel (Right Side)]}}
+\caption{Professional Control Panel}
+\label{fig:graph-controls}
+\end{figure}
+
+\subsection{Advanced Filtering}
+
+\textbf{Progressive Disclosure:}
+\begin{itemize}
+    \item Default: Show top 50 most connected nodes
+    \item Toggle \textbf{"Show All Nodes"} to display full graph
+    \item Filter by minimum connections (0-10)
+    \item Filter by confidence threshold (0-100\%)
+\end{itemize}
+
+\textbf{Community Detection:}
+\begin{itemize}
+    \item Enable \textbf{"Show Communities"} toggle
+    \item Nodes grouped by Louvain algorithm
+    \item Color-coded by semantic clusters
+    \item Useful for identifying drug-disease relationships
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: Knowledge Hub with Community Detection Enabled]}}
+\caption{Community Detection - Semantic Clustering}
+\label{fig:communities}
+\end{figure}
+
+\subsection{Entity Details Panel}
+
+Clicking any node opens a detailed drawer:
+
+\begin{itemize}
+    \item \textbf{Entity Information}
+    \begin{itemize}
+        \item Name, Type (Drug/Disease/Person/Org)
+        \item Confidence score
+        \item Source documents count
+    \end{itemize}
+    \item \textbf{Source Documents} (up to 20)
+    \begin{itemize}
+        \item Document title and snippet
+        \item Highlighted entity mentions
+        \item Click to open full document
+    \end{itemize}
+    \item \textbf{Interactive Chat}
+    \begin{itemize}
+        \item Ask questions about the entity
+        \item AI-powered responses with citations
+        \item Example: "What are the side effects?"
+    \end{itemize}
+    \item \textbf{Pin to Investigation Board}
+    \begin{itemize}
+        \item Save entity for collaborative review
+        \item Add to active safety signal investigations
+    \end{itemize}
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: Entity Details Drawer - Source Documents \& Chat]}}
+\caption{Entity Details Panel}
+\label{fig:entity-drawer}
+\end{figure}
+
+\section{ICSR Reviewer Workflow}
+
+\subsection{Automated ICSR Extraction}
+
+For documents classified as ICSR, the system automatically extracts:
+
+\begin{table}[h]
+\centering
+\caption{ICSR Extracted Fields}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Category} & \textbf{Extracted Fields} \\
+\midrule
+Patient & Age, Gender, Weight, Initials \\
+Drug & Product Name, Dosage, Route, Start/End Date \\
+Event & Adverse Event Description, Onset Date, Outcome, Seriousness \\
+Reporter & Reporter Type, Country, Contact Info \\
+Narrative & AI-generated summary, Timeline \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Review Interface}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: ICSR Reviewer - Side-by-Side View]}}
+\caption{ICSR Reviewer - Document \& Extracted Data}
+\label{fig:icsr-reviewer}
+\end{figure}
+
+\textbf{Review Process:}
+\begin{enumerate}
+    \item Navigate to \textbf{ICSR Reviewer}
+    \item Select document from queue
+    \item Review extracted fields in form
+    \item Edit/correct fields as needed
+    \item Add reviewer notes
+    \item Mark as: Approved / Needs Revision / Rejected
+    \item Submit for regulatory reporting
+\end{enumerate}
+
+\textbf{Validation Rules:}
+\begin{itemize}
+    \item Required fields highlighted in red
+    \item Date format validation (ISO 8601)
+    \item Drug name verification against database
+    \item Seriousness criteria check
+\end{itemize}
+
+\section{Investigation Boards}
+
+\subsection{Creating an Investigation Board}
+
+\begin{enumerate}
+    \item Navigate to \textbf{Investigation Boards}
+    \item Click \textbf{Create New Board}
+    \item Enter board details:
+    \begin{itemize}
+        \item Title: "Cardiac Events - Drug X"
+        \item Description: Objective and scope
+        \item Priority: Low / Medium / High / Critical
+        \item Due Date: Target completion date
+    \end{itemize}
+    \item Assign team members
+    \item Click \textbf{Create Board}
+\end{enumerate}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: Investigation Board Creation Modal]}}
+\caption{Create New Investigation Board}
+\label{fig:create-board}
+\end{figure}
+
+\subsection{Pinning Entities \& Documents}
+
+\textbf{From Knowledge Hub:}
+\begin{itemize}
+    \item Click any entity node
+    \item Click \textbf{Pin to Investigation Board}
+    \item Select target board
+    \item Add pin reason/notes
+\end{itemize}
+
+\textbf{From Document Viewer:}
+\begin{itemize}
+    \item Open any document
+    \item Click \textbf{Pin to Board} button
+    \item Select entities to include
+    \item Choose investigation board
+\end{itemize}
+
+\subsection{Collaborative Features}
+
+\begin{itemize}
+    \item \textbf{Real-time Updates} - Changes visible to all team members
+    \item \textbf{Comments} - Add notes on any pinned item
+    \item \textbf{Task Assignment} - Assign review tasks to users
+    \item \textbf{Status Tracking} - Mark items as: To Do / In Progress / Completed
+    \item \textbf{Export} - Generate PDF reports with all evidence
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: Investigation Board - Collaborative Workspace]}}
+\caption{Investigation Board - Active Case}
+\label{fig:investigation-board}
+\end{figure}
+
+\section{Monitoring \& Performance}
+
+\subsection{System Dashboard (Grafana)}
+
+Access: \texttt{http://localhost:3001}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: Grafana Dashboard - System Metrics]}}
+\caption{Grafana - Real-time Performance Monitoring}
+\label{fig:grafana}
+\end{figure}
+
+\textbf{Key Metrics Monitored:}
+\begin{itemize}
+    \item CPU \& Memory usage per service
+    \item Request rate \& response times
+    \item Database query performance
+    \item Classification throughput (docs/hour)
+    \item Error rates \& exception tracking
+    \item Queue depth \& processing lag
+\end{itemize}
+
+\subsection{Audit Logs}
+
+Navigate to \textbf{Settings → Security → Audit Logs}
+
+\begin{itemize}
+    \item All user actions logged with timestamps
+    \item Searchable by: User, Action, Date Range
+    \item Exportable to CSV for compliance
+    \item Retention policy: 90 days default
+\end{itemize}
+
+\section{User Management \& Security}
+
+\subsection{Role-Based Access Control (RBAC)}
+
+\begin{table}[h]
+\centering
+\caption{User Roles \& Permissions}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Role} & \textbf{Permissions} \\
+\midrule
+\textbf{Admin} & Full system access, user management, security settings \\
+\textbf{Data Manager} & Upload documents, configure sources, manage projects \\
+\textbf{Reviewer} & Review ICSRs, approve classifications, add annotations \\
+\textbf{Analyst} & View documents, search, knowledge hub (read-only) \\
+\textbf{Guest} & Limited access, cannot modify data \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Adding Users}
+
+\begin{enumerate}
+    \item Navigate to \textbf{Settings → User Management}
+    \item Click \textbf{Add New User}
+    \item Fill in user details:
+    \begin{itemize}
+        \item Full Name
+        \item Email Address
+        \item Assign Role
+        \item Set Password (or send invite link)
+    \end{itemize}
+    \item Click \textbf{Create User}
+    \item User receives email invitation
+\end{enumerate}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: User Management Interface]}}
+\caption{User Management Dashboard}
+\label{fig:user-mgmt}
+\end{figure}
+
+\subsection{Multi-Factor Authentication (MFA)}
+
+\textbf{Enable MFA for Enhanced Security:}
+\begin{enumerate}
+    \item Navigate to \textbf{Settings → Security → MFA}
+    \item Click \textbf{Enable MFA}
+    \item Scan QR code with authenticator app (Google Authenticator, Authy)
+    \item Enter verification code
+    \item Save backup codes in secure location
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{Backup Codes:} Store backup codes securely. If authenticator is lost, these codes are the only way to regain access.
+\end{warningbox}
+
+\end{document}
+

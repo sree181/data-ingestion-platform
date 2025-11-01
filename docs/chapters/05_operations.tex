@@ -1,0 +1,630 @@
+% ============================================================================
+% CHAPTER 5: OPERATIONS & MAINTENANCE
+% ============================================================================
+
+\chapter{Operations \& Maintenance}
+
+\section{Starting and Stopping Services}
+
+\subsection{Complete System Startup}
+
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Navigate to project root
+cd /Users/sreehasgopinathan/Documents/Auburn/Project/Data_Ingestion
+
+# Start all services
+docker-compose up -d
+
+# Verify services are healthy (wait 30-60 seconds)
+docker-compose ps
+
+# Check logs for any errors
+docker-compose logs -f --tail=100
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Expected Startup Time:}
+\begin{itemize}
+    \item Database services: 15-20 seconds
+    \item Backend services: 20-30 seconds
+    \item Frontend: 10-15 seconds
+    \item Total: ~60 seconds for full stack
+\end{itemize}
+
+\subsection{Starting Individual Services}
+
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Start only database services
+docker-compose up -d postgres elasticsearch neo4j redis
+
+# Start only application services
+docker-compose up -d api-gateway pv-classification-service frontend
+
+# Start specific service
+docker-compose up -d frontend
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Graceful Shutdown}
+
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Stop all services (graceful shutdown, 10s timeout)
+docker-compose stop
+
+# Stop all services immediately (force)
+docker-compose down
+
+# Stop and remove volumes (WARNING: Deletes all data)
+docker-compose down -v
+\end{lstlisting}
+\end{commandbox}
+
+\begin{warningbox}
+\textbf{Data Loss Warning:} Using \texttt{docker-compose down -v} will delete all database data, uploaded documents, and configuration. Only use for complete system reset.
+\end{warningbox}
+
+\subsection{Service Restart}
+
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Restart specific service (e.g., after config change)
+docker-compose restart frontend
+
+# Restart all services
+docker-compose restart
+
+# Rebuild and restart (after code changes)
+docker-compose up -d --build frontend
+\end{lstlisting}
+\end{commandbox}
+
+\section{Health Monitoring}
+
+\subsection{Service Health Checks}
+
+\textbf{Docker Health Status:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# View service status
+docker-compose ps
+
+# Expected output:
+# NAME                    STATUS              PORTS
+# frontend                Up (healthy)        0.0.0.0:3000->80/tcp
+# api-gateway             Up (healthy)        0.0.0.0:8000->8000/tcp
+# pv-classification       Up (healthy)        0.0.0.0:8012->8002/tcp
+# postgres                Up (healthy)        0.0.0.0:5432->5432/tcp
+# elasticsearch           Up (healthy)        0.0.0.0:9200->9200/tcp
+# neo4j                   Up (healthy)        0.0.0.0:7474->7474/tcp
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Manual Health Check Endpoints:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# API Gateway
+curl http://localhost:8000/health
+
+# Expected: {"status":"healthy","version":"1.0.0"}
+
+# Elasticsearch
+curl http://localhost:9200/_cluster/health
+
+# Neo4j (via Cypher)
+curl -u neo4j:password http://localhost:7474/db/data/
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Log Monitoring}
+
+\textbf{View Real-time Logs:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# All services
+docker-compose logs -f
+
+# Specific service
+docker-compose logs -f api-gateway
+
+# Last 100 lines
+docker-compose logs --tail=100 api-gateway
+
+# With timestamps
+docker-compose logs -f --timestamps api-gateway
+
+# Filter by pattern (e.g., errors)
+docker-compose logs -f api-gateway | grep ERROR
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Log Locations (Inside Containers):}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Service} & \textbf{Log Path} \\
+\midrule
+API Gateway & /app/logs/api-gateway.log \\
+PV Classification & /app/logs/pv-classification.log \\
+Frontend (Nginx) & /var/log/nginx/access.log, error.log \\
+PostgreSQL & /var/log/postgresql/ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Prometheus \& Grafana Monitoring}
+
+\textbf{Access Dashboards:}
+\begin{itemize}
+    \item Prometheus: \texttt{http://localhost:9090}
+    \item Grafana: \texttt{http://localhost:3001} (admin/admin)
+\end{itemize}
+
+\textbf{Key Metrics to Monitor:}
+\begin{enumerate}
+    \item \textbf{System Resources}
+    \begin{itemize}
+        \item CPU usage per container
+        \item Memory usage and limits
+        \item Disk I/O and space
+    \end{itemize}
+    
+    \item \textbf{Application Metrics}
+    \begin{itemize}
+        \item Request rate (requests/second)
+        \item Response time (p50, p95, p99)
+        \item Error rate (4xx, 5xx responses)
+    \end{itemize}
+    
+    \item \textbf{Database Metrics}
+    \begin{itemize}
+        \item Query execution time
+        \item Connection pool usage
+        \item Index hit rate
+    \end{itemize}
+    
+    \item \textbf{Queue Metrics}
+    \begin{itemize}
+        \item Processing queue depth
+        \item Job success/failure rate
+        \item Average processing time
+    \end{itemize}
+\end{enumerate}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: Grafana Dashboard - System Overview]}}
+\caption{Grafana Monitoring Dashboard}
+\label{fig:grafana-monitoring}
+\end{figure}
+
+\section{Database Maintenance}
+
+\subsection{PostgreSQL Maintenance}
+
+\textbf{Backup Database:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Full database backup
+docker-compose exec postgres pg_dump -U postgres document_intelligence > backup_$(date +%Y%m%d).sql
+
+# Backup with compression
+docker-compose exec postgres pg_dump -U postgres document_intelligence | gzip > backup_$(date +%Y%m%d).sql.gz
+
+# Restore from backup
+docker-compose exec -T postgres psql -U postgres document_intelligence < backup_20241101.sql
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Database Vacuum (Performance Optimization):}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Analyze and optimize tables
+docker-compose exec postgres psql -U postgres -d document_intelligence -c "VACUUM ANALYZE;"
+
+# Full vacuum (requires downtime)
+docker-compose exec postgres psql -U postgres -d document_intelligence -c "VACUUM FULL;"
+
+# Check database size
+docker-compose exec postgres psql -U postgres -c "\l+ document_intelligence"
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Elasticsearch Maintenance}
+
+\textbf{Index Management:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Check cluster health
+curl http://localhost:9200/_cluster/health?pretty
+
+# List all indices
+curl http://localhost:9200/_cat/indices?v
+
+# Check index size
+curl http://localhost:9200/_cat/indices/documents?v&h=index,docs.count,store.size
+
+# Force merge (optimize) index
+curl -X POST "http://localhost:9200/documents/_forcemerge?max_num_segments=1"
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Snapshot Backup:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Register snapshot repository
+curl -X PUT "http://localhost:9200/_snapshot/backup_repo" -H 'Content-Type: application/json' -d'
+{
+  "type": "fs",
+  "settings": {
+    "location": "/usr/share/elasticsearch/backups"
+  }
+}'
+
+# Create snapshot
+curl -X PUT "http://localhost:9200/_snapshot/backup_repo/snapshot_$(date +%Y%m%d)?wait_for_completion=true"
+
+# Restore snapshot
+curl -X POST "http://localhost:9200/_snapshot/backup_repo/snapshot_20241101/_restore"
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Neo4j Maintenance}
+
+\textbf{Database Backup:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Stop Neo4j for consistent backup
+docker-compose stop neo4j
+
+# Backup database files
+docker run --rm -v data_ingestion_neo4j-data:/data -v $(pwd):/backup \
+  ubuntu tar czf /backup/neo4j_backup_$(date +%Y%m%d).tar.gz /data
+
+# Restart Neo4j
+docker-compose start neo4j
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Database Statistics:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Connect to Neo4j browser (http://localhost:7474)
+# Run Cypher query:
+
+// Count nodes by type
+MATCH (n)
+RETURN labels(n) as NodeType, count(*) as Count
+ORDER BY Count DESC;
+
+// Count relationships by type
+MATCH ()-[r]->()
+RETURN type(r) as RelationshipType, count(*) as Count
+ORDER BY Count DESC;
+
+// Database size
+CALL apoc.meta.stats();
+\end{lstlisting}
+\end{commandbox}
+
+\section{Performance Optimization}
+
+\subsection{Docker Resource Allocation}
+
+\textbf{Recommended Resource Limits:}
+
+\begin{lstlisting}[style=pythonstyle]
+# docker-compose.yml
+services:
+  elasticsearch:
+    mem_limit: 4g
+    cpus: 2.0
+    environment:
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+  
+  postgres:
+    mem_limit: 2g
+    cpus: 1.0
+  
+  neo4j:
+    mem_limit: 2g
+    cpus: 1.0
+    environment:
+      - NEO4J_dbms_memory_heap_max__size=1g
+  
+  pv-classification-service:
+    mem_limit: 4g  # For BERT model
+    cpus: 2.0
+\end{lstlisting}
+
+\subsection{Database Query Optimization}
+
+\textbf{PostgreSQL Indexing:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Create indexes for frequently queried fields
+docker-compose exec postgres psql -U postgres -d document_intelligence -c "
+CREATE INDEX IF NOT EXISTS idx_documents_space_id ON documents(space_id);
+CREATE INDEX IF NOT EXISTS idx_documents_classification ON documents(classification);
+CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_documents_doc_id ON documents(doc_id);
+"
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Elasticsearch Query Optimization:}
+\begin{itemize}
+    \item Use \texttt{\_source} filtering to reduce payload size
+    \item Implement query result caching (Redis)
+    \item Use \texttt{scroll} API for large result sets
+    \item Disable scoring when not needed (\texttt{filter} context)
+\end{itemize}
+
+\subsection{Caching Strategy}
+
+\textbf{Redis Caching:}
+\begin{lstlisting}[style=pythonstyle]
+# Classification result caching (30 minutes TTL)
+CACHE_KEY = f"classification:{doc_id}"
+cached_result = redis.get(CACHE_KEY)
+
+if cached_result:
+    return json.loads(cached_result)
+
+# Compute result
+result = classify_document(document)
+
+# Cache result
+redis.setex(CACHE_KEY, 1800, json.dumps(result))
+return result
+\end{lstlisting}
+
+\textbf{Frontend Caching:}
+\begin{itemize}
+    \item API responses cached in React Query (5 minutes)
+    \item Static assets cached with aggressive headers (1 year)
+    \item Service Worker for offline capability (future)
+\end{itemize}
+
+\section{Security Operations}
+
+\subsection{SSL/TLS Certificate Management}
+
+\textbf{Generate Self-Signed Certificate (Development):}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Generate certificate
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout ./nginx/ssl/selfsigned.key \
+  -out ./nginx/ssl/selfsigned.crt \
+  -subj "/C=US/ST=Alabama/L=Auburn/O=Auburn/CN=localhost"
+
+# Update nginx.conf to use SSL
+# Restart frontend
+docker-compose restart frontend
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Let's Encrypt Certificate (Production):}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Install certbot
+sudo apt-get install certbot python3-certbot-nginx
+
+# Obtain certificate
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+
+# Auto-renewal (cron job)
+0 0 * * * certbot renew --quiet --post-hook "docker-compose restart frontend"
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Secret Rotation}
+
+\textbf{JWT Secret Rotation:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Generate new secret
+NEW_SECRET=$(openssl rand -hex 32)
+
+# Update .env file
+sed -i "s/JWT_SECRET_KEY=.*/JWT_SECRET_KEY=$NEW_SECRET/" .env
+
+# Restart API Gateway (invalidates all existing tokens)
+docker-compose restart api-gateway
+
+# Notify users to re-login
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Database Password Rotation:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Generate new password
+NEW_PASSWORD=$(openssl rand -base64 24)
+
+# Update PostgreSQL password
+docker-compose exec postgres psql -U postgres -c \
+  "ALTER USER postgres WITH PASSWORD '$NEW_PASSWORD';"
+
+# Update .env file
+sed -i "s/POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$NEW_PASSWORD/" .env
+
+# Restart services that connect to database
+docker-compose restart api-gateway pv-classification-service
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Audit Log Review}
+
+\textbf{Security Event Monitoring:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# View failed login attempts
+docker-compose logs api-gateway | grep "Failed login"
+
+# View unauthorized access attempts
+docker-compose logs api-gateway | grep "401\|403"
+
+# Export audit logs for compliance
+docker-compose exec postgres psql -U postgres -d document_intelligence -c \
+  "COPY (SELECT * FROM audit_logs WHERE created_at >= NOW() - INTERVAL '30 days') \
+   TO STDOUT CSV HEADER" > audit_export_$(date +%Y%m%d).csv
+\end{lstlisting}
+\end{commandbox}
+
+\section{Scaling Operations}
+
+\subsection{Horizontal Scaling}
+
+\textbf{Scale API Gateway:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Scale to 3 instances
+docker-compose up -d --scale api-gateway=3
+
+# Add load balancer (nginx)
+# Edit docker-compose.yml to add nginx load balancer service
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Load Balancer Configuration (nginx):}
+\begin{lstlisting}[style=pythonstyle]
+upstream api_backend {
+    least_conn;  # Load balancing algorithm
+    server api-gateway-1:8000 max_fails=3 fail_timeout=30s;
+    server api-gateway-2:8000 max_fails=3 fail_timeout=30s;
+    server api-gateway-3:8000 max_fails=3 fail_timeout=30s;
+}
+
+server {
+    listen 80;
+    location /api/ {
+        proxy_pass http://api_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+\end{lstlisting}
+
+\subsection{Vertical Scaling}
+
+\textbf{Increase Resource Limits:}
+\begin{lstlisting}[style=pythonstyle]
+# docker-compose.yml
+services:
+  pv-classification-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'      # Increase from 2.0
+          memory: 8G       # Increase from 4G
+        reservations:
+          cpus: '2.0'
+          memory: 4G
+\end{lstlisting}
+
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Apply changes
+docker-compose up -d --force-recreate pv-classification-service
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Database Sharding (Advanced)}
+
+\textbf{Elasticsearch Sharding Configuration:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Update index settings
+curl -X PUT "http://localhost:9200/documents/_settings" -H 'Content-Type: application/json' -d'
+{
+  "index": {
+    "number_of_shards": 5,
+    "number_of_replicas": 1
+  }
+}'
+\end{lstlisting}
+\end{commandbox}
+
+\section{Disaster Recovery}
+
+\subsection{Backup Strategy}
+
+\textbf{Recommended Backup Schedule:}
+\begin{table}[h]
+\centering
+\caption{Backup Frequency Recommendations}
+\begin{tabularx}{\textwidth}{lXl}
+\toprule
+\textbf{Data Type} & \textbf{Backup Frequency} & \textbf{Retention} \\
+\midrule
+PostgreSQL & Daily (full), Hourly (incremental) & 30 days \\
+Elasticsearch & Daily snapshots & 14 days \\
+Neo4j & Weekly & 30 days \\
+Uploaded Files & Daily (rsync) & 90 days \\
+Configuration & After each change & Indefinite (Git) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Automated Backup Script:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+#!/bin/bash
+# daily_backup.sh
+
+BACKUP_DIR="/backups/$(date +%Y%m%d)"
+mkdir -p $BACKUP_DIR
+
+# PostgreSQL backup
+docker-compose exec -T postgres pg_dump -U postgres document_intelligence \
+  | gzip > $BACKUP_DIR/postgres.sql.gz
+
+# Elasticsearch snapshot
+curl -X PUT "http://localhost:9200/_snapshot/backup_repo/snapshot_$(date +%Y%m%d)?wait_for_completion=true"
+
+# Copy Neo4j data
+docker run --rm -v data_ingestion_neo4j-data:/data -v $BACKUP_DIR:/backup \
+  ubuntu tar czf /backup/neo4j.tar.gz /data
+
+# Upload to S3 (optional)
+aws s3 sync $BACKUP_DIR s3://your-backup-bucket/$(date +%Y%m%d)/
+
+# Clean old backups (keep last 30 days)
+find /backups/* -type d -mtime +30 -exec rm -rf {} \;
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Schedule with Cron:}
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Edit crontab
+crontab -e
+
+# Add daily backup at 2 AM
+0 2 * * * /path/to/daily_backup.sh >> /var/log/backup.log 2>&1
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Disaster Recovery Procedure}
+
+\textbf{Full System Recovery:}
+\begin{enumerate}
+    \item Stop all services: \texttt{docker-compose down}
+    \item Restore database backups (PostgreSQL, Elasticsearch, Neo4j)
+    \item Restore uploaded files and configuration
+    \item Start services: \texttt{docker-compose up -d}
+    \item Verify data integrity
+    \item Update DNS/load balancer to point to recovered system
+\end{enumerate}
+
+\textbf{Recovery Time Objective (RTO):} 4 hours
+
+\textbf{Recovery Point Objective (RPO):} 24 hours (last daily backup)
+
+\end{document}
+

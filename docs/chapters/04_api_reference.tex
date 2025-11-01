@@ -1,0 +1,558 @@
+% ============================================================================
+% CHAPTER 4: API REFERENCE
+% ============================================================================
+
+\chapter{API Reference}
+
+\section{API Gateway Overview}
+
+\textbf{Base URL:} \texttt{http://localhost:8000}
+
+\textbf{API Version:} v1
+
+\textbf{Authentication:} Bearer token (JWT)
+
+\subsection{Authentication Endpoints}
+
+\subsubsection{POST /api/v1/auth/login}
+
+Authenticate user and obtain access token.
+
+\textbf{Request:}
+\begin{lstlisting}[style=pythonstyle]
+POST /api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "SecurePass123!"
+}
+\end{lstlisting}
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer",
+  "expires_in": 1800,
+  "user": {
+    "id": "user_123",
+    "email": "user@example.com",
+    "role": "data_manager",
+    "full_name": "John Doe"
+  }
+}
+\end{lstlisting}
+
+\textbf{Error Responses:}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Status} & \textbf{Description} \\
+\midrule
+400 & Invalid request format \\
+401 & Invalid credentials \\
+429 & Too many login attempts (rate limited) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{POST /api/v1/auth/refresh}
+
+Refresh expired access token.
+
+\textbf{Request:}
+\begin{lstlisting}[style=pythonstyle]
+POST /api/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+\end{lstlisting}
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expires_in": 1800
+}
+\end{lstlisting}
+
+\section{Document Management API}
+
+\subsection{POST /api/v1/upload}
+
+Upload and process document(s).
+
+\textbf{Request (multipart/form-data):}
+\begin{lstlisting}[style=pythonstyle]
+POST /api/v1/upload
+Authorization: Bearer <access_token>
+Content-Type: multipart/form-data
+
+files: [File, File, ...]
+space_id: "space_abc123"
+processing_options: {
+  "enable_classification": true,
+  "enable_entity_extraction": true,
+  "force_ensemble": false
+}
+\end{lstlisting}
+
+\textbf{Response (202 Accepted):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "status": "accepted",
+  "job_id": "job_xyz789",
+  "documents": [
+    {
+      "doc_id": "doc_001",
+      "filename": "study_report.pdf",
+      "status": "processing",
+      "estimated_time": "30s"
+    }
+  ],
+  "message": "Documents queued for processing"
+}
+\end{lstlisting}
+
+\subsection{GET /api/v1/documents}
+
+List documents with filtering and pagination.
+
+\textbf{Query Parameters:}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Parameter} & \textbf{Type} & \textbf{Description} \\
+\midrule
+space\_id & string & Filter by project space \\
+classification & string & Filter by classification \\
+page & integer & Page number (default: 1) \\
+limit & integer & Results per page (default: 20) \\
+sort\_by & string & Sort field (created\_at, title) \\
+order & string & asc or desc (default: desc) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Request Example:}
+\begin{lstlisting}[style=bashstyle]
+GET /api/v1/documents?space_id=space_abc123&classification=ICSR&page=1&limit=20
+Authorization: Bearer <access_token>
+\end{lstlisting}
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "total": 145,
+  "page": 1,
+  "limit": 20,
+  "documents": [
+    {
+      "doc_id": "doc_001",
+      "title": "Adverse Event Case Report - Drug X",
+      "classification": "ICSR",
+      "classification_confidence": 0.94,
+      "created_at": "2024-11-01T10:30:00Z",
+      "source_type": "pdf",
+      "ensemble_metadata": {
+        "models_used": ["rule_based", "bert", "llm"],
+        "processing_time_ms": 2340,
+        "cost": 0.0001
+      }
+    }
+  ]
+}
+\end{lstlisting}
+
+\subsection{GET /api/v1/documents/\{doc\_id\}}
+
+Retrieve single document with full details.
+
+\textbf{Request:}
+\begin{lstlisting}[style=bashstyle]
+GET /api/v1/documents/doc_001
+Authorization: Bearer <access_token>
+\end{lstlisting}
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "doc_id": "doc_001",
+  "title": "Adverse Event Case Report",
+  "content": "Full document text...",
+  "classification": "ICSR",
+  "classification_confidence": 0.94,
+  "classification_reasoning": "Document contains specific patient...",
+  "extracted_entities": [
+    {
+      "entity_id": "Drug_aspirin_13ce41e9",
+      "type": "Drug",
+      "name": "Aspirin",
+      "confidence": 0.96
+    }
+  ],
+  "ensemble_metadata": {
+    "individual_results": [
+      {
+        "model": "rule_based",
+        "classification": "ICSR",
+        "confidence": 0.89
+      },
+      {
+        "model": "bert",
+        "classification": "Safety_Information",
+        "confidence": 0.72
+      },
+      {
+        "model": "llm",
+        "classification": "ICSR",
+        "confidence": 0.96
+      }
+    ],
+    "final_verdict": "ICSR",
+    "confidence": 0.94,
+    "decision_path": ["rule_based", "llm"],
+    "processing_time_ms": 2340
+  }
+}
+\end{lstlisting}
+
+\section{Classification API}
+
+\subsection{POST /api/v1/pv-classification/classify}
+
+Classify single document (direct call to PV service).
+
+\textbf{Request:}
+\begin{lstlisting}[style=pythonstyle]
+POST /api/v1/pv-classification/classify
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "doc_id": "doc_001",
+  "title": "Case Report: Drug-Induced Liver Injury",
+  "abstract": "A 55-year-old male developed acute liver injury...",
+  "content": "Full text content...",
+  "mesh_terms": ["Liver Diseases", "Drug-Related Side Effects"],
+  "publication_types": ["Case Reports"],
+  "force_ensemble": false
+}
+\end{lstlisting}
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "doc_id": "doc_001",
+  "classification": "ICSR",
+  "classification_confidence": 0.94,
+  "classification_reasoning": "Specific patient case with temporal...",
+  "classification_entities": ["patient", "aspirin", "liver_injury"],
+  "ensemble_metadata": {
+    "models_used": ["rule_based", "llm"],
+    "processing_time_ms": 2340,
+    "classification_cost": 0.0001,
+    "decision_path": ["rule_based", "llm"]
+  }
+}
+\end{lstlisting}
+
+\subsection{POST /api/v1/pv-classification/classify/batch}
+
+Batch classify multiple documents.
+
+\textbf{Request:}
+\begin{lstlisting}[style=pythonstyle]
+POST /api/v1/pv-classification/classify/batch
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "documents": [
+    { "doc_id": "doc_001", "title": "...", "abstract": "..." },
+    { "doc_id": "doc_002", "title": "...", "abstract": "..." }
+  ],
+  "force_ensemble": false
+}
+\end{lstlisting}
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "total_documents": 2,
+  "successful": 2,
+  "failed": 0,
+  "results": [
+    { "doc_id": "doc_001", "classification": "ICSR", ... },
+    { "doc_id": "doc_002", "classification": "Non-ICSR", ... }
+  ],
+  "total_processing_time_ms": 4680,
+  "total_cost": 0.0002
+}
+\end{lstlisting}
+
+\section{Knowledge Hub API}
+
+\subsection{GET /api/v1/knowledge-hub/graph}
+
+Retrieve full knowledge graph data.
+
+\textbf{Query Parameters:}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Parameter} & \textbf{Type} & \textbf{Description} \\
+\midrule
+limit & integer & Max nodes to return (default: 1000) \\
+space\_id & string & Filter by project space \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Request:}
+\begin{lstlisting}[style=bashstyle]
+GET /api/v1/knowledge-hub/graph?limit=500
+Authorization: Bearer <access_token>
+\end{lstlisting}
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "success": true,
+  "node_count": 487,
+  "edge_count": 1243,
+  "nodes": [
+    {
+      "id": "Drug_aspirin_13ce41e9",
+      "name": "Aspirin",
+      "type": "Drug",
+      "confidence": 0.96,
+      "source_count": 15,
+      "has_pdf": true,
+      "has_external": true
+    }
+  ],
+  "edges": [
+    {
+      "source": "Drug_aspirin_13ce41e9",
+      "target": "Disease_gastritis_a7b3c2d1",
+      "type": "CAUSES",
+      "predicate": "CAUSES",
+      "confidence": 0.82
+    }
+  ]
+}
+\end{lstlisting}
+
+\subsection{GET /api/v1/knowledge-hub/entities/\{entity\_id\}/source-documents}
+
+Get source documents for a specific entity.
+
+\textbf{Request:}
+\begin{lstlisting}[style=bashstyle]
+GET /api/v1/knowledge-hub/entities/Drug_aspirin_13ce41e9/source-documents?limit=20
+Authorization: Bearer <access_token>
+\end{lstlisting}
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "success": true,
+  "entity_name": "Aspirin",
+  "document_count": 15,
+  "documents": [
+    {
+      "doc_id": "doc_001",
+      "title": "Aspirin-Induced Gastritis",
+      "doc_type": "pdf",
+      "source_type": "local",
+      "snippets": [
+        "...patient developed <mark>aspirin</mark>-induced gastritis..."
+      ],
+      "summary": "Case report of 45-year-old with gastritis...",
+      "entity_confidence": 0.96,
+      "score": 14.2
+    }
+  ]
+}
+\end{lstlisting}
+
+\section{Ingestion API}
+
+\subsection{POST /api/v1/ingestion/pubmed/start}
+
+Start PubMed ingestion job.
+
+\textbf{Request:}
+\begin{lstlisting}[style=pythonstyle]
+POST /api/v1/ingestion/pubmed/start
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "space_id": "space_abc123",
+  "queries": [
+    "COVID-19 adverse events",
+    "vaccine safety pharmacovigilance"
+  ],
+  "max_results_per_query": 50,
+  "date_range": {
+    "start": "2024-01-01",
+    "end": "2024-12-31"
+  },
+  "processing_options": {
+    "enable_classification": true,
+    "enable_entity_extraction": true,
+    "force_ensemble": false
+  }
+}
+\end{lstlisting}
+
+\textbf{Response (202 Accepted):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "status": "accepted",
+  "job_id": "ingestion_job_xyz789",
+  "estimated_total_documents": 100,
+  "estimated_time_minutes": 15,
+  "message": "PubMed ingestion started"
+}
+\end{lstlisting}
+
+\subsection{GET /api/v1/ingestion/status/\{job\_id\}}
+
+Check ingestion job status.
+
+\textbf{Request:}
+\begin{lstlisting}[style=bashstyle]
+GET /api/v1/ingestion/status/ingestion_job_xyz789
+Authorization: Bearer <access_token>
+\end{lstlisting}
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "job_id": "ingestion_job_xyz789",
+  "status": "processing",
+  "progress": {
+    "total_documents": 100,
+    "processed": 65,
+    "failed": 2,
+    "pending": 33
+  },
+  "started_at": "2024-11-01T10:00:00Z",
+  "estimated_completion": "2024-11-01T10:15:00Z",
+  "current_phase": "classification"
+}
+\end{lstlisting}
+
+\section{RL Intelligence API}
+
+\subsection{GET /api/v1/rl/status}
+
+Get RL system status.
+
+\textbf{Request:}
+\begin{lstlisting}[style=bashstyle]
+GET /api/v1/rl/status
+Authorization: Bearer <access_token>
+\end{lstlisting}
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "status": "active",
+  "model_loaded": true,
+  "training_episodes": 1000,
+  "learning_confirmed": true,
+  "reward_improvement_percent": 147.0,
+  "last_updated": "2024-11-01T08:00:00Z"
+}
+\end{lstlisting}
+
+\subsection{GET /api/v1/rl/metrics}
+
+Get current RL performance metrics.
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "accuracy": 0.928,
+  "cost_efficiency": 0.65,
+  "processing_speed": 1.8,
+  "total_reward": 0.84,
+  "peak_episode": 987
+}
+\end{lstlisting}
+
+\section{Rate Limiting}
+
+All API endpoints are rate limited:
+
+\begin{table}[h]
+\centering
+\caption{API Rate Limits}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Endpoint Category} & \textbf{Rate Limit} \\
+\midrule
+Authentication & 10 requests/minute per IP \\
+Document Upload & 100 requests/hour per user \\
+Classification & 1000 requests/hour per user \\
+Search/Read & 1000 requests/hour per user \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Rate Limit Headers:}
+\begin{lstlisting}[style=bashstyle]
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 987
+X-RateLimit-Reset: 1698840000
+\end{lstlisting}
+
+\section{Error Codes}
+
+\begin{table}[h]
+\centering
+\caption{Standard HTTP Error Codes}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Code} & \textbf{Description} \\
+\midrule
+400 & Bad Request - Invalid input format \\
+401 & Unauthorized - Missing or invalid token \\
+403 & Forbidden - Insufficient permissions \\
+404 & Not Found - Resource does not exist \\
+422 & Unprocessable Entity - Validation failed \\
+429 & Too Many Requests - Rate limit exceeded \\
+500 & Internal Server Error - Server malfunction \\
+503 & Service Unavailable - Maintenance or overload \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Error Response Format:}
+\begin{lstlisting}[style=pythonstyle]
+{
+  "error": {
+    "code": "INVALID_INPUT",
+    "message": "Document title cannot be empty",
+    "details": {
+      "field": "title",
+      "constraint": "required"
+    },
+    "request_id": "req_abc123xyz"
+  }
+}
+\end{lstlisting}
+
+\end{document}
+

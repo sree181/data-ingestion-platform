@@ -1,0 +1,572 @@
+% ============================================================================
+% ENTERPRISE DATA INGESTION PLATFORM - TECHNICAL DOCUMENTATION
+% Version: 1.0
+% Date: November 2025
+% ============================================================================
+
+\documentclass[11pt,a4paper,twoside]{book}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fontawesome5}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,shadows}
+
+% ============================================================================
+% COLOR DEFINITIONS
+% ============================================================================
+\definecolor{primaryblue}{RGB}{66,126,234}
+\definecolor{secondaryblue}{RGB}{102,179,255}
+\definecolor{darkgray}{RGB}{51,51,51}
+\definecolor{lightgray}{RGB}{242,242,242}
+\definecolor{successgreen}{RGB}{16,185,129}
+\definecolor{warningyellow}{RGB}{245,158,11}
+\definecolor{errorred}{RGB}{239,68,68}
+\definecolor{codebg}{RGB}{45,45,45}
+
+% ============================================================================
+% HYPERREF SETUP
+% ============================================================================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primaryblue,
+    filecolor=primaryblue,
+    urlcolor=primaryblue,
+    pdftitle={Enterprise Data Ingestion Platform - Technical Documentation},
+    pdfauthor={Auburn University},
+    pdfsubject={Technical Manual},
+    pdfkeywords={Data Ingestion, AI, Document Processing, Pharmacovigilance}
+}
+
+% ============================================================================
+% CODE LISTING SETUP
+% ============================================================================
+\lstdefinestyle{bashstyle}{
+    language=bash,
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\small\color{white},
+    keywordstyle=\color{successgreen}\bfseries,
+    commentstyle=\color{lightgray}\itshape,
+    stringstyle=\color{secondaryblue},
+    numbers=left,
+    numberstyle=\tiny\color{lightgray},
+    stepnumber=1,
+    numbersep=10pt,
+    tabsize=2,
+    showspaces=false,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{darkgray},
+    captionpos=b
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\small\color{white},
+    keywordstyle=\color{warningyellow}\bfseries,
+    commentstyle=\color{lightgray}\itshape,
+    stringstyle=\color{successgreen},
+    numbers=left,
+    numberstyle=\tiny\color{lightgray},
+    stepnumber=1,
+    numbersep=10pt,
+    tabsize=4,
+    showspaces=false,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{darkgray},
+    captionpos=b
+}
+
+% ============================================================================
+% CUSTOM BOXES
+% ============================================================================
+\newtcolorbox{infobox}{
+    colback=lightgray,
+    colframe=primaryblue,
+    fonttitle=\bfseries,
+    title=\faInfoCircle\ Information,
+    arc=2mm
+}
+
+\newtcolorbox{warningbox}{
+    colback=warningyellow!10,
+    colframe=warningyellow,
+    fonttitle=\bfseries,
+    title=\faExclamationTriangle\ Warning,
+    arc=2mm
+}
+
+\newtcolorbox{commandbox}{
+    colback=codebg,
+    colframe=successgreen,
+    fonttitle=\bfseries,
+    title=\faTerminal\ Command,
+    arc=2mm,
+    colupper=white
+}
+
+% ============================================================================
+% HEADER/FOOTER SETUP
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\leftmark}
+\fancyhead[RO]{\rightmark}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.5pt}
+
+% ============================================================================
+% TITLE FORMATTING
+% ============================================================================
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{primaryblue}}
+  {\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{0pt}{40pt}
+
+% ============================================================================
+% DOCUMENT BEGIN
+% ============================================================================
+\begin{document}
+
+% ============================================================================
+% TITLE PAGE
+% ============================================================================
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Huge\bfseries Enterprise Data Ingestion Platform\par}
+    \vspace{1cm}
+    {\Large Technical Documentation\par}
+    \vspace{2cm}
+    
+    \begin{tikzpicture}
+        \node[draw=primaryblue,line width=2pt,rectangle,rounded corners=10pt,
+              fill=primaryblue!10,minimum width=10cm,minimum height=5cm] (box) at (0,0) {};
+        \node[above=0.5cm of box.south] {\Large\textbf{Version 1.0}};
+        \node[below=0.5cm of box.north] {\large Production-Ready Framework};
+    \end{tikzpicture}
+    
+    \vspace{2cm}
+    {\large Auburn University\par}
+    {\large Pharmacovigilance Intelligence System\par}
+    
+    \vfill
+    
+    {\large November 2025\par}
+    
+    \vspace{1cm}
+    
+    \begin{tabular}{ll}
+        \textbf{Document Type:} & Technical Manual \\
+        \textbf{Classification:} & Private (Enterprise) \\
+        \textbf{Status:} & Production Ready \\
+        \textbf{Last Updated:} & \today
+    \end{tabular}
+\end{titlepage}
+
+% ============================================================================
+% COPYRIGHT & LEGAL
+% ============================================================================
+\newpage
+\thispagestyle{empty}
+\vspace*{\fill}
+\begin{center}
+    \textbf{Copyright \& Legal Notice}
+\end{center}
+
+\noindent
+Copyright \textcopyright\ 2025 Auburn University. All rights reserved.
+
+\vspace{1cm}
+
+\noindent
+\textbf{Confidentiality Notice:} This document contains proprietary and confidential information. Distribution, reproduction, or disclosure of this document or its contents to unauthorized parties is strictly prohibited.
+
+\vspace{0.5cm}
+
+\noindent
+\textbf{Technology Stack:}
+\begin{itemize}[noitemsep]
+    \item Python 3.10+ (Backend Services)
+    \item React 18.3+ (Frontend Application)
+    \item Docker \& Docker Compose (Containerization)
+    \item PostgreSQL 15+ (Primary Database)
+    \item Elasticsearch 8.0+ (Search \& Document Storage)
+    \item Neo4j 5.0+ (Knowledge Graph)
+    \item Redis 7.0+ (Caching \& Session Storage)
+\end{itemize}
+
+\vspace*{\fill}
+
+% ============================================================================
+% TABLE OF CONTENTS
+% ============================================================================
+\tableofcontents
+\listoffigures
+\listoftables
+
+% ============================================================================
+% CHAPTER 1: INTRODUCTION
+% ============================================================================
+\chapter{Introduction}
+
+\section{Executive Summary}
+
+The Enterprise Data Ingestion Platform is a production-ready, AI-powered document processing and intelligence system designed specifically for pharmacovigilance operations. This platform enables organizations to:
+
+\begin{itemize}[itemsep=10pt]
+    \item \textbf{Ingest} multi-source documents (PDF, PubMed, FDA, Clinical Trials)
+    \item \textbf{Process} documents with AI-powered classification and entity extraction
+    \item \textbf{Analyze} medical literature using ensemble ML models
+    \item \textbf{Visualize} knowledge relationships in interactive 3D graphs
+    \item \textbf{Investigate} safety signals through collaborative workspaces
+    \item \textbf{Monitor} real-time performance with comprehensive dashboards
+\end{itemize}
+
+\subsection{Key Features}
+
+\begin{table}[h]
+\centering
+\caption{Platform Feature Overview}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Feature} & \textbf{Description} \\
+\midrule
+Multi-Source Ingestion & PDF upload, PubMed API, FDA databases, ClinicalTrials.gov \\
+AI Classification & 3-tier ensemble (Rule-based + BERT + LLM) \\
+Knowledge Graph & Interactive 3D WebGL visualization with 60 FPS \\
+ICSR Automation & Automated extraction and review workflows \\
+Investigation Boards & Collaborative workspace for safety signals \\
+Security & Role-based access control (RBAC) with MFA support \\
+Monitoring & Real-time metrics with Prometheus \& Grafana \\
+Scalability & Microservices architecture with horizontal scaling \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Target Audience}
+
+This technical documentation is intended for:
+
+\begin{itemize}
+    \item \textbf{DevOps Engineers} - Deployment and infrastructure management
+    \item \textbf{Software Developers} - Integration and custom development
+    \item \textbf{System Administrators} - Day-to-day operations and maintenance
+    \item \textbf{Data Scientists} - ML model training and optimization
+    \item \textbf{Technical Architects} - System design and scaling decisions
+\end{itemize}
+
+\section{System Architecture}
+
+\subsection{High-Level Overview}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: System Architecture Diagram]}}
+\caption{Enterprise Data Ingestion Platform - System Architecture}
+\label{fig:architecture}
+\end{figure}
+
+The platform follows a microservices architecture pattern with the following layers:
+
+\begin{enumerate}
+    \item \textbf{Presentation Layer} - React frontend with Material-UI
+    \item \textbf{API Gateway Layer} - FastAPI routing and authentication
+    \item \textbf{Service Layer} - Specialized microservices
+    \item \textbf{Data Layer} - Multiple database technologies
+    \item \textbf{Infrastructure Layer} - Docker, monitoring, logging
+\end{enumerate}
+
+\subsection{Microservices Architecture}
+
+\begin{table}[h]
+\centering
+\caption{Microservices Inventory}
+\begin{tabularx}{\textwidth}{lXc}
+\toprule
+\textbf{Service} & \textbf{Responsibility} & \textbf{Port} \\
+\midrule
+API Gateway & Request routing, auth, rate limiting & 8000 \\
+PV Classification & Document classification (ensemble ML) & 8002 \\
+Document Processing & PDF parsing, OCR, text extraction & 8003 \\
+Knowledge Hub & Neo4j graph queries, entity linking & 8000 \\
+RL Intelligence & Reinforcement learning optimization & 8013 \\
+Monitoring & Prometheus metrics collection & 9090 \\
+Grafana & Metrics visualization dashboard & 3001 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ============================================================================
+% CHAPTER 2: INSTALLATION & SETUP
+% ============================================================================
+\chapter{Installation \& Setup}
+
+\section{Prerequisites}
+
+\subsection{Hardware Requirements}
+
+\begin{infobox}
+\textbf{Minimum Requirements:}
+\begin{itemize}[noitemsep]
+    \item CPU: 4 cores (8 threads recommended)
+    \item RAM: 16 GB (32 GB recommended)
+    \item Storage: 100 GB SSD
+    \item Network: 100 Mbps
+\end{itemize}
+
+\textbf{Production Requirements:}
+\begin{itemize}[noitemsep]
+    \item CPU: 8+ cores
+    \item RAM: 64 GB+
+    \item Storage: 500 GB+ NVMe SSD
+    \item Network: 1 Gbps
+    \item GPU: Optional (NVIDIA for ML acceleration)
+\end{itemize}
+\end{infobox}
+
+\subsection{Software Requirements}
+
+\begin{table}[h]
+\centering
+\caption{Required Software Components}
+\begin{tabularx}{\textwidth}{lXl}
+\toprule
+\textbf{Component} & \textbf{Version} & \textbf{Purpose} \\
+\midrule
+Docker & 24.0+ & Container runtime \\
+Docker Compose & 2.20+ & Multi-container orchestration \\
+Git & 2.40+ & Version control \\
+Python & 3.10+ & Backend development (optional) \\
+Node.js & 18.0+ & Frontend development (optional) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Installation Steps}
+
+\subsection{Step 1: Clone Repository}
+
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Clone the repository
+git clone https://github.com/sree181/data-ingestion-platform.git
+
+# Navigate to project directory
+cd data-ingestion-platform
+
+# Verify all files are present
+ls -la
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Step 2: Environment Configuration}
+
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Copy environment template
+cp .env.example .env
+
+# Edit environment variables
+nano .env
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Required Environment Variables:}
+
+\begin{lstlisting}[style=bashstyle]
+# Database Configuration
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=<secure_password>
+POSTGRES_DB=document_intelligence
+
+# Elasticsearch Configuration
+ELASTIC_PASSWORD=<secure_password>
+ELASTICSEARCH_URL=http://elasticsearch:9200
+
+# Neo4j Configuration
+NEO4J_AUTH=neo4j/<secure_password>
+NEO4J_URL=bolt://neo4j:7687
+
+# OpenAI API (Optional - for LLM classification)
+OPENAI_API_KEY=<your_api_key>
+
+# Security
+JWT_SECRET_KEY=<generate_random_secret>
+JWT_ALGORITHM=HS256
+\end{lstlisting}
+
+\begin{warningbox}
+\textbf{Security Best Practices:}
+\begin{itemize}[noitemsep]
+    \item Use strong passwords (16+ characters, mixed case, numbers, symbols)
+    \item Never commit \texttt{.env} file to version control
+    \item Rotate JWT secret keys regularly
+    \item Use different passwords for each service
+\end{itemize}
+\end{warningbox}
+
+\subsection{Step 3: Build Docker Images}
+
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Build all services
+docker-compose build
+
+# Build with no cache (if issues occur)
+docker-compose build --no-cache
+
+# Build specific service
+docker-compose build frontend
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Expected Output:}
+\begin{lstlisting}[style=bashstyle]
+[+] Building 120.5s (45/45) FINISHED
+ => [frontend] exporting to image
+ => [api-gateway] exporting to image
+ => [pv-classification-service] exporting to image
+Successfully built all services
+\end{lstlisting}
+
+\subsection{Step 4: Initialize Databases}
+
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Start database services only
+docker-compose up -d postgres elasticsearch neo4j redis
+
+# Wait for services to be healthy (30-60 seconds)
+docker-compose ps
+
+# Run database migrations
+docker-compose exec api-gateway python -m alembic upgrade head
+
+# Create admin user
+docker-compose exec postgres psql -U postgres -d document_intelligence -f /sql/create_admin_user.sql
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Step 5: Start All Services}
+
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Start all services
+docker-compose up -d
+
+# Verify all services are running
+docker-compose ps
+
+# Check service logs
+docker-compose logs -f --tail=100
+\end{lstlisting}
+\end{commandbox}
+
+\textbf{Service Health Check:}
+
+\begin{table}[h]
+\centering
+\caption{Service Health Verification}
+\begin{tabularx}{\textwidth}{lXl}
+\toprule
+\textbf{Service} & \textbf{Health Check URL} & \textbf{Expected} \\
+\midrule
+Frontend & http://localhost:3000 & Login page \\
+API Gateway & http://localhost:8000/health & \{"status":"healthy"\} \\
+Elasticsearch & http://localhost:9200 & Cluster info JSON \\
+Neo4j & http://localhost:7474 & Neo4j Browser \\
+Grafana & http://localhost:3001 & Dashboard \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\fbox{\textit{[SCREENSHOT PLACEHOLDER: All Services Running - Docker PS Output]}}
+\caption{Docker Compose Services Status}
+\label{fig:docker-ps}
+\end{figure}
+
+\section{Network Configuration}
+
+\subsection{IP Address \& Port Mapping}
+
+\begin{table}[h]
+\centering
+\caption{Service Network Configuration}
+\begin{tabularx}{\textwidth}{lllX}
+\toprule
+\textbf{Service} & \textbf{Internal Port} & \textbf{External Port} & \textbf{Access URL} \\
+\midrule
+Frontend & 80 & 3000 & http://localhost:3000 \\
+API Gateway & 8000 & 8000 & http://localhost:8000 \\
+PV Classification & 8002 & 8012 & http://localhost:8012 \\
+PostgreSQL & 5432 & 5432 & localhost:5432 \\
+Elasticsearch & 9200 & 9200 & http://localhost:9200 \\
+Neo4j HTTP & 7474 & 7474 & http://localhost:7474 \\
+Neo4j Bolt & 7687 & 7687 & bolt://localhost:7687 \\
+Redis & 6379 & 6379 & localhost:6379 \\
+Grafana & 3000 & 3001 & http://localhost:3001 \\
+Prometheus & 9090 & 9090 & http://localhost:9090 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Firewall Configuration}
+
+For production deployment, configure firewall rules:
+
+\begin{commandbox}
+\begin{lstlisting}[style=bashstyle]
+# Ubuntu/Debian with UFW
+sudo ufw allow 3000/tcp    # Frontend
+sudo ufw allow 8000/tcp    # API Gateway
+sudo ufw allow 8012/tcp    # PV Classification (if external access needed)
+
+# Allow from specific IP range (recommended)
+sudo ufw allow from 192.168.1.0/24 to any port 3000
+sudo ufw allow from 192.168.1.0/24 to any port 8000
+
+# Enable firewall
+sudo ufw enable
+sudo ufw status verbose
+\end{lstlisting}
+\end{commandbox}
+
+% Include additional chapters
+\input{chapters/02_usage_guide}
+\input{chapters/03_features}
+\input{chapters/04_api_reference}
+\input{chapters/05_operations}
+\input{chapters/06_troubleshooting}
+\input{chapters/07_advanced}
+
+\end{document}
+
