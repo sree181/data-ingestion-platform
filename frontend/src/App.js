@@ -43,6 +43,7 @@ import KnowledgeHub from './pages/KnowledgeHub';
 import InvestigationBoards from './pages/InvestigationBoards';
 import InvestigationBoardCanvas from './pages/InvestigationBoardCanvas';
 import WorkflowBuilder from './pages/WorkflowBuilder';
+import PVWorkflowBuilder from './pages/PVWorkflowBuilder';
 import LiteratureAutomation from './pages/LiteratureAutomation';
 import ICSRAutomation from './pages/ICSRAutomation';
 import ICSRReviewer from './pages/ICSRReviewer';
@@ -110,7 +111,7 @@ function AppContent() {
                         <Route path="investigations" element={<InvestigationBoards />} />
                         <Route path="investigations/:boardId" element={<InvestigationBoardCanvas />} />
                         <Route path="investigation" element={<EnhancedInvestigativeWorkspace />} />
-                        <Route path="workflow-builder" element={<WorkflowBuilder />} />
+                        <Route path="workflow-builder" element={<PVWorkflowBuilder />} />
                         <Route path="entity-enrichment" element={<EntityEnrichment />} />
                         <Route path="spaces" element={<EnhancedProjectSpacesOptimized />} />
                         <Route path="lease-management" element={<LeaseManagement />} />
