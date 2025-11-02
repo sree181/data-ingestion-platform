@@ -1,0 +1,781 @@
+% ============================================================================
+% REINFORCEMENT LEARNING SYSTEM - BEAMER PRESENTATION
+% Enterprise Data Ingestion Platform
+% Auburn University
+% ============================================================================
+
+\documentclass[aspectratio=169]{beamer}
+
+% Theme
+\usetheme{Madrid}
+\usecolortheme{default}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{fontawesome5}
+\usepackage{emoji}
+\usetikzlibrary{shapes,arrows,positioning,shadows}
+
+% Color definitions
+\definecolor{primaryblue}{RGB}{66,126,234}
+\definecolor{successgreen}{RGB}{16,185,129}
+\definecolor{warningyellow}{RGB}{245,158,11}
+\definecolor{errorred}{RGB}{239,68,68}
+\definecolor{codebg}{RGB}{45,45,45}
+
+% Custom colors for theme
+\setbeamercolor{structure}{fg=primaryblue}
+\setbeamercolor{frametitle}{bg=primaryblue,fg=white}
+\setbeamercolor{block title}{bg=primaryblue,fg=white}
+\setbeamercolor{block body}{bg=primaryblue!10}
+
+% Code listing style
+\lstdefinestyle{codestyle}{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{successgreen}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{warningyellow},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{codebg!10}
+}
+
+% Title page information
+\title[RL System Explained]{Reinforcement Learning System}
+\subtitle{Simple End-to-End Explanation}
+\author{Auburn University}
+\institute{Enterprise Data Ingestion Platform}
+\date{\today}
+
+% ============================================================================
+% DOCUMENT BEGIN
+% ============================================================================
+\begin{document}
+
+% Title slide
+\begin{frame}
+\titlepage
+\end{frame}
+
+% Table of contents
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+% ============================================================================
+% SECTION 1: THE BIG PICTURE
+% ============================================================================
+\section{The Big Picture}
+
+\begin{frame}{What Problem Does RL Solve?}
+\begin{block}{The Scenario}
+Imagine you have 3 different doctors (models) who can diagnose documents:
+\end{block}
+
+\vspace{0.5cm}
+
+\begin{columns}[T]
+\column{0.33\textwidth}
+\begin{alertblock}{Doctor 1: Rule-based}
+\centering
+\faUserMd \\
+\textbf{Fast} \\
+Sometimes wrong
+\end{alertblock}
+
+\column{0.33\textwidth}
+\begin{block}{Doctor 2: BERT}
+\centering
+\faRobot \\
+\textbf{Medium speed} \\
+Okay accuracy
+\end{block}
+
+\column{0.33\textwidth}
+\begin{exampleblock}{Doctor 3: LLM/GPT}
+\centering
+\faBrain \\
+\textbf{Slow \& expensive} \\
+Very accurate
+\end{exampleblock}
+\end{columns}
+
+\vspace{0.5cm}
+
+\begin{alertblock}{The Problem}
+\centering
+How do you decide which doctor to use for each document to get the best results while saving time and money?
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{The Solution: Reinforcement Learning}
+\begin{center}
+\begin{tikzpicture}[scale=0.9]
+    % Problem box
+    \node[draw=errorred, fill=errorred!20, rectangle, rounded corners, text width=4cm, align=center, line width=2pt] (problem) at (0,0) {
+        \textbf{Problem:} \\
+        Which model(s) to use?
+    };
+    
+    % RL box
+    \node[draw=successgreen, fill=successgreen!20, rectangle, rounded corners, text width=4cm, align=center, line width=2pt] (rl) at (6,0) {
+        \textbf{RL Solution:} \\
+        Learn optimal strategy \\
+        automatically!
+    };
+    
+    % Arrow
+    \draw[->, line width=3pt, successgreen] (problem) -- (rl);
+    
+    % Benefits
+    \node[draw=primaryblue, fill=primaryblue!10, rectangle, rounded corners, text width=10cm, align=left] (benefits) at (3,-2.5) {
+        \textbf{Benefits:} \\
+        \faCheck\ 93\% accuracy (+5.6\%) \\
+        \faCheck\ 65\% cost reduction (\$8.40 → \$2.95 per 1K docs) \\
+        \faCheck\ 44\% faster (3.2s → 1.8s per doc)
+    };
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+% ============================================================================
+% SECTION 2: HOW IT WORKS
+% ============================================================================
+\section{How It Works}
+
+\begin{frame}{Step 1: The RL Agent Observes \faEye}
+\begin{block}{For each document, the agent examines 47 different features:}
+\end{block}
+
+\begin{columns}[T]
+\column{0.5\textwidth}
+\textbf{Document Features (15):}
+\begin{itemize}
+    \item How long is the document?
+    \item Does it have medical terms?
+    \item Mentions patients, drugs, side effects?
+    \item Publication type?
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Recent Performance (10):}
+\begin{itemize}
+    \item How accurate lately?
+    \item How much money spent?
+    \item How fast were we?
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{System Status (12):}
+\begin{itemize}
+    \item Is the system busy?
+    \item CPU/memory usage?
+    \item What time of day?
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Domain Info (10):}
+\begin{itemize}
+    \item Heart disease? Brain? Cancer?
+    \item Clinical trial or case report?
+\end{itemize}
+\end{columns}
+
+\vspace{0.3cm}
+\begin{alertblock}{}
+\centering
+\textbf{Total: 47-dimensional observation space}
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Step 2: The RL Agent Decides \faDice}
+\begin{block}{Based on observations, agent picks one of 12 possible actions:}
+\end{block}
+
+\begin{columns}[T]
+\column{0.5\textwidth}
+\textbf{Weight Adjustments:}
+\begin{enumerate}
+    \item Trust Rule-based more (+10\%)
+    \item Trust Rule-based less (-10\%)
+    \item Trust BERT more (+10\%)
+    \item Trust BERT less (-10\%)
+    \item Trust LLM more (+10\%)
+    \item Trust LLM less (-10\%)
+\end{enumerate}
+
+\column{0.5\textwidth}
+\textbf{Threshold Adjustments:}
+\begin{enumerate}
+    \setcounter{enumi}{6}
+    \item Increase Rule threshold
+    \item Decrease Rule threshold
+    \item Increase BERT threshold
+    \item Decrease BERT threshold
+    \item Skip expensive models (cascade ON)
+    \item Always use all models (cascade OFF)
+\end{enumerate}
+\end{columns}
+
+\vspace{0.5cm}
+
+\begin{exampleblock}{Example Decisions}
+\begin{itemize}
+    \item Document looks easy → ``Skip expensive LLM, just use Rule-based''
+    \item Document looks complex → ``Use all 3 doctors and combine opinions''
+\end{itemize}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Step 3: The System Classifies \faFileAlt}
+\begin{block}{The classification system follows RL agent's decision:}
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{columns}[T]
+\column{0.5\textwidth}
+\begin{alertblock}{Scenario 1: Easy Document}
+\textbf{RL says: ``Use Rule-based only''}
+
+\vspace{0.2cm}
+\faArrowRight\ Rule-based classifies \\
+\faArrowRight\ Done in \textbf{75ms} \\
+\faArrowRight\ Cost: \textbf{\$0}
+\end{alertblock}
+
+\column{0.5\textwidth}
+\begin{exampleblock}{Scenario 2: Hard Document}
+\textbf{RL says: ``Use all 3''}
+
+\vspace{0.2cm}
+\faArrowRight\ Rule (75ms) + BERT (850ms) + LLM (2500ms) \\
+\faArrowRight\ Combine all 3 opinions \\
+\faArrowRight\ Done in \textbf{3425ms} \\
+\faArrowRight\ Cost: \textbf{\$0.0001}
+\end{exampleblock}
+\end{columns}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tikzpicture}
+    \node[draw=primaryblue, fill=primaryblue!20, rectangle, rounded corners, text width=10cm, align=center, line width=2pt] {
+        \textbf{Key Insight:} RL learned to skip expensive LLM for 65\% of documents!
+    };
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}{Step 4: The RL Agent Gets Feedback \faChartLine}
+\begin{block}{After classification, agent receives a \textbf{reward} (like a grade):}
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{columns}[T]
+\column{0.5\textwidth}
+\textbf{1. Accuracy (40\% weight):}
+\begin{itemize}
+    \item \faCheck\ Correct: +1.0 points
+    \item \faTimes\ Wrong: -0.5 points
+\end{itemize}
+
+\vspace{0.2cm}
+
+\textbf{2. Cost Efficiency (25\%):}
+\begin{itemize}
+    \item \faDollarSign\ Avoided LLM: +1.0
+    \item \faDollarSign\ Used LLM: +0.5
+\end{itemize}
+
+\vspace{0.2cm}
+
+\textbf{3. Speed (15\%):}
+\begin{itemize}
+    \item \faBolt\ Fast (<1s): +1.0
+    \item \faTortoise\ Slow (>3s): +0.3
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{4. Stability (10\%):}
+\begin{itemize}
+    \item \faChartLine\ Consistent: +1.0
+    \item \faChartArea\ Erratic: +0.2
+\end{itemize}
+
+\vspace{0.2cm}
+
+\textbf{5. Domain Specialization (10\%):}
+\begin{itemize}
+    \item \faBullseye\ Correct on hard domain: +1.0
+    \item \faTimes\ Wrong on hard domain: -1.0
+\end{itemize}
+\end{columns}
+
+\vspace{0.5cm}
+
+\begin{alertblock}{}
+\centering
+\textbf{Total Reward = Weighted sum of all 5 components}
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Step 5: The RL Agent Learns \faBrain}
+\begin{block}{Agent uses reward to update its neural network:}
+\end{block}
+
+\vspace{0.5cm}
+
+\begin{columns}[T]
+\column{0.5\textwidth}
+\begin{exampleblock}{If reward was HIGH}
+\centering
+\faThumbsUp \\
+\vspace{0.2cm}
+``That was a good decision! \\
+Do more of that.''
+
+\vspace{0.3cm}
+\faArrowUp\ Increase probability of \\
+similar actions in \\
+similar situations
+\end{exampleblock}
+
+\column{0.5\textwidth}
+\begin{alertblock}{If reward was LOW}
+\centering
+\faThumbsDown \\
+\vspace{0.2cm}
+``That was a bad decision. \\
+Avoid that.''
+
+\vspace{0.3cm}
+\faArrowDown\ Decrease probability of \\
+that action in \\
+similar situations
+\end{alertblock}
+\end{columns}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tikzpicture}
+    \node[draw=successgreen, fill=successgreen!20, rectangle, rounded corners, text width=10cm, align=center, line width=2pt] {
+        \textbf{This is how the agent gets smarter over time!}
+    };
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+% ============================================================================
+% SECTION 3: TRAINING PROCESS
+% ============================================================================
+\section{Training Process}
+
+\begin{frame}{Training Data}
+\begin{block}{How we trained the RL agent:}
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item \textbf{Collected 500 real PubMed documents}
+    \begin{itemize}
+        \item Medical literature about drugs, diseases, adverse events
+        \item Diverse topics: cardiology, neurology, oncology, etc.
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \item \textbf{Each document was classified by all 3 models}
+    \begin{itemize}
+        \item Rule-based classifier
+        \item BERT zero-shot classifier
+        \item LLM (GPT-4o-mini) classifier
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \item \textbf{Recorded for each document:}
+    \begin{itemize}
+        \item Accuracy (correct or wrong?)
+        \item Cost (how much did it cost?)
+        \item Speed (how long did it take?)
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Training Loop: 1000 Episodes}
+\begin{block}{Training Process (4.2 hours on CPU):}
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{enumerate}
+    \item Agent sees a document (47 features)
+    \item Agent picks an action (adjust weights/thresholds)
+    \item System classifies the document
+    \item Agent gets reward (accuracy + cost + speed)
+    \item Agent updates its neural network
+\end{enumerate}
+
+\vspace{0.5cm}
+
+\begin{table}
+\centering
+\begin{tabular}{cl}
+\toprule
+\textbf{Episode} & \textbf{Reward} \\
+\midrule
+1 & 0.12 \textcolor{errorred}{(terrible, random guessing)} \\
+100 & 0.34 \textcolor{warningyellow}{(learning...)} \\
+500 & 0.67 \textcolor{primaryblue}{(getting good!)} \\
+\textbf{987} & \textbf{0.84} \textcolor{successgreen}{(PEAK! Best strategy)} \\
+1000 & 0.82 \textcolor{successgreen}{(stable)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}{What the Agent Learned \faGraduationCap}
+\begin{block}{After 1000 episodes, the RL agent discovered the optimal strategy:}
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{columns}[T]
+\column{0.5\textwidth}
+\begin{alertblock}{BEFORE RL (baseline)}
+\begin{itemize}
+    \item Rule-based: 30\%
+    \item BERT: 48\%
+    \item LLM: 22\%
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{Strategy:} Always use all 3 models
+\end{alertblock}
+
+\column{0.5\textwidth}
+\begin{exampleblock}{AFTER RL (optimized)}
+\begin{itemize}
+    \item Rule-based: \textbf{48\%} \faArrowUp\ (+60\%!)
+    \item BERT: \textbf{30\%} \faArrowDown\ (-38\%)
+    \item LLM: \textbf{27\%} \faArrowUp\ (+23\%)
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{Strategy:} Skip LLM for 65\% of docs
+\end{exampleblock}
+\end{columns}
+
+\vspace{0.5cm}
+
+\begin{block}{Why This Works:}
+\begin{itemize}
+    \item \faCheck\ Rule-based is very good when it's confident
+    \item \faTimes\ BERT is the weakest link (least reliable)
+    \item \faCheck\ LLM is best but expensive, so use it selectively
+\end{itemize}
+\end{block}
+\end{frame}
+
+% ============================================================================
+% SECTION 4: REAL RESULTS
+% ============================================================================
+\section{Real Results}
+
+\begin{frame}{Performance Improvements \faChartBar}
+\begin{table}
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Metric} & \textbf{Before RL} & \textbf{After RL} & \textbf{Improvement} \\
+\midrule
+\textbf{Accuracy} & 87.2\% & \textcolor{successgreen}{\textbf{92.8\%}} & \textcolor{successgreen}{+5.6\%} \faBullseye \\
+\textbf{Cost/1K docs} & \$8.40 & \textcolor{successgreen}{\textbf{\$2.95}} & \textcolor{successgreen}{-65\%} \faDollarSign \\
+\textbf{Speed/doc} & 3.2s & \textcolor{successgreen}{\textbf{1.8s}} & \textcolor{successgreen}{-44\%} \faBolt \\
+\textbf{Confidence} & 0.72 & \textcolor{successgreen}{\textbf{0.89}} & \textcolor{successgreen}{+24\%} \faChartLine \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tikzpicture}
+    \node[draw=successgreen, fill=successgreen!20, rectangle, rounded corners, text width=10cm, align=center, line width=3pt] {
+        \Large\textbf{Better, Faster, Cheaper!} \\
+        \vspace{0.2cm}
+        \normalsize RL optimization achieved all 3 goals simultaneously
+    };
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}{How It Saves Money \faDollarSign}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\begin{alertblock}{BEFORE RL}
+\textbf{Strategy:} Every document → All 3 models
+
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item 1000 documents
+    \item Each uses LLM (\$0.0001)
+    \item Plus BERT (\$0) + Rule (\$0)
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Total Cost:} \\
+1000 × \$0.0084 = \textcolor{errorred}{\textbf{\$8.40}}
+\end{alertblock}
+
+\column{0.5\textwidth}
+\begin{exampleblock}{AFTER RL}
+\textbf{Strategy:} Selective model usage
+
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item 650 docs → Rule only (\$0)
+    \item 250 docs → Rule + BERT (\$0)
+    \item 100 docs → All 3 (\$0.01)
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Total Cost:} \\
+1000 × \$0.00295 = \textcolor{successgreen}{\textbf{\$2.95}}
+\end{exampleblock}
+\end{columns}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tikzpicture}
+    \node[draw=successgreen, fill=successgreen!20, rectangle, rounded corners, text width=10cm, align=center, line width=2pt] {
+        \Large\textbf{SAVINGS: \$5.45 per 1000 documents (65\% cheaper!)}
+    };
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+% ============================================================================
+% SECTION 5: PRODUCTION DEPLOYMENT
+% ============================================================================
+\section{Production Deployment}
+
+\begin{frame}{How It Works in Production (Right Now) \faServer}
+\begin{block}{Current Status:}
+RL system is \textcolor{successgreen}{\textbf{deployed and running}} in \texttt{rl-intelligence-service} (port 8013)
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm, scale=0.8, every node/.style={scale=0.8}]
+    \node[draw, rectangle, rounded corners, fill=primaryblue!20, text width=2.5cm, align=center] (user) {1. User uploads document};
+    \node[draw, rectangle, rounded corners, fill=primaryblue!20, text width=2.5cm, align=center, below of=user] (gateway) {2. API Gateway receives};
+    \node[draw, rectangle, rounded corners, fill=successgreen!20, text width=2.5cm, align=center, below of=gateway] (rl) {3. RL Intelligence analyzes};
+    \node[draw, rectangle, rounded corners, fill=warningyellow!20, text width=2.5cm, align=center, below of=rl] (classify) {4. PV Classification follows RL};
+    \node[draw, rectangle, rounded corners, fill=primaryblue!20, text width=2.5cm, align=center, below of=classify] (result) {5. Result to user};
+    
+    \draw[->, line width=2pt] (user) -- (gateway);
+    \draw[->, line width=2pt] (gateway) -- (rl);
+    \draw[->, line width=2pt] (rl) -- (classify);
+    \draw[->, line width=2pt] (classify) -- (result);
+    
+    \node[draw, rectangle, rounded corners, fill=successgreen!10, text width=3cm, align=left, right of=rl, xshift=3cm] (details) {
+        \small
+        • Extract 47 features \\
+        • Run neural network \\
+        • Output strategy
+    };
+    
+    \draw[->, dashed] (rl) -- (details);
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.3cm}
+
+\begin{exampleblock}{Result}
+\centering
+\textbf{Faster, cheaper, more accurate classification!}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Real-Time Monitoring \faDesktop}
+\begin{block}{You can monitor RL performance at:}
+\texttt{http://localhost:8013/api/v1/rl/status}
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{lstlisting}[style=codestyle,language=json]
+{
+  "status": "active",
+  "model_loaded": true,
+  "training_episodes": 1000,
+  "learning_confirmed": true,
+  "current_accuracy": 0.928,
+  "cost_savings": 0.65,
+  "speed_improvement": 0.44,
+  "reward_improvement_percent": 147.0
+}
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+\begin{alertblock}{Live Dashboard}
+Access the RL Intelligence Dashboard at: \\
+\texttt{http://localhost:3000/rl-intelligence}
+\end{alertblock}
+\end{frame}
+
+% ============================================================================
+% SECTION 6: SIMPLE ANALOGY
+% ============================================================================
+\section{Simple Analogy}
+
+\begin{frame}{Simple Analogy: Learning to Play Chess \faChess}
+\begin{block}{Think of RL like learning to play chess:}
+\end{block}
+
+\vspace{0.5cm}
+
+\begin{table}
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Chess} & \textbf{Our RL System} \\
+\midrule
+Current board position & 47 document features \\
+Which move to make & 12 weight adjustments \\
+Did you win? & Accuracy + cost + speed \\
+After many games, learn best moves & After 1000 episodes, learn best strategy \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.5cm}
+
+\begin{exampleblock}{What Our RL Agent Learned}
+After playing 1000 ``games'' (episodes), it learned:
+\begin{itemize}
+    \item When to use the fast doctor (Rule-based)
+    \item When to use the expensive doctor (LLM)
+    \item How to balance accuracy, cost, and speed
+\end{itemize}
+\end{exampleblock}
+\end{frame}
+
+% ============================================================================
+% SECTION 7: Q&A
+% ============================================================================
+\section{Common Questions}
+
+\begin{frame}{Common Questions \faQuestionCircle}
+\begin{block}{Q: Does it keep learning?}
+\textbf{A:} Not currently. It was trained once on 500 documents and now uses that learned strategy. \\
+\textbf{Future:} Continuous learning from user feedback.
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{block}{Q: Can it make mistakes?}
+\textbf{A:} Yes, but less often than before! It's 5.6\% more accurate than the baseline.
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{block}{Q: How does it know which documents are ``easy'' vs ``hard''?}
+\textbf{A:} It looks at 47 features like keyword density, MeSH terms, publication type, document length. Easy documents have clear keywords; hard ones are ambiguous.
+\end{block}
+
+\vspace{0.3cm}
+
+\begin{block}{Q: What if I want to force all 3 models?}
+\textbf{A:} Use the ``Force Full Ensemble'' checkbox in the UI. This bypasses RL and runs all 3 models for comparison.
+\end{block}
+\end{frame}
+
+% ============================================================================
+% SECTION 8: BOTTOM LINE
+% ============================================================================
+\section{Bottom Line}
+
+\begin{frame}{Bottom Line: RL = Smart Traffic Cop \faTrafficLight}
+\begin{center}
+\begin{tikzpicture}[scale=0.9]
+    % Traffic light
+    \node[draw, circle, fill=successgreen, minimum size=1cm] (green) at (0,2) {};
+    \node[draw, circle, fill=warningyellow, minimum size=1cm] (yellow) at (0,1) {};
+    \node[draw, circle, fill=errorred, minimum size=1cm] (red) at (0,0) {};
+    
+    % Lanes
+    \node[draw, rectangle, fill=successgreen!20, text width=3cm, align=center] (fast) at (4,2) {
+        \textbf{Fast Lane} \\
+        Easy documents \\
+        Rule-based only
+    };
+    
+    \node[draw, rectangle, fill=warningyellow!20, text width=3cm, align=center] (medium) at (4,1) {
+        \textbf{Medium Lane} \\
+        Medium documents \\
+        Rule + BERT
+    };
+    
+    \node[draw, rectangle, fill=errorred!20, text width=3cm, align=center] (slow) at (4,0) {
+        \textbf{All Lanes} \\
+        Hard documents \\
+        Rule + BERT + LLM
+    };
+    
+    \draw[->, line width=2pt] (green) -- (fast);
+    \draw[->, line width=2pt] (yellow) -- (medium);
+    \draw[->, line width=2pt] (red) -- (slow);
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+
+\begin{exampleblock}{Result}
+\centering
+\Large\textbf{93\% accuracy, 65\% cheaper, 44\% faster!} \faRocket
+\end{exampleblock}
+\end{frame}
+
+% ============================================================================
+% FINAL SLIDE
+% ============================================================================
+\begin{frame}[standout]
+\Huge\textbf{Thank You!}
+
+\vspace{1cm}
+
+\Large Questions?
+
+\vspace{1cm}
+
+\normalsize
+\textbf{Enterprise Data Ingestion Platform} \\
+Auburn University \\
+Pharmacovigilance Intelligence System
+
+\vspace{0.5cm}
+
+\texttt{http://localhost:3000/rl-intelligence}
+\end{frame}
+
+\end{document}
+
