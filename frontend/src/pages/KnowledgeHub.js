@@ -1185,10 +1185,12 @@ const KnowledgeHub = () => {
 
   const handleNodeClick = useCallback(async (node) => {
     const isDocument = node.type === 'Document';
-    console.log('🖱️ Node clicked:', node.name, '| Type:', node.type, '| Connected nodes:', graphData.links.filter(link => 
+    console.log('🖱️ Node clicked:', node.name, '| Type:', node.type, '| Node ID:', node.id, '| Connected nodes:', graphData.links.filter(link => 
       (link.source.id === node.id || link.source === node.id) ||
       (link.target.id === node.id || link.target === node.id)
     ).length);
+    console.log('🔍 Full node object:', node);
+    console.log('🎯 Render mode:', renderMode);
     
     // If clicking the same node, deselect it
     if (selectedEntity && selectedEntity.id === node.id) {
@@ -1294,22 +1296,29 @@ const KnowledgeHub = () => {
       }
       
       // Load source documents for entities
+      console.log(`📄 Loading source documents for entity ID: ${node.id}`);
       setLoadingSources(true);
       setSourceDocuments([]);
       try {
         const sourcesResponse = await apiService.getEntitySourceDocuments(node.id);
-        if (sourcesResponse.success) {
-          setSourceDocuments(sourcesResponse.documents || []);
-          console.log(`  → Loaded ${sourcesResponse.documents?.length || 0} source documents`);
+        console.log('📦 Source documents API response:', sourcesResponse);
+        if (sourcesResponse && sourcesResponse.success) {
+          const docs = sourcesResponse.documents || [];
+          setSourceDocuments(docs);
+          console.log(`✅ Loaded ${docs.length} source documents:`, docs);
+        } else {
+          console.warn('⚠️ Source documents API returned unsuccessful response:', sourcesResponse);
+          setSourceDocuments([]);
         }
       } catch (err) {
-        // Silently ignore - source documents are optional
-        console.log('  → Could not load source documents');
+        console.error('❌ Failed to load source documents:', err);
+        setSourceDocuments([]);
       } finally {
         setLoadingSources(false);
+        console.log('🏁 Source documents loading complete');
       }
     }
-  }, [graphData.links, showAllNodes, expandedNodes, expandNode, selectedEntity]);
+  }, [graphData.links, showAllNodes, expandedNodes, expandNode, selectedEntity, renderMode]);
 
   const handleNodeHover = useCallback((node) => {
     setHoverNode(node || null);
@@ -1386,6 +1395,11 @@ const KnowledgeHub = () => {
     if (!chatInput.trim() || !selectedEntity || chatLoading) return;
     
     const userMessage = chatInput.trim();
+    console.log(`💬 Sending chat message for entity: ${selectedEntity}`, {
+      message: userMessage,
+      sourceDocumentsCount: sourceDocuments.length,
+      entityDetails: entityDetails
+    });
     setChatInput('');
     
     // Add user message to chat
@@ -1400,6 +1414,8 @@ const KnowledgeHub = () => {
         newMessages.map(msg => ({ role: msg.role, content: msg.content }))
       );
       
+      console.log('💬 Chat API response:', response);
+      
       if (response.success) {
         setChatMessages([
           ...newMessages,
@@ -1409,6 +1425,7 @@ const KnowledgeHub = () => {
             sources: response.sources || []
           }
         ]);
+        console.log(`✅ Chat response received with ${response.sources?.length || 0} sources`);
       } else {
         setChatMessages([
           ...newMessages,
@@ -1418,9 +1435,10 @@ const KnowledgeHub = () => {
             sources: []
           }
         ]);
+        console.warn('⚠️ Chat API returned error:', response.error);
       }
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error('❌ Chat error:', error);
       setChatMessages([
         ...newMessages,
         {
