@@ -298,6 +298,7 @@ async def get_entity_source_documents_by_id(
     Returns list of documents that contain this entity
     """
     try:
+        print(f"🎯 ROUTE HANDLER: User {current_user.get('email')} requesting sources for entity ID: {entity_id}")
         logger.info(f"User {current_user.get('email')} requesting sources for entity ID: {entity_id}")
         
         result = await kb_service.get_entity_source_documents_by_id(
@@ -306,6 +307,7 @@ async def get_entity_source_documents_by_id(
             limit=limit
         )
         
+        print(f"🎯 ROUTE HANDLER: Result: {result}")
         return result
         
     except Exception as e:

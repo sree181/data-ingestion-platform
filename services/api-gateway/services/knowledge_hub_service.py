@@ -765,6 +765,7 @@ class KnowledgeHubService:
         Returns:
             Dictionary with source documents
         """
+        logger.warning(f"🎯 START: get_entity_source_documents_by_id CALLED with entity_id: {entity_id}")
         try:
             # First, get the entity name from Neo4j
             cypher = """
@@ -773,7 +774,9 @@ class KnowledgeHubService:
             LIMIT 1
             """
             
+            logger.warning(f"🔍 Querying Neo4j for entity name with ID: {entity_id}")
             result = await self._execute_cypher(cypher, {"entity_id": entity_id})
+            logger.warning(f"🔍 Entity name query result: {result}")
             
             if not result or not result.get('results') or not result['results'][0].get('data'):
                 logger.warning(f"Entity not found with ID: {entity_id}")
@@ -791,8 +794,9 @@ class KnowledgeHubService:
                 return es_results
             
             # TIER 2: Fallback to Neo4j relationships
-            logger.info(f"Tier 1 returned 0 results. Trying Tier 2: Neo4j relationships for entity '{entity_name}'")
+            logger.warning(f"🔄 Tier 1 returned 0 results. Trying Tier 2: Neo4j relationships for entity '{entity_name}' (ID: {entity_id})")
             neo4j_results = await self._get_documents_from_neo4j_relationships(entity_id, entity_name, entity_type, limit)
+            logger.warning(f"🔄 Tier 2 returned: {neo4j_results.get('document_count', 0)} documents")
             
             if neo4j_results.get("document_count", 0) > 0:
                 logger.info(f"✅ Tier 2 SUCCESS: Found {neo4j_results['document_count']} documents via Neo4j relationships")
@@ -850,6 +854,14 @@ class KnowledgeHubService:
             
             result = await self._execute_cypher(cypher, {"entity_id": entity_id, "limit": limit})
             
+            # DEBUG: Log the full Neo4j response
+            logger.warning(f"🔍 Neo4j response for entity {entity_id}: {result}")
+            logger.warning(f"🔍 Result type: {type(result)}")
+            logger.warning(f"🔍 Result keys: {result.keys() if result else 'None'}")
+            if result and result.get('results'):
+                logger.warning(f"🔍 Results[0] keys: {result['results'][0].keys()}")
+                logger.warning(f"🔍 Data length: {len(result['results'][0].get('data', []))}")
+            
             if not result or not result.get('results') or not result['results'][0].get('data'):
                 logger.info(f"No Neo4j relationships found for entity {entity_id}")
                 return {"success": True, "documents": [], "document_count": 0, "method": "neo4j"}
@@ -885,20 +897,23 @@ class KnowledgeHubService:
             
             # Query Elasticsearch by matching titles (since doc_ids don't match)
             # Build a query that searches for documents by title
+            # Use a SET to track unique titles (avoid duplicate queries)
+            unique_titles = set()
             title_queries = []
             for neo4j_doc in neo4j_docs:
                 if neo4j_doc["title"] and neo4j_doc["title"] != "Untitled":
                     # Clean the title (remove .pdf extension for matching)
                     clean_title = neo4j_doc["title"].replace(".pdf", "").strip()
-                    title_queries.append({
-                        "match": {
-                            "title": {
-                                "query": clean_title,
-                                "fuzziness": "AUTO"
+                    if clean_title not in unique_titles:
+                        unique_titles.add(clean_title)
+                        # Use match_phrase for exact phrase matching (no fuzziness)
+                        title_queries.append({
+                            "match_phrase": {
+                                "title": clean_title
                             }
-                        }
-                    })
+                        })
             
+            logger.warning(f"🔍 Built {len(title_queries)} title queries from {len(neo4j_docs)} Neo4j docs")
             if not title_queries:
                 # Fallback: return Neo4j data only
                 logger.warning(f"No valid titles to search in Elasticsearch, returning Neo4j data only")
@@ -935,10 +950,37 @@ class KnowledgeHubService:
                 ]
             }
             
+            logger.warning(f"🔍 ES Query: {len(title_queries)} title queries, limit={limit}")
             es_result = await self.elasticsearch_service.client.search(
                 index="documents",
                 body=es_query
             )
+            logger.warning(f"🔍 ES Result: Found {len(es_result.get('hits', {}).get('hits', []))} documents")
+            
+            # If Elasticsearch returns no documents, fallback to Neo4j-only data
+            if not es_result.get("hits", {}).get("hits", []):
+                logger.warning(f"⚠️  Elasticsearch returned 0 documents, using Neo4j-only data")
+                documents = []
+                seen_doc_ids = set()
+                for neo4j_doc in neo4j_docs:
+                    if neo4j_doc["doc_id"] not in seen_doc_ids:
+                        seen_doc_ids.add(neo4j_doc["doc_id"])
+                        documents.append({
+                            "id": neo4j_doc["doc_id"],
+                            "title": neo4j_doc["title"],
+                            "source": neo4j_doc["source_type"],
+                            "abstract": neo4j_doc["abstract"],
+                            "entity_confidence": neo4j_doc["rel_confidence"],
+                            "entity_type": entity_type,
+                            "relationship_type": neo4j_doc["rel_type"]
+                        })
+                return {
+                    "success": True,
+                    "entity_name": entity_name,
+                    "document_count": len(documents),
+                    "documents": documents,
+                    "method": "neo4j_only"
+                }
             
             # Merge Neo4j metadata with Elasticsearch content
             documents = []
