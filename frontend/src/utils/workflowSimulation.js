@@ -321,7 +321,7 @@ export class WorkflowSimulator {
         metrics: {
           documentsClassified: docsClassified,
           totalDocuments: inputDocs,
-          averageConfidence,
+          averageConfidence: avgConfidence,
           duration: i * updateInterval,
         }
       });
