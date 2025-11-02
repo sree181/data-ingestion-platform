@@ -944,10 +944,20 @@ class KnowledgeHubService:
             documents = []
             for hit in es_result.get("hits", {}).get("hits", []):
                 source = hit.get("_source", {})
-                doc_id = source.get("doc_id")
+                # Elasticsearch uses source_id, not doc_id
+                es_doc_id = source.get("source_id") or source.get("id")
+                es_title = source.get("title", "")
                 
-                # Find corresponding Neo4j metadata
-                neo4j_meta = next((d for d in neo4j_docs if d["doc_id"] == doc_id), {})
+                # Find corresponding Neo4j metadata by matching title (since IDs don't match)
+                neo4j_meta = {}
+                for neo4j_doc in neo4j_docs:
+                    neo4j_title = neo4j_doc.get("title", "").replace(".pdf", "").strip()
+                    if neo4j_title and es_title and neo4j_title.lower() in es_title.lower():
+                        neo4j_meta = neo4j_doc
+                        break
+                
+                # Use Neo4j doc_id if we found a match, otherwise use ES id
+                doc_id = neo4j_meta.get("doc_id") or es_doc_id
                 
                 # Extract snippet around entity mention (if content exists)
                 snippets = []
@@ -966,18 +976,21 @@ class KnowledgeHubService:
                         snippets.append(f"...{snippet}...")
                 
                 documents.append({
-                    "doc_id": doc_id,
+                    "id": doc_id,  # Changed from doc_id to id for frontend compatibility
                     "title": source.get("title") or neo4j_meta.get("title", "Untitled"),
-                    "doc_type": source.get("doc_type", "unknown"),
-                    "source_type": source.get("source_type") or neo4j_meta.get("source_type", "unknown"),
-                    "is_external": source.get("is_external", False),
+                    "document_type": source.get("document_type", "unknown"),
+                    "source": source.get("source") or neo4j_meta.get("source_type", "unknown"),
+                    "external_source": source.get("external_source", ""),
                     "created_at": source.get("created_at"),
                     "snippets": snippets,
-                    "summary": (source.get("openai_summary") or source.get("abstract") or neo4j_meta.get("abstract", ""))[:200] + "...",
+                    "abstract": source.get("abstract") or neo4j_meta.get("abstract", ""),
+                    "summary": (source.get("openai_summary") or source.get("abstract") or neo4j_meta.get("abstract", ""))[:200] if source.get("openai_summary") or source.get("abstract") or neo4j_meta.get("abstract") else "",
+                    "classification": source.get("classification", ""),
+                    "classification_confidence": source.get("classification_confidence", 0),
                     "entity_confidence": neo4j_meta.get("rel_confidence", 0.8),
                     "entity_type": entity_type,
                     "score": hit.get("_score", 0),
-                    "relationship_type": neo4j_meta.get("rel_type", "HAS_ENTITY")
+                    "relationship_type": neo4j_meta.get("rel_type", "CONTAINS")
                 })
             
             logger.info(f"Successfully fetched {len(documents)} documents from Elasticsearch for entity {entity_name}")
