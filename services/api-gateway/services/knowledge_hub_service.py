@@ -883,17 +883,55 @@ class KnowledgeHubService:
             if not self.elasticsearch_service.client:
                 await self.elasticsearch_service.connect()
             
-            # Query Elasticsearch for these specific document IDs
+            # Query Elasticsearch by matching titles (since doc_ids don't match)
+            # Build a query that searches for documents by title
+            title_queries = []
+            for neo4j_doc in neo4j_docs:
+                if neo4j_doc["title"] and neo4j_doc["title"] != "Untitled":
+                    # Clean the title (remove .pdf extension for matching)
+                    clean_title = neo4j_doc["title"].replace(".pdf", "").strip()
+                    title_queries.append({
+                        "match": {
+                            "title": {
+                                "query": clean_title,
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    })
+            
+            if not title_queries:
+                # Fallback: return Neo4j data only
+                logger.warning(f"No valid titles to search in Elasticsearch, returning Neo4j data only")
+                documents = []
+                for neo4j_doc in neo4j_docs:
+                    documents.append({
+                        "id": neo4j_doc["doc_id"],
+                        "title": neo4j_doc["title"],
+                        "source": neo4j_doc["source_type"],
+                        "abstract": neo4j_doc["abstract"],
+                        "filename": neo4j_doc["filename"],
+                        "confidence": neo4j_doc["rel_confidence"]
+                    })
+                return {
+                    "success": True,
+                    "entity_name": entity_name,
+                    "document_count": len(documents),
+                    "documents": documents,
+                    "method": "neo4j_only"
+                }
+            
             es_query = {
                 "query": {
-                    "terms": {
-                        "doc_id.keyword": doc_ids
+                    "bool": {
+                        "should": title_queries,
+                        "minimum_should_match": 1
                     }
                 },
                 "size": limit,
                 "_source": [
-                    "doc_id", "title", "content", "doc_type", "source_type", 
-                    "is_external", "created_at", "openai_summary", "abstract"
+                    "source_id", "title", "content", "document_type", "source", 
+                    "external_source", "created_at", "openai_summary", "abstract",
+                    "classification", "classification_confidence"
                 ]
             }
             
