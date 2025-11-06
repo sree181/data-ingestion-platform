@@ -19,6 +19,7 @@ const PVNodePalette = () => {
     { type: 'ncbi', label: 'NCBI', icon: <SourceIcon />, color: '#06B6D4', description: 'Fetch documents from NCBI database' },
     { type: 'pubmed', label: 'PubMed', icon: <SourceIcon />, color: '#06B6D4', description: 'Fetch documents from PubMed' },
     { type: 'chembl', label: 'ChEMBL', icon: <SourceIcon />, color: '#06B6D4', description: 'Fetch chemical data from ChEMBL' },
+    { type: 'cochrane', label: 'Cochrane', icon: <SourceIcon />, color: '#06B6D4', description: 'Fetch clinical trials from Cochrane' },
     { type: 'fda', label: 'FDA', icon: <SourceIcon />, color: '#06B6D4', description: 'Fetch FDA adverse event reports' },
   ];
 
@@ -29,6 +30,10 @@ const PVNodePalette = () => {
 
   const storageNodes = [
     { type: 'ingestion', label: 'Ingestion', icon: <IngestionIcon />, color: '#F59E0B', description: 'Store in Elasticsearch & Neo4j' },
+    { type: 's3', label: 'AWS S3', icon: <IngestionIcon />, color: '#FF9900', description: 'Store in AWS S3 bucket' },
+    { type: 'box', label: 'Box', icon: <IngestionIcon />, color: '#0061D5', description: 'Store in Box cloud storage' },
+    { type: 'minio', label: 'MinIO', icon: <IngestionIcon />, color: '#C72E49', description: 'Store in MinIO object storage' },
+    { type: 'gdrive', label: 'Google Drive', icon: <IngestionIcon />, color: '#4285F4', description: 'Store in Google Drive' },
   ];
 
   const analysisNodes = [

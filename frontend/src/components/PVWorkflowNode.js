@@ -39,10 +39,15 @@ const PVWorkflowNode = ({ data, isConnectable }) => {
     ncbi: '#06B6D4',
     pubmed: '#06B6D4',
     chembl: '#06B6D4',
+    cochrane: '#06B6D4',
     fda: '#06B6D4',
     preprocessing: '#8B5CF6',
     ner: '#EC4899',
     ingestion: '#F59E0B',
+    s3: '#FF9900',
+    box: '#0061D5',
+    minio: '#C72E49',
+    gdrive: '#4285F4',
     classification: '#10B981',
     monitoring: '#6366F1',
   };
@@ -53,10 +58,15 @@ const PVWorkflowNode = ({ data, isConnectable }) => {
       ncbi: <SourceIcon />,
       pubmed: <SourceIcon />,
       chembl: <SourceIcon />,
+      cochrane: <SourceIcon />,
       fda: <SourceIcon />,
       preprocessing: <PreprocessIcon />,
       ner: <NERIcon />,
       ingestion: <IngestionIcon />,
+      s3: <IngestionIcon />,
+      box: <IngestionIcon />,
+      minio: <IngestionIcon />,
+      gdrive: <IngestionIcon />,
       classification: <ClassificationIcon />,
       monitoring: <MonitoringIcon />,
     };
@@ -101,7 +111,7 @@ const PVWorkflowNode = ({ data, isConnectable }) => {
       }}
     >
       {/* Input Handle */}
-      {type !== 'ncbi' && type !== 'pubmed' && type !== 'chembl' && type !== 'fda' && (
+      {type !== 'ncbi' && type !== 'pubmed' && type !== 'chembl' && type !== 'cochrane' && type !== 'fda' && (
         <Handle
           type="target"
           position={Position.Left}
@@ -179,11 +189,25 @@ const PVWorkflowNode = ({ data, isConnectable }) => {
       {/* Metrics Section */}
       <Box sx={{ px: 1.5, pb: 1.5 }}>
         {/* Source Node Metrics */}
-        {(type === 'ncbi' || type === 'pubmed' || type === 'chembl' || type === 'fda') && (
+        {(type === 'ncbi' || type === 'pubmed' || type === 'chembl' || type === 'cochrane' || type === 'fda') && (
           <Box>
             <Typography variant="caption" color="text.secondary">
               Documents: {metrics.documentsFetched || 0} / {config.maxDocuments || 0}
             </Typography>
+          </Box>
+        )}
+
+        {/* Storage Node Metrics */}
+        {(type === 's3' || type === 'box' || type === 'minio' || type === 'gdrive') && (
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              Files Stored: {metrics.filesStored || 0}
+            </Typography>
+            {metrics.storageUsed && (
+              <Typography variant="caption" color="text.secondary" display="block">
+                Storage: {metrics.storageUsed}
+              </Typography>
+            )}
           </Box>
         )}
 
@@ -294,7 +318,7 @@ const PVWorkflowNode = ({ data, isConnectable }) => {
       </Box>
 
       {/* Output Handle */}
-      {type !== 'monitoring' && (
+      {type !== 'monitoring' && type !== 's3' && type !== 'box' && type !== 'minio' && type !== 'gdrive' && (
         <Handle
           type="source"
           position={Position.Right}

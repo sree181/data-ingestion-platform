@@ -25,10 +25,15 @@ const nodeTypes = {
   ncbi: PVWorkflowNode,
   pubmed: PVWorkflowNode,
   chembl: PVWorkflowNode,
+  cochrane: PVWorkflowNode,
   fda: PVWorkflowNode,
   preprocessing: PVWorkflowNode,
   ner: PVWorkflowNode,
   ingestion: PVWorkflowNode,
+  s3: PVWorkflowNode,
+  box: PVWorkflowNode,
+  minio: PVWorkflowNode,
+  gdrive: PVWorkflowNode,
   classification: PVWorkflowNode,
   monitoring: PVWorkflowNode,
 };
@@ -37,10 +42,15 @@ const nodeLabels = {
   ncbi: 'NCBI Source',
   pubmed: 'PubMed Source',
   chembl: 'ChEMBL Source',
+  cochrane: 'Cochrane Source',
   fda: 'FDA Source',
   preprocessing: 'Preprocessing',
   ner: 'NER & Relations',
   ingestion: 'Ingestion',
+  s3: 'AWS S3',
+  box: 'Box',
+  minio: 'MinIO',
+  gdrive: 'Google Drive',
   classification: 'Classification',
   monitoring: 'Monitoring',
 };
@@ -48,12 +58,26 @@ const nodeLabels = {
 let nodeId = 0;
 const getId = () => `node_${nodeId++}`;
 
-// Demo workflow for PV pipeline
+// Demo workflow - Multi-source to Multi-destination
 const initialNodes = [
+  // LEFT SIDE: Data Sources
   {
-    id: 'demo-1',
+    id: 'source-1',
+    type: 'ncbi',
+    position: { x: 50, y: 100 },
+    data: {
+      label: 'NCBI Source',
+      type: 'ncbi',
+      status: 'pending',
+      progress: 0,
+      config: { maxDocuments: 100 },
+      metrics: {},
+    },
+  },
+  {
+    id: 'source-2',
     type: 'pubmed',
-    position: { x: 100, y: 250 },
+    position: { x: 50, y: 220 },
     data: {
       label: 'PubMed Source',
       type: 'pubmed',
@@ -64,7 +88,34 @@ const initialNodes = [
     },
   },
   {
-    id: 'demo-2',
+    id: 'source-3',
+    type: 'chembl',
+    position: { x: 50, y: 340 },
+    data: {
+      label: 'ChEMBL Source',
+      type: 'chembl',
+      status: 'pending',
+      progress: 0,
+      config: { maxDocuments: 100 },
+      metrics: {},
+    },
+  },
+  {
+    id: 'source-4',
+    type: 'cochrane',
+    position: { x: 50, y: 460 },
+    data: {
+      label: 'Cochrane Source',
+      type: 'cochrane',
+      status: 'pending',
+      progress: 0,
+      config: { maxDocuments: 100 },
+      metrics: {},
+    },
+  },
+  // CENTER: Processing Pipeline
+  {
+    id: 'process-1',
     type: 'preprocessing',
     position: { x: 450, y: 250 },
     data: {
@@ -82,9 +133,9 @@ const initialNodes = [
     },
   },
   {
-    id: 'demo-3',
+    id: 'process-2',
     type: 'ner',
-    position: { x: 800, y: 250 },
+    position: { x: 850, y: 250 },
     data: {
       label: 'NER & Relations',
       type: 'ner',
@@ -94,29 +145,14 @@ const initialNodes = [
       metrics: {},
     },
   },
+  // RIGHT SIDE: Storage Destinations
   {
-    id: 'demo-4',
-    type: 'ingestion',
-    position: { x: 1150, y: 250 },
+    id: 'storage-1',
+    type: 's3',
+    position: { x: 1250, y: 100 },
     data: {
-      label: 'Ingestion',
-      type: 'ingestion',
-      status: 'pending',
-      progress: 0,
-      config: {},
-      metrics: {
-        elasticsearch: { progress: 0, status: 'pending' },
-        neo4j: { progress: 0, status: 'pending' },
-      },
-    },
-  },
-  {
-    id: 'demo-5',
-    type: 'classification',
-    position: { x: 1500, y: 150 },
-    data: {
-      label: 'Classification',
-      type: 'classification',
+      label: 'AWS S3',
+      type: 's3',
       status: 'pending',
       progress: 0,
       config: {},
@@ -124,12 +160,38 @@ const initialNodes = [
     },
   },
   {
-    id: 'demo-6',
-    type: 'monitoring',
-    position: { x: 1500, y: 350 },
+    id: 'storage-2',
+    type: 'box',
+    position: { x: 1250, y: 220 },
     data: {
-      label: 'Monitoring',
-      type: 'monitoring',
+      label: 'Box',
+      type: 'box',
+      status: 'pending',
+      progress: 0,
+      config: {},
+      metrics: {},
+    },
+  },
+  {
+    id: 'storage-3',
+    type: 'minio',
+    position: { x: 1250, y: 340 },
+    data: {
+      label: 'MinIO',
+      type: 'minio',
+      status: 'pending',
+      progress: 0,
+      config: {},
+      metrics: {},
+    },
+  },
+  {
+    id: 'storage-4',
+    type: 'gdrive',
+    position: { x: 1250, y: 460 },
+    data: {
+      label: 'Google Drive',
+      type: 'gdrive',
       status: 'pending',
       progress: 0,
       config: {},
@@ -139,54 +201,93 @@ const initialNodes = [
 ];
 
 const initialEdges = [
+  // Sources to Preprocessing
   {
-    id: 'e1-2',
-    source: 'demo-1',
-    target: 'demo-2',
+    id: 'e-s1-p1',
+    source: 'source-1',
+    target: 'process-1',
     type: 'smoothstep',
     animated: false,
     markerEnd: { type: MarkerType.ArrowClosed },
     style: { strokeWidth: 2, stroke: '#06B6D4' },
   },
   {
-    id: 'e2-3',
-    source: 'demo-2',
-    target: 'demo-3',
+    id: 'e-s2-p1',
+    source: 'source-2',
+    target: 'process-1',
+    type: 'smoothstep',
+    animated: false,
+    markerEnd: { type: MarkerType.ArrowClosed },
+    style: { strokeWidth: 2, stroke: '#06B6D4' },
+  },
+  {
+    id: 'e-s3-p1',
+    source: 'source-3',
+    target: 'process-1',
+    type: 'smoothstep',
+    animated: false,
+    markerEnd: { type: MarkerType.ArrowClosed },
+    style: { strokeWidth: 2, stroke: '#06B6D4' },
+  },
+  {
+    id: 'e-s4-p1',
+    source: 'source-4',
+    target: 'process-1',
+    type: 'smoothstep',
+    animated: false,
+    markerEnd: { type: MarkerType.ArrowClosed },
+    style: { strokeWidth: 2, stroke: '#06B6D4' },
+  },
+  // Preprocessing to NER
+  {
+    id: 'e-p1-p2',
+    source: 'process-1',
+    target: 'process-2',
     type: 'smoothstep',
     animated: false,
     markerEnd: { type: MarkerType.ArrowClosed },
     style: { strokeWidth: 2, stroke: '#8B5CF6' },
   },
+  // NER to Storage Destinations
   {
-    id: 'e3-4',
-    source: 'demo-3',
-    target: 'demo-4',
+    id: 'e-p2-st1',
+    source: 'process-2',
+    target: 'storage-1',
     type: 'smoothstep',
     animated: false,
     markerEnd: { type: MarkerType.ArrowClosed },
     style: { strokeWidth: 2, stroke: '#EC4899' },
   },
   {
-    id: 'e4-5',
-    source: 'demo-4',
-    target: 'demo-5',
+    id: 'e-p2-st2',
+    source: 'process-2',
+    target: 'storage-2',
     type: 'smoothstep',
     animated: false,
     markerEnd: { type: MarkerType.ArrowClosed },
-    style: { strokeWidth: 2, stroke: '#F59E0B' },
+    style: { strokeWidth: 2, stroke: '#EC4899' },
   },
   {
-    id: 'e4-6',
-    source: 'demo-4',
-    target: 'demo-6',
+    id: 'e-p2-st3',
+    source: 'process-2',
+    target: 'storage-3',
     type: 'smoothstep',
     animated: false,
     markerEnd: { type: MarkerType.ArrowClosed },
-    style: { strokeWidth: 2, stroke: '#F59E0B' },
+    style: { strokeWidth: 2, stroke: '#EC4899' },
+  },
+  {
+    id: 'e-p2-st4',
+    source: 'process-2',
+    target: 'storage-4',
+    type: 'smoothstep',
+    animated: false,
+    markerEnd: { type: MarkerType.ArrowClosed },
+    style: { strokeWidth: 2, stroke: '#EC4899' },
   },
 ];
 
-nodeId = 7; // Start after demo nodes
+nodeId = 11; // Start after demo nodes
 
 const PVWorkflowBuilder = () => {
   const reactFlowWrapper = useRef(null);
@@ -466,10 +567,15 @@ const PVWorkflowBuilder = () => {
                   ncbi: '#06B6D4',
                   pubmed: '#06B6D4',
                   chembl: '#06B6D4',
+                  cochrane: '#06B6D4',
                   fda: '#06B6D4',
                   preprocessing: '#8B5CF6',
                   ner: '#EC4899',
                   ingestion: '#F59E0B',
+                  s3: '#FF9900',
+                  box: '#0061D5',
+                  minio: '#C72E49',
+                  gdrive: '#4285F4',
                   classification: '#10B981',
                   monitoring: '#6366F1',
                 };

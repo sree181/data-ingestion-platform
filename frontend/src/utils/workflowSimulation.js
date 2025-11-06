@@ -342,6 +342,55 @@ export class WorkflowSimulator {
     }
   }
 
+  // Simulate Storage (S3, Box, MinIO, Google Drive)
+  async simulateStorage(nodeId, inputDocs = 100) {
+    const storageDuration = 12000; // 12 seconds
+    const updateInterval = 200;
+    const stepsCount = storageDuration / updateInterval;
+
+    this.updateNode(nodeId, {
+      status: 'running',
+      progress: 0,
+      metrics: {
+        filesStored: 0,
+        totalFiles: inputDocs,
+        storageUsed: '0 MB',
+      }
+    });
+
+    for (let i = 0; i <= stepsCount && this.isRunning; i++) {
+      await delay(updateInterval);
+      const progress = (i / stepsCount) * 100;
+      const filesStored = Math.floor((progress / 100) * inputDocs);
+      const storageMB = Math.floor((progress / 100) * inputDocs * 2.5); // ~2.5MB per file
+
+      this.updateNode(nodeId, {
+        status: 'running',
+        progress: Math.floor(progress),
+        metrics: {
+          filesStored,
+          totalFiles: inputDocs,
+          storageUsed: `${storageMB} MB`,
+          duration: i * updateInterval,
+        }
+      });
+    }
+
+    if (this.isRunning) {
+      this.updateNode(nodeId, {
+        status: 'complete',
+        progress: 100,
+        metrics: {
+          filesStored: inputDocs,
+          totalFiles: inputDocs,
+          storageUsed: `${Math.floor(inputDocs * 2.5)} MB`,
+          duration: storageDuration,
+          endTime: new Date(),
+        }
+      });
+    }
+  }
+
   // Simulate Monitoring
   async simulateMonitoring(nodeId) {
     const monitoringDuration = 10000; // 10 seconds
@@ -436,8 +485,15 @@ export class WorkflowSimulator {
         case 'ncbi':
         case 'pubmed':
         case 'chembl':
+        case 'cochrane':
         case 'fda':
           await this.simulateSourceFetch(nodeId, config);
+          break;
+        case 's3':
+        case 'box':
+        case 'minio':
+        case 'gdrive':
+          await this.simulateStorage(nodeId, config.maxDocuments || 100);
           break;
         case 'preprocessing':
           await this.simulatePreprocessing(nodeId, config.maxDocuments || 100);
